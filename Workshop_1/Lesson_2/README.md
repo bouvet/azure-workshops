@@ -1,18 +1,30 @@
 # Azure Storage Account
 
-Denne leksjonen tar for seg Azure Storage. Azure Storage er en lagringstjeneste hvor man kan lagre data i Azure på en forholdsvis rimelig måte. En Storage Account kan inneholde fork
+Denne leksjonen tar for seg Azure Storage. Azure Storage er en lagringstjeneste hvor man kan lagre data i Azure på en forholdsvis rimelig måte. En Storage Account kan inneholde forkjellige typer Storage:
 
 * Blobs - For å lagre filer i Containere. 
-* Tables - (Database)-tabeller som lagres i.
+* Tables - NoSQL, No-Schema database
 * Queues - Persistente køer.
 * Files - Filshare
 
 I denne leksjonen skal vi jobbe med blobs for å lagre bildene til app'en i, mens vi oppretter en Table for å lagre metadata om bildene.
 
-https://azure.microsoft.com/en-us/features/storage-explorer/
+Det er 
+* Portalen: Ved å velge Data Explorer 
+* Visual Studio: I Cloud Explorer kan man
+* https://azure.microsoft.com/en-us/features/storage-explorer/
 
+Du velger selv hvilken
 
 ## Opprette storage account og container
+
+
+
+* Portalen. Manuelt opprette ressurser med pek- og klikk. 
+* Powershell: . Kan også kjøres i Azure Shell i nettleseren.
+* Azure CLI. Kryss-platform
+* ARM-templates
+
 
 Forenklet sagt så kan alt du kan gjøre i portalen også gjøres i Powershell (+ mye mer).
 
@@ -41,11 +53,14 @@ Du ønsker kun å gi tilgang for web-applikasjonen din til den en blob-container
 
 Merk at:
 * Det er ikke mulig å "tilbakekalle" et token.
-* Dersom du endrer Access Keys på en Storage Account, så vil access-token
+* Dersom du endrer Access Keys på en Storage Account, så vil access-token bli ugyldig.
 
 
 ## Implementer klasse for
 
-I solution din er det en mock-implementasjon av 
+I solution din er det en tom implementasjon av <interface>. Jobben din er å lage funksjonaliteten som 
 
 1. Implementer
+
+
+
