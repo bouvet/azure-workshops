@@ -1,33 +1,170 @@
-﻿@using System.Configuration
-@{
+﻿@{
     ViewData["Title"] = "Home Page";
-    var foo = ViewData["test"];//ConfigurationManager.AppSettings["Hello"] ?? "wat";
-    
 }
 
 <!-- Client side libs required  -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.css" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/blueimp-gallery/2.25.2/css/blueimp-gallery.min.css" crossorigin="anonymous">
 
-<div class="box content">
-    <hr>
-    <h2>Upload photos</h2>
-    <div>
-        <form action="/api/images/upload"
-              class="dropzone needsclick dz-clickable"
-              id="image-upload"
-              method="post"
-              enctype="multipart/form">
+<style>
+    html {
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    }
 
-            <div class="dz-message needsclick">
-                <span class="note needsclick">
-                    Drop files here or click to upload.
-                </span>
-            </div>
-        </form>
+    main {
+        margin: 20px;
+        text-align: center;
+    }
+
+    .stored-images {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+
+    .image-wrapper {
+        width: 20%;/*calc(20% - 30px);*/
+        margin: auto;
+    }
+
+    .image {
+        width: 20vw;
+        margin: 10px;
+        -webkit-box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.48);
+        -moz-box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.48);
+        box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.48);
+    }
+
+    .dropzone {
+        border: 3px dashed #D5C383;
+        background: #8E7931;
+        color: #D5C383;
+        margin: 25px;
+        border-radius: 5px;
+        max-width: 400px;
+    }
+
+        .dropzone .dz-message {
+            font-weight: 350;
+        }
+
+            .dropzone .dz-message .note {
+                font-family: sans-serif;
+                font-size: 18px;
+                font-weight: 200;
+                display: block;
+                margin-top 1.5rem;
+            }
+</style>
+
+
+<main>
+    <div class="box header">
+        <h1><span class="fa fa-user-circle-o"></span> <span id="page-title">Blob storage</span></h1>
     </div>
-    
-    <div>
-        @foo
+
+    <div class="box content ">
+        <hr>
+        <div class="center-block">
+            <form action="/api/images/upload"
+                  class="dropzone needsclick dz-clickable"
+                  id="image-upload"
+                  method="post"
+                  enctype="multipart/form">
+
+                <div class="dz-message needsclick">
+                    <span class="note needsclick">
+                        Drop images here or click to upload.
+                    </span>
+                </div>
+            </form>
+        </div>
+        <!-- <p><span id="gallery-note">Gallery refreshes from storage container image links every 5 seconds.</span></p> -->
+        <div id="stored-images"></div>
+
+
     </div>
-</div>
+</main>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+<script>
+    // init gallery for later use
+    var gallery = [];
+
+    // Grab links for images from backend api
+    function fetchImageLinks() {
+        // Fetch images
+        $.get("api/Images/thumbnails", function (fetchedImageLinks) {
+            console.log(fetchedImageLinks)
+
+            // Check if anything is in there
+            if (_.isEmpty(fetchedImageLinks)) {
+                console.log('empty fetched')
+                // do nothing
+            } else {
+                // Check if we have a gallery initialized
+
+                // check if images are equal to array
+                console.log('currently in gallery:')
+
+                var imageLinksEqual = _.isEqual(_.sortBy(gallery.map(s => s.split("?")[0])), _.sortBy(fetchedImageLinks.map(s => s.split("?")[0])))
+                if (imageLinksEqual) {
+                    console.log('images arr are equal')
+                    // do nothing
+                } else {
+                    console.log('images arr are not equal')
+
+                    // update gallery with new image urls. Only compare actual url without SAS token query string
+                    var newImageLinks = _.difference(fetchedImageLinks.map(s => s.split("?")[0]), gallery.map(s => s.split("?")[0]))
+
+                    console.log('differene is: ')
+                    console.log(newImageLinks)
+                    // Only add new images
+
+                    var divContainer = document.getElementById("stored-images");
+
+                    _.forEach(newImageLinks, x => {
+
+                        var imageWrapper = document.createElement("span");
+                        imageWrapper.className = "image-wrapper";
+
+                        var imageElement = document.createElement("img");
+                        imageElement.src = x;
+                        imageElement.className = "image";
+
+                        imageWrapper.appendChild(imageElement);
+
+                        divContainer.appendChild(imageWrapper)
+                    });
+
+                    gallery = fetchedImageLinks;
+                }
+
+            }
+        });
+    }
+
+    // Start first interval
+    fetchImageLinks()
+
+    setInterval(function () {
+        fetchImageLinks()
+    }, 5000)
+
+    /* Dropzone */
+    // "imageUpload" is the camelized version of the HTML element's ID
+    Dropzone.options.imageUpload = {
+        paramName: "files", // The name that will be used to transfer the file
+        dictDefaultMessage: "Drop files here or Click to Upload",
+        addRemoveLinks: true, // Allows for cancellation of file upload and remove thumbnail
+        init: function () {
+            myDropzone = this;
+            myDropzone.on("success", function (file, response) {
+                console.log("Success");
+                myDropzone.removeFile(file);
+            });
+        }
+    };
+</script>

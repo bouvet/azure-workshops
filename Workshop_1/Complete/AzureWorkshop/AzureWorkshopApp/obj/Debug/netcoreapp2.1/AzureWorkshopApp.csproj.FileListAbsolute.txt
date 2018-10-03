@@ -25,3 +25,30 @@ D:\repos\bouvet internt\azure-workshops\AzureWorkshop\AzureWorkshopApp\obj\Debug
 D:\repos\bouvet internt\azure-workshops\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.pdb
 D:\repos\bouvet internt\azure-workshops\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.csproj.CopyComplete
 D:\repos\bouvet internt\azure-workshops\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\UserSecretsAssemblyInfo.cs
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\bin\Debug\netcoreapp2.1\AzureWorkshopApp.deps.json
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\bin\Debug\netcoreapp2.1\AzureWorkshopApp.runtimeconfig.json
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\bin\Debug\netcoreapp2.1\AzureWorkshopApp.runtimeconfig.dev.json
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\bin\Debug\netcoreapp2.1\AzureWorkshopApp.dll
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\bin\Debug\netcoreapp2.1\AzureWorkshopApp.pdb
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\bin\Debug\netcoreapp2.1\AzureWorkshopApp.Views.dll
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\bin\Debug\netcoreapp2.1\AzureWorkshopApp.Views.pdb
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.csprojAssemblyReference.cache
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.csproj.CoreCompileInputs.cache
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.RazorAssemblyInfo.cache
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.RazorAssemblyInfo.cs
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\UserSecretsAssemblyInfo.cs
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.AssemblyInfoInputs.cache
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.AssemblyInfo.cs
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.TagHelpers.input.cache
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.TagHelpers.output.cache
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.RazorCoreGenerate.cache
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\Razor\Views\Home\Index.g.cshtml.cs
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\Razor\Views\Shared\_Layout.g.cshtml.cs
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\Razor\Views\_ViewImports.g.cshtml.cs
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\Razor\Views\_ViewStart.g.cshtml.cs
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.RazorTargetAssemblyInfo.cache
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.RazorTargetAssemblyInfo.cs
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.Views.pdb
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.dll
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.pdb
+C:\Source\Repos\azure-workshops\Workshop_1\Complete\AzureWorkshop\AzureWorkshopApp\obj\Debug\netcoreapp2.1\AzureWorkshopApp.csproj.CopyComplete
