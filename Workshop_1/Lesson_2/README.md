@@ -61,7 +61,7 @@ Merk at:
 I solution under Lesson_2 ligger det en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url til de samme bildene.
 
 Implementer metodene:
-* UploadFileToStorage(Stream fileStream, string fileName, AzureStorageConfig storageConfig)
+* UploadFileToStorage (Stream fileStream, string fileName, AzureStorageConfig storageConfig)
     * Lag et StorageCredentials-objekt ved å bruke konfigurasjonen i parameteret storageConfig.
     * Bruk storage credentials til å lage en instans av CloudStorageAccount.
     * Lag en CloudBlobClient vha. storageAccount.CreateCloudBlobClient().
