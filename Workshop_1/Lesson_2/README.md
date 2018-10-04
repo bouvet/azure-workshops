@@ -56,11 +56,17 @@ Merk at:
 * Dersom du endrer Access Keys på en Storage Account, så vil access-token bli ugyldig.
 
 
-## Implementer klasse for
+## Implementer klasse StorageHelper
 
-I solution din er det en tom implementasjon av <interface>. Jobben din er å lage funksjonaliteten som 
+I solution under Lesson_2 ligger det en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url til de samme bildene.
 
-1. Implementer
-
-
+Implementer metodene:
+* UploadFileToStorage(Stream fileStream, string fileName, AzureStorageConfig storageConfig)
+** Lag et StorageCredentials-objekt ved å bruke konfigurasjonen i parameteret storageConfig.
+** Bruk storage credentials til å lage en instans av CloudStorageAccount.
+** Lag en CloudBlobClient vha. storageAccount.CreateCloudBlobClient().
+** Bruk klienten for å hente referanse til kontaineren hvor bildene skal ligge(CloudBlobContainer). Navnet på container ligger i storageConfig.
+** Hent referanse til block blob fra kontaineren vha. container.GetBlockBlobReference(fileName).
+** Last opp filen: await blockBlob.UploadFromStreamAsync(fileStream);
+** Returner 'true'.
 
