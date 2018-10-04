@@ -70,4 +70,4 @@ Implementer metodene:
     * Last opp filen: await blockBlob.UploadFromStreamAsync(fileStream);
     * Returner 'true'.
     
-* GetImageUrls(AzureStorageConfig storageConfig)
+* GetImageUrls (AzureStorageConfig storageConfig)
