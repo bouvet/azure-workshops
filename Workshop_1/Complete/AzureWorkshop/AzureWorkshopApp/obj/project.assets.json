@@ -7534,7 +7534,7 @@
       ]
     },
     "Newtonsoft.Json.Bson/1.0.1": {
-      "sha512": "7J5y3QJSarhluVoDGm+zXNJV51hUitUvcuibJIe1XD4+F0toRWUdkvT790FHStfVK1Lx7mChwnX3GINGpcNvuQ==",
+      "sha512": "qS/rJIv0uWo11UX0mBaGwldsgXj+X+/i6u37ObW9MrbEEeRSujICX51GSfdYS44/vvp8Pupc3Z8tuPMwzddoUA==",
       "type": "package",
       "path": "newtonsoft.json.bson/1.0.1",
       "files": [
@@ -8579,7 +8579,7 @@
       ]
     },
     "System.Diagnostics.FileVersionInfo/4.3.0": {
-      "sha512": "6VRIZxuRqLWpCtU5oGnKuTqwtsAbsIFoX+qgwFhfn34MHuo4eG9nwdOEdKGDpYxKi1hvjFEo291KcFIK/74PEA==",
+      "sha512": "BHn0r6aUFTwX/ZQQOUCYlZJDgWUMK6a6DnZV4x6aDOX7Xc4F+DOkSEia7mSEzwHoXK3yiGy48CPWAHVlbaSdnQ==",
       "type": "package",
       "path": "system.diagnostics.fileversioninfo/4.3.0",
       "files": [
@@ -9025,7 +9025,7 @@
       ]
     },
     "System.Interactive.Async/3.1.1": {
-      "sha512": "jhI9lzgcr7cKS1mRGBvhmKcYLi+u/TJqcZyR2euzyPNosR59CTXn34JVc3f9Q1eAsUwg8ixMvZUUFf7h6Wvlnw==",
+      "sha512": "eR9K+KT6tbkY+VItV+QgnHatvXxqHGgjKH9czrznQLCV/y4929IFxhYd2qlohYbhCcqVHGZ0WynuyPhfVyNRMA==",
       "type": "package",
       "path": "system.interactive.async/3.1.1",
       "files": [
@@ -11978,7 +11978,7 @@
       ]
     },
     "System.ValueTuple/4.3.0": {
-      "sha512": "47EkAdN0dwxLQopuMP457wPuvDbAXt5Q7vQWfr7L2vB6iT/fUviaKUk+am9r5t08k3mPpf4BmuKOUrEh2gfeWQ==",
+      "sha512": "wp9+Wd6lwBgPElTaRmTCNuG9Jkr9FnPE5b3u82J8uPLoTARdOLgzcpQRFC5a48yNwQdd+I1mKR64FaV7XaCV0Q==",
       "type": "package",
       "path": "system.valuetuple/4.3.0",
       "files": [
@@ -12237,7 +12237,7 @@
       ]
     },
     "System.Xml.XPath/4.3.0": {
-      "sha512": "2HLD9Ur8QBW/BBsZ1Xbm7nwtPGxRYcm9Quf9MHM1nIzxEvFxyfG4RBShLJ5z5zVv060Bs05nE00FpE3vkinjFQ==",
+      "sha512": "twrE/IaOdk5d8/OitvhO6ib1GVSv2dXCJVJ7yIQDmgwPyjQ9VXPF3OBhhcjFljpmefECpAcQuHWY2s2nNlxaOg==",
       "type": "package",
       "path": "system.xml.xpath/4.3.0",
       "files": [
@@ -12274,7 +12274,7 @@
       ]
     },
     "System.Xml.XPath.XDocument/4.3.0": {
-      "sha512": "0mC7G6hPwAhi+7R4jeUMxm8Zqs+DmrssqcYBITCCUz2cuKwPaPc2cKh/JqQx3a+meDKjHxSWcWgrUH1GUebl1Q==",
+      "sha512": "87KtEKsiE2e9m1eATXD3rePqLRd6Gr1a6lhOx8tMY+LH14SHBYdACD8sdjjbZyF3qwhuzOaandr64zOeHhHy7A==",
       "type": "package",
       "path": "system.xml.xpath.xdocument/4.3.0",
       "files": [
@@ -12311,7 +12311,7 @@
       ]
     },
     "WindowsAzure.Storage/9.3.1": {
-      "sha512": "s3BpEZRQD9lNKlraWEfbzRLhRUgEl3TMHXsTiHJACwqGJaYEv4kHfm8luxmqJUMZ18hqi3x4XgpwNZ+6E1vBFQ==",
+      "sha512": "1DromuIr4Py2QsqMFuJHZj9OTIPXWfoDyFptnpRD1BQObbRiD8g9I30A8mMzM9r3hpxMnTL+B/f3eo6a0evbxQ==",
       "type": "package",
       "path": "windowsazure.storage/9.3.1",
       "files": [
@@ -12344,23 +12344,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\BjørnTore\\.nuget\\packages\\": {},
+    "C:\\Users\\bjorntore.gjerde\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Source\\Repos\\azure-workshops\\Workshop_1\\Complete\\AzureWorkshop\\AzureWorkshopApp\\AzureWorkshopApp.csproj",
+      "projectUniqueName": "C:\\Repos\\azure-workshops\\Workshop_1\\Complete\\AzureWorkshop\\AzureWorkshopApp\\AzureWorkshopApp.csproj",
       "projectName": "AzureWorkshopApp",
-      "projectPath": "C:\\Source\\Repos\\azure-workshops\\Workshop_1\\Complete\\AzureWorkshop\\AzureWorkshopApp\\AzureWorkshopApp.csproj",
-      "packagesPath": "C:\\Users\\BjørnTore\\.nuget\\packages\\",
-      "outputPath": "C:\\Source\\Repos\\azure-workshops\\Workshop_1\\Complete\\AzureWorkshop\\AzureWorkshopApp\\obj\\",
+      "projectPath": "C:\\Repos\\azure-workshops\\Workshop_1\\Complete\\AzureWorkshop\\AzureWorkshopApp\\AzureWorkshopApp.csproj",
+      "packagesPath": "C:\\Users\\bjorntore.gjerde\\.nuget\\packages\\",
+      "outputPath": "C:\\Repos\\azure-workshops\\Workshop_1\\Complete\\AzureWorkshop\\AzureWorkshopApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\BjørnTore\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\bjorntore.gjerde\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -12368,7 +12368,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\BjørnTore\\.dotnet\\NuGetFallbackFolder": {},
+        "C:\\Users\\bjorntore.gjerde\\.dotnet\\NuGetFallbackFolder": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
