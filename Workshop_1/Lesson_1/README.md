@@ -19,7 +19,7 @@ en av de Europeiske (Western eller Northern)
 2. Bygg prosjektet. 
 3. Høyreklikk på prosjektet og velg "Publish". Logg så inn med 
 4. Se at <>.azurewebsites.net
-5. Legg merke til at IP-adressen nede ikke endres, selv om du trykker F5 flere ganger i nettleseren.
+5. Legg merke til at IP-adressen oppe til høyre ikke endres, selv om du trykker F5 flere ganger i nettleseren.
 
 ## Test av skalering 
 
