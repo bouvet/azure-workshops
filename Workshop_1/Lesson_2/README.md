@@ -62,11 +62,11 @@ I solution under Lesson_2 ligger det en klasse som heter StorageHelper hvor det 
 
 Implementer metodene:
 * UploadFileToStorage(Stream fileStream, string fileName, AzureStorageConfig storageConfig)
-** Lag et StorageCredentials-objekt ved å bruke konfigurasjonen i parameteret storageConfig.
-** Bruk storage credentials til å lage en instans av CloudStorageAccount.
-** Lag en CloudBlobClient vha. storageAccount.CreateCloudBlobClient().
-** Bruk klienten for å hente referanse til kontaineren hvor bildene skal ligge(CloudBlobContainer). Navnet på container ligger i storageConfig.
-** Hent referanse til block blob fra kontaineren vha. container.GetBlockBlobReference(fileName).
-** Last opp filen: await blockBlob.UploadFromStreamAsync(fileStream);
-** Returner 'true'.
+    * Lag et StorageCredentials-objekt ved å bruke konfigurasjonen i parameteret storageConfig.
+    * Bruk storage credentials til å lage en instans av CloudStorageAccount.
+    * Lag en CloudBlobClient vha. storageAccount.CreateCloudBlobClient().
+    * Bruk klienten for å hente referanse til kontaineren hvor bildene skal ligge(CloudBlobContainer). Navnet på container ligger i storageConfig.
+    * Hent referanse til block blob fra kontaineren vha. container.GetBlockBlobReference(fileName).
+    * Last opp filen: await blockBlob.UploadFromStreamAsync(fileStream);
+    * Returner 'true'.
 
