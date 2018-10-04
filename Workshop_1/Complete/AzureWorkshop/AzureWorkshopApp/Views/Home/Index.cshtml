@@ -1,9 +1,15 @@
-﻿@{
+﻿@using System.Net
+@using System.Net.Sockets
+@{
     ViewData["Title"] = "Home Page";
+    ViewData["IpAddress"] = Dns.GetHostAddresses(Dns.GetHostName()).FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
 }
 
 <!-- Client side libs required  -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.css" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 
 <style>
     html {
@@ -22,21 +28,38 @@
 
     .stored-images {
         display: flex;
+        -moz-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+        -o-flex-wrap: wrap;
+        -webkit-flex-wrap: wrap;
         flex-wrap: wrap;
         flex-direction: row;
     }
 
     .image-wrapper {
-        width: 20%; /*calc(20% - 30px);*/
         margin: auto;
     }
 
     .image {
-        width: 20vw;
+        width: calc(33% - 20px);
         margin: 10px;
         -webkit-box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.48);
         -moz-box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.48);
         box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.48);
+    }
+
+    @@media only screen and (min-device-width : 320px) and (max-device-width : 700px) {
+        .image {
+            width: 100%;
+        }
+    }
+
+    #ip-address {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding-top: 10px;
+        padding-right: 16px;
     }
 
     .dropzone {
@@ -44,12 +67,13 @@
         background: #8E7931;
         color: #D5C383;
         margin: 25px;
+        -ms-border-radius: 5px;
         border-radius: 5px;
         max-width: 400px;
     }
 
         .dropzone .dz-message {
-            font-weight: 350;
+            font-weight: 300;
         }
 
             .dropzone .dz-message .note {
@@ -67,6 +91,8 @@
         <h1><span class="fa fa-user-circle-o"></span> <span id="page-title">Blob storage</span></h1>
     </div>
 
+    <aside id="ip-address">IP: @ViewData["IpAddress"]</aside>
+
     <div class="box content">
         <hr>
         <div class="form-wrapper">
@@ -83,73 +109,54 @@
                 </div>
             </form>
         </div>
-        <!-- <p><span id="gallery-note">Gallery refreshes from storage container image links every 5 seconds.</span></p> -->
         <div id="stored-images"></div>
-
-
     </div>
 </main>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-
 <script>
-    // init gallery for later use
     var gallery = [];
 
-    // Grab links for images from backend api
     function fetchImageLinks() {
-        // Fetch images
-        $.get("api/Images/thumbnails", function (fetchedImageLinks) {
-            console.log(fetchedImageLinks)
-
-            // Check if anything is in there
+        $.get("api/Images", function (fetchedImageLinks) {
             if (_.isEmpty(fetchedImageLinks)) {
-                console.log('empty fetched')
-                // do nothing
-            } else {
-                // Check if we have a gallery initialized
-
-                // check if images are equal to array
-                console.log('currently in gallery:')
-
-                var imageLinksEqual = _.isEqual(_.sortBy(gallery.map(s => s.split("?")[0])), _.sortBy(fetchedImageLinks.map(s => s.split("?")[0])))
-                if (!imageLinksEqual) {
-                    // update gallery with new image urls. Only compare actual url without SAS token query string
-                    var newImageLinks = _.difference(fetchedImageLinks.map(s => s.split("?")[0]), gallery.map(s => s.split("?")[0]))
-
-                    console.log(newImageLinks)
-                    // Only add new images
-
-                    var divContainer = document.getElementById("stored-images");
-
-                    _.forEach(newImageLinks, x => {
-
-                        var imageWrapper = document.createElement("span");
-                        imageWrapper.className = "image-wrapper";
-
-                        var imageElement = document.createElement("img");
-                        imageElement.src = x;
-                        imageElement.className = "image";
-
-                        imageWrapper.appendChild(imageElement);
-
-                        divContainer.appendChild(imageWrapper);
-                    });
-
-                    gallery = fetchedImageLinks;
-                }
+                return;
             }
+
+            var imageLinksEqual = _.isEqual(_.sortBy(gallery.map(s => s.split("?")[0])),
+                _.sortBy(fetchedImageLinks.map(s => s.split("?")[0])));
+            if (!imageLinksEqual) {
+                var newImageLinks = _.difference(fetchedImageLinks.map(s => s.split("?")[0]),
+                    gallery.map(s => s.split("?")[0]));
+
+                var divContainer = document.getElementById("stored-images");
+
+                _.forEach(newImageLinks, x => {
+
+                    var imageWrapper = document.createElement("span");
+                    imageWrapper.className = "image-wrapper";
+
+                    var imageElement = document.createElement("img");
+                    imageElement.src = x;
+                    imageElement.className = "image";
+
+                    imageWrapper.appendChild(imageElement);
+
+                    divContainer.appendChild(imageWrapper);
+                });
+
+                gallery = fetchedImageLinks;
+            }
+
         });
     }
 
-    // Start first interval
-    fetchImageLinks()
+    fetchImageLinks();
 
+    // Poll for changes
     setInterval(function () {
-        fetchImageLinks()
-    }, 5000)
+        fetchImageLinks();
+    },
+        5000);
 
     /* Dropzone */
     // "imageUpload" is the camelized version of the HTML element's ID

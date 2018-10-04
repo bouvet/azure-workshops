@@ -49,9 +49,9 @@ namespace AzureWorkshopApp.Helpers
             return await Task.FromResult(true);
         }
 
-        public static async Task<List<string>> GetThumbNailUrls(AzureStorageConfig storageConfig)
+        public static async Task<List<string>> GetImageUrls(AzureStorageConfig storageConfig)
         {
-            List<string> thumbnailUrls = new List<string>();
+            List<string> imageUrls = new List<string>();
 
             // Create storagecredentials object by reading the values from the configuration (appsettings.json)
             StorageCredentials storageCredentials = new StorageCredentials(storageConfig.AccountName, storageConfig.AccountKey);
@@ -77,7 +77,7 @@ namespace AzureWorkshopApp.Helpers
 
                 foreach (var blobItem in resultSegment.Results)
                 {
-                    thumbnailUrls.Add(blobItem.StorageUri.PrimaryUri.ToString());
+                    imageUrls.Add(blobItem.StorageUri.PrimaryUri.ToString());
                 }
 
                 //Get the continuation token.
@@ -86,7 +86,7 @@ namespace AzureWorkshopApp.Helpers
 
             while (continuationToken != null);
 
-            return await Task.FromResult(thumbnailUrls);
+            return await Task.FromResult(imageUrls);
         }
     }
 }

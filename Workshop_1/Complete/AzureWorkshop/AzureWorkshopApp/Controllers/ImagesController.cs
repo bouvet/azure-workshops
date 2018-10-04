@@ -34,7 +34,7 @@ namespace AzureWorkshopApp.Controllers
 
                 if (_storageConfig.AccountKey == string.Empty || _storageConfig.AccountName == string.Empty)
 
-                    return BadRequest("sorry, can't retrieve your azure storage details from appsettings.js, make sure that you add azure storage details there");
+                    return BadRequest("Sorry, can't retrieve your azure storage details from appsettings.js, make sure that you add azure storage details there");
 
                 if (_storageConfig.ImageContainer == string.Empty)
 
@@ -56,9 +56,9 @@ namespace AzureWorkshopApp.Controllers
 
                 if (isUploaded)
                 {
-                    if (_storageConfig.ThumbnailContainer != string.Empty)
+                    if (_storageConfig.ImageContainer != string.Empty)
 
-                        return new AcceptedAtActionResult("GetThumbNails", "Images", null, null);
+                        return new AcceptedAtActionResult("GetImages", "Images", null, null);
 
                     return new AcceptedResult();
                 }
@@ -71,15 +71,15 @@ namespace AzureWorkshopApp.Controllers
             }
         }
 
-        // GET /api/images/thumbnails
-        [HttpGet("thumbnails")]
-        public async Task<IActionResult> GetThumbNails()
+        // GET /api/images
+        [HttpGet]
+        public async Task<IActionResult> GetImages()
         {
             try
             {
                 if (_storageConfig.AccountKey == string.Empty || _storageConfig.AccountName == string.Empty)
                 {
-                    return BadRequest("sorry, can't retrieve your azure storage details from appsettings.js, make sure that you add azure storage details there");
+                    return BadRequest("Sorry, can't retrieve your azure storage details from appsettings.js, make sure that you add azure storage details there");
                 }
 
                 if (_storageConfig.ImageContainer == string.Empty)
@@ -87,9 +87,9 @@ namespace AzureWorkshopApp.Controllers
                     return BadRequest("Please provide a name for your image container in the azure blob storage");
                 }
 
-                var thumbnailUrls = await StorageHelper.GetThumbNailUrls(_storageConfig);
+                var imageUrls = await StorageHelper.GetImageUrls(_storageConfig);
 
-                return new ObjectResult(thumbnailUrls);
+                return new ObjectResult(imageUrls);
             }
             catch (Exception ex)
             {
