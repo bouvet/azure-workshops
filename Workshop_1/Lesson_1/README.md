@@ -1,8 +1,8 @@
 # App Service
 
-App Service er en av de mest brukte tjenesten i Azure, og 
+App Service er en av de mest brukte tjenesten i Azure, og er en paraply-betegnelse for flere tjenester som bruker samme underliggende infrastruktur.
 
-Mere informasjon om App Services
+Mere informasjon om App Services finnes her.
 
 
 ## Opprette Web App (App Services)
@@ -29,5 +29,5 @@ en av de Europeiske (Western eller Northern)
 4. Trykk så gjentatte ganger på F5 i nettleseren og se at IP-adressen.
 5. Sett så tilbake 1 instans og velg Free tier igjen, så slipper 
 
-##
+
 
