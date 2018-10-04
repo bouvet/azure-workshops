@@ -69,4 +69,5 @@ Implementer metodene:
     * Hent referanse til block blob fra kontaineren vha. container.GetBlockBlobReference(fileName).
     * Last opp filen: await blockBlob.UploadFromStreamAsync(fileStream);
     * Returner 'true'.
-
+    
+* GetImageUrls(AzureStorageConfig storageConfig)
