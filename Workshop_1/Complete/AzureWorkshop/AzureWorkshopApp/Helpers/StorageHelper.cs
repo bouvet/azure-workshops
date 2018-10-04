@@ -63,7 +63,7 @@ namespace AzureWorkshopApp.Helpers
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
             // Get reference to the container
-            CloudBlobContainer container = blobClient.GetContainerReference(storageConfig.ThumbnailContainer);
+            CloudBlobContainer container = blobClient.GetContainerReference(storageConfig.ImageContainer);
 
             BlobContinuationToken continuationToken = null;
 
