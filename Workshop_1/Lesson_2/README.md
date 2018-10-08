@@ -50,7 +50,7 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
 
    __UploadFileToStorage (Stream fileStream, string fileName, AzureStorageConfig storageConfig)__
    
-   Følgende klasser og metoder ble brukt i løsningsforslaget.
+   Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
 
    | Klasse              | Metoder               |
    |---------------------|-----------------------|
@@ -64,7 +64,7 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
    
    __GetImageUrls (AzureStorageConfig storageConfig)__
    
-   Følgende klasser og metoder ble brukt i løsningsforslaget.
+   Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
    
    | Klasse              | Metoder               |
    |---------------------|-----------------------|
