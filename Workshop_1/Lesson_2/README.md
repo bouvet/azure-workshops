@@ -60,7 +60,7 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
    | CloudBlobContainer  | GetBlockBlobReference |
    | CloudBlockBlob      | UploadFromStreamAsync |
     
-4. Implementer metoden for å hente ut URL til de blob-ene.
+4. Implementer metoden for å hente ut URL-er til blob-ene.
    
    __GetImageUrls (AzureStorageConfig storageConfig)__
    
