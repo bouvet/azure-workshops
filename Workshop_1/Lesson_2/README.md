@@ -44,7 +44,9 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
 
 1. Legg til NuGet-pakke for Azure Storage: WindowsAzure.Storage.
 
-2. Implementer metoden for å laste opp fil:
+2. Hent ut AccountName og AccountKey for storage kontoen du opprettet tidligere og legg disse i appsettings.json.
+
+3. Implementer metoden for å laste opp fil:
 
    __UploadFileToStorage (Stream fileStream, string fileName, AzureStorageConfig storageConfig)__
    
@@ -58,7 +60,7 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
    | CloudBlobContainer  | GetBlockBlobReference |
    | CloudBlockBlob      | UploadFromStreamAsync |
     
-3. Implementer metoden for å hente ut URL til de blob-ene.
+4. Implementer metoden for å hente ut URL til de blob-ene.
    
    __GetImageUrls (AzureStorageConfig storageConfig)__
    
