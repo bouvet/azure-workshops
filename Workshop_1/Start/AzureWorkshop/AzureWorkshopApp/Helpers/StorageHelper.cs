@@ -5,9 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzureWorkshopApp.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace AzureWorkshopApp.Helpers
 {
@@ -28,23 +25,6 @@ namespace AzureWorkshopApp.Helpers
 
         public static async Task<bool> UploadFileToStorage(Stream fileStream, string fileName, AzureStorageConfig storageConfig)
         {
-            // Create storagecredentials object by reading the values from the configuration (appsettings.json)
-            StorageCredentials storageCredentials = new StorageCredentials(storageConfig.AccountName, storageConfig.AccountKey);
-
-            // Create cloudstorage account by passing the storagecredentials
-            CloudStorageAccount storageAccount = new CloudStorageAccount(storageCredentials, true);
-
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
-            // Get reference to the blob container by passing the name by reading the value from the configuration (appsettings.json)
-            CloudBlobContainer container = blobClient.GetContainerReference(storageConfig.ImageContainer);
-
-            // Get the reference to the block blob from the container
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
-
-            // Upload the file
-            await blockBlob.UploadFromStreamAsync(fileStream);
 
             return await Task.FromResult(true);
         }
@@ -53,38 +33,6 @@ namespace AzureWorkshopApp.Helpers
         {
             List<string> imageUrls = new List<string>();
 
-            // Create storagecredentials object by reading the values from the configuration (appsettings.json)
-            StorageCredentials storageCredentials = new StorageCredentials(storageConfig.AccountName, storageConfig.AccountKey);
-
-            // Create cloudstorage account by passing the storagecredentials
-            CloudStorageAccount storageAccount = new CloudStorageAccount(storageCredentials, true);
-
-            // Create blob client
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
-            // Get reference to the container
-            CloudBlobContainer container = blobClient.GetContainerReference(storageConfig.ImageContainer);
-
-            BlobContinuationToken continuationToken = null;
-
-            //Call ListBlobsSegmentedAsync and enumerate the result segment returned, while the continuation token is non-null.
-            //When the continuation token is null, the last page has been returned and execution can exit the loop.
-            do
-            {
-                //This overload allows control of the page size. You can return all remaining results by passing null for the maxResults parameter,
-                //or by calling a different overload.
-                BlobResultSegment resultSegment = await container.ListBlobsSegmentedAsync("", true, BlobListingDetails.All, 10, continuationToken, null, null);
-
-                foreach (var blobItem in resultSegment.Results)
-                {
-                    imageUrls.Add(blobItem.StorageUri.PrimaryUri.ToString());
-                }
-
-                //Get the continuation token.
-                continuationToken = resultSegment.ContinuationToken;
-            }
-
-            while (continuationToken != null);
 
             return await Task.FromResult(imageUrls);
         }
