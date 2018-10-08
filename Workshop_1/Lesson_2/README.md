@@ -16,7 +16,7 @@ Det er flere måter
 
 Du velger selv hvilken metode du ønsker å prøve ut.
 
-## Opprette storage account og container for blobs.
+## Opprette storage account og container for blobs
 
 Det er flere metoder for å opprette ressurser i Azure. De mest vanlige er her:
 
@@ -50,7 +50,7 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
 
    __UploadFileToStorage (Stream fileStream, string fileName, AzureStorageConfig storageConfig)__
    
-   Følgende klasser og metoder ble brukt da vi implementerte løsningsforslaget.
+   Følgende klasser og metoder ble brukt i løsningsforslaget.
 
    | Klasse              | Metoder               |
    |---------------------|-----------------------|
@@ -63,6 +63,8 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
 4. Implementer metoden for å hente ut URL-er til blob-ene.
    
    __GetImageUrls (AzureStorageConfig storageConfig)__
+   
+   Følgende klasser og metoder ble brukt i løsningsforslaget.
    
    | Klasse              | Metoder               |
    |---------------------|-----------------------|
