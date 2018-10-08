@@ -16,7 +16,7 @@ Det er flere måter
 
 Du velger selv hvilken metode du ønsker å prøve ut.
 
-## Opprette storage account og container for blobs.
+## Opprette storage account og container for blobs
 
 Det er flere metoder for å opprette ressurser i Azure. De mest vanlige er her:
 
@@ -40,7 +40,7 @@ For å opprette en storage account og en blob-container ved å bruke Powershell.
 
 ## Implementer klasse StorageHelper
 
-Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url-ene til de samme bildene.
+I solution ligger en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url-ene til de samme bildene.
 
 1. Legg til NuGet-pakke for Azure Storage: WindowsAzure.Storage.
 
@@ -50,7 +50,7 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
 
    __UploadFileToStorage (Stream fileStream, string fileName, AzureStorageConfig storageConfig)__
    
-   Følgende klasser og metoder ble brukt da vi implementerte løsningsforslaget.
+   Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
 
    | Klasse              | Metoder               |
    |---------------------|-----------------------|
@@ -64,13 +64,14 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
    
    __GetImageUrls (AzureStorageConfig storageConfig)__
    
+   Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
+   
    | Klasse              | Metoder               |
    |---------------------|-----------------------|
    | StorageCredentials  |                       |
    | CloudStorageAccount | CreateCloudBlobClient |
    | CloudBlobClient     | GetContainerReference |
    | CloudBlobContainer  | GetBlockBlobReference, ListBlobsSegmentedAsync |
-   | CloudBlockBlob      | UploadFromStreamAsync |
    | BlobContinuationToken | Lag for eksempel en do-while. Start med å kalle ListBlobsSegmentedAsync og enumerer resultat-segmentet som returneres. Fortsett å gjøre dette så lenge continuation token i resultat-segmentet ikke er null. Når continuation tokenet er null, så har det siste segmentet blitt returnert og loopen kan brytes. |
    
 
