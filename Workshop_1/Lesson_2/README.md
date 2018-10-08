@@ -71,3 +71,5 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
    | CloudBlockBlob      | UploadFromStreamAsync |
    | BlobContinuationToken | Lag for eksempel en do-while. Start med å kalle ListBlobsSegmentedAsync og enumerer resultat-segmentet som returneres. Fortsett å gjøre dette så lenge continuation token i resultat-segmentet ikke er null. Når continuation tokenet er null, så har det siste segmentet blitt returnert og loopen kan brytes. |
    
+
+## Deploy og test
