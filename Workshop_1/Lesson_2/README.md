@@ -5,38 +5,38 @@ Denne leksjonen tar for seg Azure Storage. Azure Storage er en lagringstjeneste 
 * Blobs - For å lagre filer i Containere. 
 * Tables - NoSQL, No-Schema database
 * Queues - Persistente køer.
-* Files - Filshare
+* Files - Filer som oppfører seg om et filshare.
 
-I denne leksjonen skal vi jobbe med blobs for å lagre bildene til app'en i, mens vi oppretter en Table for å lagre metadata om bildene.
+I denne leksjonen skal vi jobbe med blobs for å lagre bildene til app'en i.
 
-Det er 
+Det er flere måter 
 * Portalen: Ved å velge Data Explorer 
-* Visual Studio: I Cloud Explorer kan man
-* https://azure.microsoft.com/en-us/features/storage-explorer/
+* Visual Studio: I Cloud Explorer i Visual Studio kan man gjøre
+* Azure Storage Explorer: Azure Storage Explorer er en klient fra Microsoft for å administrere og bruke Storage Accounts: https://azure.microsoft.com/en-us/features/storage-explorer/
 
-Du velger selv hvilken
+Du velger selv hvilken metode du ønsker å prøve ut.
 
-## Opprette storage account og container
+## Opprette storage account og container for blobs.
 
-
+Det er flere metoder for å opprette ressurser i Azure. De mest vanlige er her:
 
 * Portalen. Manuelt opprette ressurser med pek- og klikk. 
-* Powershell: . Kan også kjøres i Azure Shell i nettleseren.
-* Azure CLI. Kryss-platform
-* ARM-templates
+* Powershell: Det finnes egne Powershell-moduler (AzureRM f.eks.) for å administrere Azure. Powershell også kjøres i Azure Shell i nettleseren.
+* Azure CLI. Kryss-plattform shell som blant annet finnes både på Windows, Mac og Linux
+* ARM-templates - deklarativ beskrivelse av Azure-komponenter og infrastruktur i JSON-format. 
 
+I denne leksjonen skal du bruke Powershell for å opprette en Storage Account og en Blob-Container.
+Hovedregelen er at alt du kan gjøre i portalen kan du også gjøre via Powershell, og det er også mye 
 
-Forenklet sagt så kan alt du kan gjøre i portalen også gjøres i Powershell (+ mye mer).
+For å opprette en storage account og en blob-container ved å bruke Powershell. 
 
-For å opprette en storage account og en blob-container ved å bruke Powershell.
-
-1. Start et Powershell kommandolinjevindu
-2. (Hvis du ikke har Install-Module )
+1. Start et Powershell kommandolinjevindu, eller bruk Azure Shell.
+2. (Hvis du bruker ikke har gjort dette før,Install-Module AzureRM)
 3. Autentiser deg mot din Azure-konto med kommandoen: Login-AzureRmAccount
-3. Gå til for å lære hvordan : https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-powershell 
-4. Opprett en storage account i samme ressursgruppe som du opprettet i leksjon 1.
-5. Opprett en blob-container i storage account.
-6. Test containeren ved å laste opp en fil ved enten å bruke Storage Explorer, Visual Studio eller Powershell
+4. Gå til denne siden for å lære hvordan det utføres: https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-powershell 
+5. Opprett en storage account i samme ressursgruppe som du opprettet i leksjon 1.
+6. Opprett en blob-container i storage account.
+7. Test containeren ved å laste opp en fil ved enten å bruke Storage Explorer, Visual Studio eller Powershell.
 
 ## Opprette SAS-token
 

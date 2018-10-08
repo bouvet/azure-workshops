@@ -1,6 +1,6 @@
 # Bonus Lesson
 
-## Lagring av tag's på bildene.
+## Lagring av tag på bildene dine.
 
 Legg til funksjonalitet i Web-applikasjonen din for å legge.
 
