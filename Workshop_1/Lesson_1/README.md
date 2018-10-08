@@ -36,7 +36,7 @@ Mere informasjon om App Services finnes her: https://azure.microsoft.com/en-us/s
 
 ##  Deploy 
 
-1. Åpne solution Lesson1/
+1. Åpne solution som ligger i mappen Start.
 2. Bygg prosjektet. 
 3. Høyreklikk på prosjektet og velg "Publish". Logg så inn med 
 4. Se at <appservicenavn>.azurewebsites.net
