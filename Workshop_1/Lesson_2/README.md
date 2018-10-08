@@ -58,16 +58,33 @@ Merk at:
 
 ## Implementer klasse StorageHelper
 
-I solution under Lesson_2 ligger det en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url til de samme bildene.
+Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url-ene til de samme bildene.
 
-Implementer metodene:
-* UploadFileToStorage (Stream fileStream, string fileName, AzureStorageConfig storageConfig)
-    * Lag et StorageCredentials-objekt ved å bruke konfigurasjonen i parameteret storageConfig.
-    * Bruk storage credentials til å lage en instans av CloudStorageAccount.
-    * Lag en CloudBlobClient vha. storageAccount.CreateCloudBlobClient().
-    * Bruk klienten for å hente referanse til kontaineren hvor bildene skal ligge(CloudBlobContainer). Navnet på container ligger i storageConfig.
-    * Hent referanse til block blob fra kontaineren vha. container.GetBlockBlobReference(fileName).
-    * Last opp filen: await blockBlob.UploadFromStreamAsync(fileStream);
-    * Returner 'true'.
+1. Legg til NuGet-pakke for Azure Storage: WindowsAzure.Storage.
+
+2. Implementer metoden for å laste opp fil:
+
+   __UploadFileToStorage (Stream fileStream, string fileName, AzureStorageConfig storageConfig)__
+   
+   Følgende klasser og metoder ble brukt da vi implementerte løsningsforslaget.
+
+   | Klasse              | Metoder               |
+   |---------------------|-----------------------|
+   | StorageCredentials  |                       |
+   | CloudStorageAccount | CreateCloudBlobClient |
+   | CloudBlobClient     | GetContainerReference |
+   | CloudBlobContainer  | GetBlockBlobReference |
+   | CloudBlockBlob      | UploadFromStreamAsync |
     
-* GetImageUrls (AzureStorageConfig storageConfig)
+3. Implementer metoden for å hente ut URL til de blob-ene.
+   
+   __GetImageUrls (AzureStorageConfig storageConfig)__
+   
+   | Klasse              | Metoder               |
+   |---------------------|-----------------------|
+   | StorageCredentials  |                       |
+   | CloudStorageAccount | CreateCloudBlobClient |
+   | CloudBlobClient     | GetContainerReference |
+   | CloudBlobContainer  | GetBlockBlobReference, ListBlobsSegmentedAsync |
+   | CloudBlockBlob      | UploadFromStreamAsync |
+   | BlobContinuationToken |                     |
