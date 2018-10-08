@@ -38,24 +38,6 @@ For å opprette en storage account og en blob-container ved å bruke Powershell.
 6. Opprett en blob-container i storage account.
 7. Test containeren ved å laste opp en fil ved enten å bruke Storage Explorer, Visual Studio eller Powershell.
 
-## Opprette SAS-token
-
-Et SAS-token (Shared Access Signature) en som følger Key-Valet patternet. Det er et tidsbegrenset token hvor eieren av ressursen gir en annen bruker en tidsbegrenset tilgang til ressursen.
-
-
-
-Du ønsker kun å gi tilgang for web-applikasjonen din til den en blob-containeren i storage accounten, og derfor oppretter du et to SAS-token.
-
-1. Bruk 
-
-
-5. Gjenta 
-
-Merk at:
-* Det er ikke mulig å "tilbakekalle" et token.
-* Dersom du endrer Access Keys på en Storage Account, så vil access-token bli ugyldig.
-
-
 ## Implementer klasse StorageHelper
 
 Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url-ene til de samme bildene.
@@ -88,3 +70,4 @@ Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det
    | CloudBlobContainer  | GetBlockBlobReference, ListBlobsSegmentedAsync |
    | CloudBlockBlob      | UploadFromStreamAsync |
    | BlobContinuationToken | Lag for eksempel en do-while. Start med å kalle ListBlobsSegmentedAsync og enumerer resultat-segmentet som returneres. Fortsett å gjøre dette så lenge continuation token i resultat-segmentet ikke er null. Når continuation tokenet er null, så har det siste segmentet blitt returnert og loopen kan brytes. |
+   
