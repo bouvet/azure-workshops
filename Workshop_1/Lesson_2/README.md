@@ -40,7 +40,7 @@ For å opprette en storage account og en blob-container ved å bruke Powershell.
 
 ## Implementer klasse StorageHelper
 
-Under Lesson_2 ligger en solution med en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url-ene til de samme bildene.
+I solution ligger en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url-ene til de samme bildene.
 
 1. Legg til NuGet-pakke for Azure Storage: WindowsAzure.Storage.
 
