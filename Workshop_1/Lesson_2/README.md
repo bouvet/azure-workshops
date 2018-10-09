@@ -9,7 +9,8 @@ Denne leksjonen tar for seg Azure Storage. Azure Storage er en lagringstjeneste 
 
 I denne leksjonen skal vi jobbe med blobs for å lagre bildene til app'en i.
 
-Det er flere måter 
+Det er flere måter:
+
 * Portalen: Ved å velge Data Explorer.
 * Visual Studio: I Cloud Explorer i Visual Studio kan man gjøre.
 * Azure Storage Explorer: Azure Storage Explorer er en klient fra Microsoft for å administrere og bruke Storage Accounts: https://azure.microsoft.com/en-us/features/storage-explorer/
