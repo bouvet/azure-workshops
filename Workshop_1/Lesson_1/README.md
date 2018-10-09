@@ -32,7 +32,7 @@ Mere informasjon om App Services finnes her: https://azure.microsoft.com/en-us/s
 For å opprette ressurser med portalen i Azure, så går du til https://portal.azure.com og logger inn med din Microsoft konto. Opprett ressurser ved å trykke "Create a resource" i venstre hjørne.
 
 1. Opprett en ressursgruppe (Resource Group). Du kan velge hvilken datasenter du vil det skal ligge i, men pga latency anbefales det en av de europeiske. (Western eller Northern). Test gjerne med Azure Speed Test for å kunne ta en avgjørelse: http://www.azurespeed.com/
-2. Opprett en Web App med navn <appservicenavn>. Dette navnet må være unikt i hele Azure, da den vil kunne nås fra <appservicenavn>.azurewebsites.net. Velg samme ressursgruppe som du valgte i 1). Når du skal velge App Service Plan kan du opprette en i Free tier (merket F under Dev/Test fanen). Du bør også velge samme datasenter som du valgte i 1).
+2. Opprett en Web App med navn &lt;appservicenavn&gt;. Dette navnet må være unikt i hele Azure, da den vil kunne nås fra &lt;appservicenavn&gt;.azurewebsites.net. Velg samme ressursgruppe som du valgte i 1). Når du skal velge App Service Plan kan du opprette en i Free tier (merket F under Dev/Test fanen). Du bør også velge samme datasenter som du valgte i 1).
  
 
 ##  Deploy 
