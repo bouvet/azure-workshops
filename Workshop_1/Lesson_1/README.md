@@ -1,4 +1,4 @@
-# Leksjon 1
+# Leksjon 1: Intro
 
 I denne leksjonen skal du:
 

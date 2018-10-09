@@ -1,10 +1,11 @@
-# Azure Key Vault
+# Leksjon 3: Azure Key Vault
 
 Denne leksjonen tar for seg Azure Key Vault. Azure Key Vault er et verktøy for sikker lagring og aksessering av secrets. Dette kan være f.eks. API-nøkler, passord eller sertifikater, ting man gjerne ikke vil ha liggende rundt i configfiler (eller kode.)
 
 Les mer her: https://docs.microsoft.com/en-in/azure/key-vault/key-vault-whatis
 
 ## Opprett key vault
+
 Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal opprette et key vault og kode om applikasjonen til å benytte dette.
 
 1. I Visual Studio, høyreklikk på Connected Services i for prosjektet og velg Add connected service.
@@ -14,6 +15,7 @@ Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal o
 5. Klikk Generate/Import
 6. Lag en nøkkel med navn AzureStorageAccountName og value som den står i AccountName fra appsettings.json
 7. Lag en nøkkel med navn AzureStorageAccountKey og value som den står i AccountKey fra appsettings.json
+
 
 ## Bruk key vault
 
