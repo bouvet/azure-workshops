@@ -22,7 +22,7 @@ Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal o
 Vi ønsker nå at applikasjonen skal bruke verdiene satt i Key Vault fremfor den gamle config-filen.
 
 1. Gå til Startup.cs og fjern configurasjonen av AzureStorageConfig.
-2. Legg inn services.AddTransient<AzureStorageConfig>();
+2. Legg inn `services.AddTransient&lt;AzureStorageConfig&gt;()`;
 3. Gå til AzureStorageConfig.cs og legg til følgende ctor:
 
 ```
