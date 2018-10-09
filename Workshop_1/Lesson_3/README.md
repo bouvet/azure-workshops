@@ -25,12 +25,14 @@ Vi ønsker nå at applikasjonen skal bruke verdiene satt i Key Vault fremfor den
 2. Legg inn services.AddTransient<AzureStorageConfig>();
 3. Gå til AzureStorageConfig.cs og legg til følgende ctor:
 
+```
 public AzureStorageConfig(Microsoft.Extensions.Configuration.IConfiguration azureKeyVaultConfig)
 {
     AccountName = azureKeyVaultConfig["AzureStorageAccountName"];
     AccountKey = azureKeyVaultConfig["AzureStorageAccountKey"];
     ImageContainer = "imagecontainer";
 }
+```
 
 ImageContainer kunne med computer science blitt hentet fra appsettings på samme måte som før, siden dette ikke er sensitivt.
 
