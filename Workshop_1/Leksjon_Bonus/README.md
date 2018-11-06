@@ -20,17 +20,20 @@ Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal o
 
 ### Bruk key vault
 
-Vi ønsker nå at applikasjonen skal bruke verdiene satt i Key Vault fremfor den gamle config-filen. Heldigvis er det godt støtte i .net core for å ta i bruk dette.
+Vi ønsker nå at applikasjonen skal bruke verdiene satt i Key Vault fremfor den gamle config-filen. Heldigvis er det god støtte i .net core for å ta i bruk dette.
 
-1. Vi starter med å legge til noen nuget-pakker:
+Start med å gå til appsettings.json og slett seksjonen AzureStorageConfig. Denne skal vi ikke bruke lenger.
+
+Vi må så legge til noen nuget-pakker:
 
 * Install-Package Microsoft.Azure.KeyVault
 * Install-Package Microsoft.Azure.Services.AppAuthentication
 * Install-Package Microsoft.Extensions.Configuration.AzureKeyVault
 
-Gå så til Program.cs og erstatt CreateWebHostBuilder med følgende:
+Gå så til Program.cs og erstatt `CreateWebHostBuilder` med følgende:
 
-```private const string KeyVaultEndpoint = "https://azureworkshopapp-0-kv.vault.azure.net/";
+```
+private const string KeyVaultEndpoint = "https://<navn-på-keyvault>.vault.azure.net/";
 
 public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
     WebHost.CreateDefaultBuilder(args)
@@ -45,14 +48,16 @@ public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
 
 Referer til de nye komponentene:
 
-```using Microsoft.Azure.KeyVault;
+```
+using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 ```
 
-2. Gå til Startup.cs og erstatt configurasjonen av `AzureStorageConfig` med:
-```services.AddSingleton(new AzureStorageConfig
+Gå til Startup.cs og erstatt configurasjonen av `AzureStorageConfig` med:
+```
+services.AddSingleton(new AzureStorageConfig
 {
     AccountKey = Configuration["AzureStorageAccountKey"],
     AccountName = Configuration["AzureStorageAccountName"],
@@ -60,12 +65,13 @@ using Microsoft.Extensions.Configuration.AzureKeyVault;
 });
 ```
 
-ImageContainer kunne med computer science blitt hentet fra appsettings på samme måte som før, siden dette ikke er sensitivt. Dette er utenfor scope for denne leksjonen.
+Når dette er gjort skal `Configuration` inneholde entries både fra lokal konfigurasjon og Azure Key Vault, og verdiene i fra Key Vault er ferdig dekryptert og klare til bruk.
 
-3. Gå til ImagesController og erstatt `IOptions<AzureStorageConfig> config` i ctor med `AzureStorageConfig storageConfig`.
-4. Gå til appsettings.json og slett seksjonen AzureStorageConfig. Denne skal vi ikke bruke lenger.
-5. Kjør og se at alt fortsatt fungerer.
+ImageContainer kunne med computer science blitt hentet fra appsettings på samme måte som før, siden dette ikke er sensitivt. Dette er utenfor scope for denne leksjonen. 
 
+Gå til ImagesController og erstatt `IOptions<AzureStorageConfig> config` i ctor med `AzureStorageConfig storageConfig`.
+
+Til slutt gjenstår det bare å kjøre applikasjonen og se at alt fortsatt fungerer.
 
 ## Bonus 2: lagring av tags på bildene dine
 
