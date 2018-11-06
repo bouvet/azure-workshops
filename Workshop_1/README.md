@@ -9,6 +9,9 @@ Prerequsites for å gjennomføre workshop:
 * Installere Visual Studio 2017 for Windows, eller Visual Studio for Mac. 
   * Hvis du ikke har lisens, velg Community.
   * Hvis du har lisens, velg Professional eller Enterprise.
+* En git-klient for å sjekke ut kode i github.
+  * Windows: https://git-scm.com/download/win
+  * Mac: https://git-scm.com/download/mac
 
 Disse emnene vil bli gjennomgått i denne modulen:
 * Generelt om Azure- og skytjenester
