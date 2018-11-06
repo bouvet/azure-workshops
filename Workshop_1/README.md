@@ -18,3 +18,9 @@ Disse emnene vil bli gjennomgått i denne modulen:
 * App Service tjenesten
 * Storage tjenesten
 * Key Vault tjenesten
+
+
+<details>
+  <summary>Click to expand</summary>
+  whatever
+</details>
