@@ -30,7 +30,7 @@ Vi ønsker nå at applikasjonen skal bruke verdiene satt i Key Vault fremfor den
 
 Gå så til Program.cs og erstatt CreateWebHostBuilder med følgende:
 
-`private const string KeyVaultEndpoint = "https://azureworkshopapp-0-kv.vault.azure.net/";
+```private const string KeyVaultEndpoint = "https://azureworkshopapp-0-kv.vault.azure.net/";
 
 public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
     WebHost.CreateDefaultBuilder(args)
@@ -40,22 +40,22 @@ public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
                var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
                builder.AddAzureKeyVault(KeyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager());
            })
-           .UseStartup<Startup>();`
+           .UseStartup<Startup>();```
 
 Referer til de nye komponentene:
 
-`using Microsoft.Azure.KeyVault;
+```using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureKeyVault;`
+using Microsoft.Extensions.Configuration.AzureKeyVault;```
 
-2. Gå til Startup.cs og erstatt configurasjonen av AzureStorageConfig med:
-`services.AddSingleton(new AzureStorageConfig
+2. Gå til Startup.cs og erstatt configurasjonen av `AzureStorageConfig` med:
+```services.AddSingleton(new AzureStorageConfig
 {
     AccountKey = Configuration["AzureStorageAccountKey"],
     AccountName = Configuration["AzureStorageAccountName"],
     ImageContainer = "imagecontainer"
-});`
+});```
 
 ImageContainer kunne med computer science blitt hentet fra appsettings på samme måte som før, siden dette ikke er sensitivt. Dette er utenfor scope for denne leksjonen.
 
