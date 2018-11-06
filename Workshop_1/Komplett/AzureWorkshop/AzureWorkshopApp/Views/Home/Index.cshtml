@@ -28,6 +28,11 @@
         color: white;
     }
 
+    #errors {
+        color: red;
+        font-weight: bold;
+    }
+
     .form-wrapper {
         display: flex;
         justify-content: center;
@@ -117,6 +122,7 @@
             </form>
         </div>
         <div id="stored-images"></div>
+        <div id="errors"></div>
     </div>
 </main>
 
@@ -154,6 +160,11 @@
                 gallery = fetchedImageLinks;
             }
 
+        }).fail(error => {
+            var errorContainer = document.getElementById("errors");
+            var paragraph = document.createElement("p");
+            paragraph.appendChild(document.createTextNode(error.responseText ? error.responseText : error.statusCode));
+            errorContainer.appendChild(paragraph);
         });
     }
 

@@ -1,35 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using AzureWorkshopApp.Helpers;
 using AzureWorkshopApp.Models;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace AzureWorkshopApp.Helpers
+namespace AzureWorkshopApp.Services
 {
-    public static class StorageHelper
+    public class StorageService : IStorageService
     {
+        private readonly AzureStorageConfig _storageConfig;
 
-        public static bool IsImage(IFormFile file)
+        public StorageService(IOptions<AzureStorageConfig> storageConfig)
         {
-            if (file.ContentType.Contains("image"))
-            {
-                return true;
-            }
-
-            string[] formats = { ".jpg", ".png", ".gif", ".jpeg" };
-
-            return formats.Any(item => file.FileName.EndsWith(item, StringComparison.OrdinalIgnoreCase));
+            _storageConfig = storageConfig != null ? storageConfig.Value : throw new ArgumentNullException(nameof(storageConfig));
         }
 
-        public static async Task<bool> UploadFileToStorage(Stream fileStream, string fileName, AzureStorageConfig storageConfig)
+        public AzureStorageConfigValidationResult ValidateConfiguration()
+        {
+            return StorageConfigValidator.Validate(_storageConfig);
+        }
+
+        public async Task<bool> UploadFileToStorage(Stream fileStream, string fileName)
         {
             // Create storagecredentials object by reading the values from the configuration (appsettings.json)
-            StorageCredentials storageCredentials = new StorageCredentials(storageConfig.AccountName, storageConfig.AccountKey);
+            StorageCredentials storageCredentials = new StorageCredentials(_storageConfig.AccountName, _storageConfig.AccountKey);
 
             // Create cloudstorage account by passing the storagecredentials
             CloudStorageAccount storageAccount = new CloudStorageAccount(storageCredentials, true);
@@ -38,7 +37,7 @@ namespace AzureWorkshopApp.Helpers
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
             // Get reference to the blob container by passing the name by reading the value from the configuration (appsettings.json)
-            CloudBlobContainer container = blobClient.GetContainerReference(storageConfig.ImageContainer);
+            CloudBlobContainer container = blobClient.GetContainerReference(_storageConfig.ImageContainer);
 
             // Get the reference to the block blob from the container
             CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
@@ -49,12 +48,12 @@ namespace AzureWorkshopApp.Helpers
             return await Task.FromResult(true);
         }
 
-        public static async Task<List<string>> GetImageUrls(AzureStorageConfig storageConfig)
+        public async Task<List<string>> GetImageUrls()
         {
             List<string> imageUrls = new List<string>();
 
             // Create storagecredentials object by reading the values from the configuration (appsettings.json)
-            StorageCredentials storageCredentials = new StorageCredentials(storageConfig.AccountName, storageConfig.AccountKey);
+            StorageCredentials storageCredentials = new StorageCredentials(_storageConfig.AccountName, _storageConfig.AccountKey);
 
             // Create cloudstorage account by passing the storagecredentials
             CloudStorageAccount storageAccount = new CloudStorageAccount(storageCredentials, true);
@@ -63,7 +62,7 @@ namespace AzureWorkshopApp.Helpers
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
             // Get reference to the container
-            CloudBlobContainer container = blobClient.GetContainerReference(storageConfig.ImageContainer);
+            CloudBlobContainer container = blobClient.GetContainerReference(_storageConfig.ImageContainer);
 
             BlobContinuationToken continuationToken = null;
 
