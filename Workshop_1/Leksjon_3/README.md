@@ -47,13 +47,13 @@ https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-cl
 7. Test containeren ved å laste opp en fil ved enten å bruke Storage Explorer eller i portalen.
 
 
-## Implementer klasse StorageHelper
+## Implementer servicen StorageService
 
-I solution ligger en klasse som heter StorageHelper hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url-ene til de samme bildene.
+I solution ligger en klasse som heter StorageService hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url-ene til de samme bildene.
 
 1. Legg til NuGet-pakke for Azure Storage: WindowsAzure.Storage.
 
-2. Hent ut AccountName og AccountKey for storage kontoen du opprettet tidligere og legg disse i appsettings.json.
+2. Hent ut AccountName, AccountKey og ImageContainer navn for storage kontoen du opprettet tidligere og legg disse i appsettings.json.
 
 3. Implementer metoden for å laste opp fil:
 
@@ -68,6 +68,8 @@ I solution ligger en klasse som heter StorageHelper hvor det meste av funksjonal
    | CloudBlobClient     | GetContainerReference |
    | CloudBlobContainer  | GetBlockBlobReference |
    | CloudBlockBlob      | UploadFromStreamAsync |
+   
+   Dersom du står fast eller ønsker å se et ferdig eksempel så kan du se [her](https://github.com/bouvet/azure-workshops/blob/master/Workshop_1/Komplett/AzureWorkshop/AzureWorkshopApp/Services/StorageService.cs).
     
 4. Implementer metoden for å hente ut URL-er til blob-ene.
    
@@ -82,5 +84,7 @@ I solution ligger en klasse som heter StorageHelper hvor det meste av funksjonal
    | CloudBlobClient     | GetContainerReference |
    | CloudBlobContainer  | GetBlockBlobReference, ListBlobsSegmentedAsync |
    | BlobContinuationToken | Lag for eksempel en do-while. Start med å kalle ListBlobsSegmentedAsync og enumerer resultat-segmentet som returneres. Fortsett å gjøre dette så lenge continuation token i resultat-segmentet ikke er null. Når continuation tokenet er null, så har det siste segmentet blitt returnert og loopen kan brytes. |
+   
+      Dersom du står fast eller ønsker å se et ferdig eksempel så kan du se [her](https://github.com/bouvet/azure-workshops/blob/master/Workshop_1/Komplett/AzureWorkshop/AzureWorkshopApp/Services/StorageService.cs).
    
 
