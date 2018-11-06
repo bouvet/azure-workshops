@@ -2,99 +2,62 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureWorkshopApp.Helpers;
-using AzureWorkshopApp.Models;
+using AzureWorkshopApp.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace AzureWorkshopApp.Controllers
 {
     [Route("api/[controller]")]
     public class ImagesController : Controller
     {
-        // make sure that appsettings.json is filled with the necessary details of the azure storage
-        private readonly AzureStorageConfig _storageConfig;
+        private readonly IStorageService _storageService;
 
-        public ImagesController(IOptions<AzureStorageConfig> config)
+        public ImagesController(IStorageService storageService)
         {
-            _storageConfig = config.Value;
+            _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
         }
 
         // POST /api/images/upload
         [HttpPost("[action]")]
         public async Task<IActionResult> Upload(ICollection<IFormFile> files)
         {
-            var isUploaded = false;
+            var configValidation = _storageService.ValidateConfiguration();
+            if (!configValidation.IsValid()) return BadRequest(configValidation.GetErrors());
 
-            try
-            {
-                if (files.Count == 0)
+            if (files.Count == 0)
+                return BadRequest("No files received from the upload");
 
-                    return BadRequest("No files received from the upload");
-
-                if (_storageConfig.AccountKey == string.Empty || _storageConfig.AccountName == string.Empty)
-
-                    return BadRequest("Sorry, can't retrieve your azure storage details from appsettings.js, make sure that you add azure storage details there");
-
-                if (_storageConfig.ImageContainer == string.Empty)
-
-                    return BadRequest("Please provide a name for your image container in the azure blob storage");
-
-                foreach (var formFile in files)
-                    if (StorageHelper.IsImage(formFile))
-                    {
-                        if (formFile.Length > 0)
-                            using (var stream = formFile.OpenReadStream())
-                            {
-                                isUploaded = await StorageHelper.UploadFileToStorage(stream, formFile.FileName, _storageConfig);
-                            }
-                    }
-                    else
-                    {
-                        return new UnsupportedMediaTypeResult();
-                    }
-
-                if (isUploaded)
+            foreach (var formFile in files)
+                if (FileFormatHelper.IsImage(formFile))
                 {
-                    if (_storageConfig.ImageContainer != string.Empty)
-
-                        return new AcceptedAtActionResult("GetImages", "Images", null, null);
-
-                    return new AcceptedResult();
+                    if (formFile.Length > 0)
+                        using (var stream = formFile.OpenReadStream())
+                        {
+                            if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
+                            {
+                                return new AcceptedResult();
+                            }
+                        }
+                }
+                else
+                {
+                    return new UnsupportedMediaTypeResult();
                 }
 
-                return BadRequest("Look like the image couldnt upload to the storage");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return BadRequest("Look like the image couldnt upload to the storage");
         }
 
         // GET /api/images
         [HttpGet]
         public async Task<IActionResult> GetImages()
         {
-            try
-            {
-                if (_storageConfig.AccountKey == string.Empty || _storageConfig.AccountName == string.Empty)
-                {
-                    return BadRequest("Sorry, can't retrieve your azure storage details from appsettings.js, make sure that you add azure storage details there");
-                }
+            var configValidation = _storageService.ValidateConfiguration();
+            if (!configValidation.IsValid()) return BadRequest(configValidation.GetErrors());
 
-                if (_storageConfig.ImageContainer == string.Empty)
-                {
-                    return BadRequest("Please provide a name for your image container in the azure blob storage");
-                }
+            var imageUrls = await _storageService.GetImageUrls();
 
-                var imageUrls = await StorageHelper.GetImageUrls(_storageConfig);
-
-                return new ObjectResult(imageUrls);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return new ObjectResult(imageUrls);
         }
     }
 }
