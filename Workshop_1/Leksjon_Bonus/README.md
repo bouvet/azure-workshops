@@ -30,7 +30,8 @@ Vi ønsker nå at applikasjonen skal bruke verdiene satt i Key Vault fremfor den
 
 Gå så til Program.cs og erstatt CreateWebHostBuilder med følgende:
 
-```private const string KeyVaultEndpoint = "https://azureworkshopapp-0-kv.vault.azure.net/";
+```
+private const string KeyVaultEndpoint = "https://azureworkshopapp-0-kv.vault.azure.net/";
 
 public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
     WebHost.CreateDefaultBuilder(args)
@@ -45,14 +46,16 @@ public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
 
 Referer til de nye komponentene:
 
-```using Microsoft.Azure.KeyVault;
+```
+using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 ```
 
 2. Gå til Startup.cs og erstatt configurasjonen av `AzureStorageConfig` med:
-```services.AddSingleton(new AzureStorageConfig
+```
+services.AddSingleton(new AzureStorageConfig
 {
     AccountKey = Configuration["AzureStorageAccountKey"],
     AccountName = Configuration["AzureStorageAccountName"],
