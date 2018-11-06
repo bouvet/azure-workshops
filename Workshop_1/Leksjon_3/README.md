@@ -57,7 +57,7 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
 
 3. Implementer metoden for å laste opp fil:
 
-   __UploadFileToStorage (Stream fileStream, string fileName, AzureStorageConfig storageConfig)__
+   __UploadFileToStorage (Stream fileStream, string fileName)__
    
    Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
 
@@ -73,7 +73,7 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
     
 4. Implementer metoden for å hente ut URL-er til blob-ene.
    
-   __GetImageUrls (AzureStorageConfig storageConfig)__
+   __GetImageUrls ()__
    
    Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
    
