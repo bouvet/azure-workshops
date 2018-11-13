@@ -13,7 +13,7 @@ Til nå er disse modulene planlagt.
 * Workshop #2: DevOps
   * Azure DevOps
   * ARM-templates / Infrastructure as Code
-  * Application Insights
+  * Application Insights 
 
 * Workshop #3: TBD
 
