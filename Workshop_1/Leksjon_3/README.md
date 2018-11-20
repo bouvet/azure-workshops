@@ -28,22 +28,25 @@ Det er flere metoder for å opprette ressurser i Azure. De mest vanlige er her:
 
 I denne leksjonen skal du bruke Powershell eller Azure CLI for å opprette en Storage Account og en Blob-Container. Hovedregelen er at alt du kan gjøre i portalen kan du også gjøre via Powershell/Azure CLI, og det er også mye mer du kan gjøre via kommandolinje.
 
-Powershell er fint å bruk..
+Powershell er fint å bruk i Windows miljøer, mens Azure CLI er kryssplatform og kan. Begge er tilgjengelige i Azure Shell.
 
-Azure Cli er kryssplatform.
 
 For å opprette en storage account og en blob-container: 
 
 1. Start et Azure Shell kommando ved å klikke på ">_" på toppen i portalen.
-2. Trykk ja når du får spørsmål om å opprette en storage account. Denne brukes for å..
-4. Gå til denne siden for å lære hvordan du oppretter en egen Storage Account som du ønsker å bruke i applikasjonen din: 
+2. Trykk ja når du får spørsmål om å opprette en storage account. Dette er en storage account som brukes Azure Shellet og som 
+4. Gå til denne siden for å lære hvordan du oppretter en egen Storage Account som du ønsker å bruke i applikasjonen din.
+Powershell:
+https://docs.microsoft.com/en-us/azure/storage/common/storage-quickstart-create-account?tabs=powershell
+CLI: 
+https://docs.microsoft.com/en-us/azure/storage/common/storage-quickstart-create-account?tabs=azure-cli
+
+6. Opprett en blob-container i storage account.
 Powershell: 
 https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-powershell 
 CLI: 
 https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-cli
 
-5. Opprett en storage account i samme ressursgruppe som du opprettet i leksjon 1.
-6. Opprett en blob-container i storage account.
 7. Test containeren ved å laste opp en fil ved enten å bruke Storage Explorer eller i portalen.
 
 
