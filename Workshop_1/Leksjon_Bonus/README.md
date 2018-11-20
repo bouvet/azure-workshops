@@ -24,7 +24,7 @@ Vi ønsker nå at applikasjonen skal bruke verdiene satt i Key Vault fremfor den
 
 Start med å gå til appsettings.json og slett seksjonen AzureStorageConfig. Denne skal vi ikke bruke lenger.
 
-Vi må så legge til noen nuget-pakker:
+Vi må så legge til noen nuget-pakker (dette kan du gjøre i Nuget Console):
 
 * Install-Package Microsoft.Azure.KeyVault
 * Install-Package Microsoft.Azure.Services.AppAuthentication
@@ -65,18 +65,35 @@ services.AddSingleton(new AzureStorageConfig
 });
 ```
 
-Når dette er gjort skal `Configuration` inneholde entries både fra lokal konfigurasjon og Azure Key Vault, og verdiene i fra Key Vault er ferdig dekryptert og klare til bruk.
+Når dette er gjort vil `Configuration` inneholde entries som hentes fra  Azure Key Vault.
 
-ImageContainer kunne med computer science blitt hentet fra appsettings på samme måte som før, siden dette ikke er sensitivt. Dette er utenfor scope for denne leksjonen. 
+ImageContainer kunne hentet fra appsettings på samme måte som før, siden dette ikke er sensitivt, men vi har her valt å legge den her.
 
 Gå til ImagesController og erstatt `IOptions<AzureStorageConfig> config` i ctor med `AzureStorageConfig storageConfig`.
 
-Til slutt gjenstår det bare å kjøre applikasjonen og se at alt fortsatt fungerer.
+Til slutt gjenstår det bare å kjøre applikasjonen og se at alt fortsatt fungerer. Trykk F5 og se at innstillingene fra Key Vault blir brukt.
 
-## Bonus 2: lagring av tags på bildene dine
 
-Legg til funksjonalitet i Web-applikasjonen din for å legge på egne tags, tekster som beskriver bildene dine.
+## Publisering til Azure og Managed Service Identity 
 
-* Bruk en Table i Azure Storage kontoen din til å lagre tags i.
-* Utvid applikasjonen med funksjonalitet for å legge til tags. Eksempel her kan være et tekst-felt under hvert bilde etc.
-* Introduksjon av Azure Table Storage med lenker videre til C# API: https://docs.microsoft.com/en-us/azure/storage/tables/table-storage-overview
+Publiser så applikasjonen din på nytt til Azure. Nå vil du mest sannsynlig se at applikasjonen din feiler.
+
+Dersom du ønsker å finne ut hvorfor dette skjer kan du:
+
+1. Gå til Web App'en din i Azureportalen, og velg "Console" under "Development Tools".
+2. Gå så til katalogen d:\home\LogFiles og inspiser filen eventlog.xml (bruk f.eks. kommandoen tail for å se slutten på filen)
+
+Det du finner ut er mest sannsynlig at Web App'en din ikke har tilgang til å lese ut secrets fra Key Vault. For å løse dette ønsker
+vi å bruke Managed Service Identity (MSI), som gjør at man kan opprette en identitet (Service Principal/"bruker") for Web App'en din som man igjen kan gi de tilganger man vil til andre tjenester i Azure (her i Key Vault).
+
+1. Gå til Web Appen din i Azureportalen.
+2. Velg så "Managed Service Identity" under Settings, og trykk på "On" og trykk Save.
+3. Gå så til Key Vault'en din.
+4. Velg "Access policies" under settings.
+5. Trykk "Add new".
+6. På "Select principal", søker du opp navnet på Web App'en din.
+7. Velg så "Get" under "Secret Permissions"
+8. Velg så navnet på Web App'en din under "Authorized application".
+9. Trykk på OK.
+
+Nå skal applikasjonen din ha tilgang til å lese secrets fra denne Key Vaulten.
