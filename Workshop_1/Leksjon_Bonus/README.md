@@ -92,8 +92,7 @@ vi å bruke Managed Service Identity (MSI), som gjør at man kan opprette en ide
 4. Velg "Access policies" under settings.
 5. Trykk "Add new".
 6. På "Select principal", søker du opp navnet på Web App'en din.
-7. Velg så "Get" under "Secret Permissions"
-8. Velg så navnet på Web App'en din under "Authorized application".
-9. Trykk på OK.
+7. Velg så "Get" og "List" under "Secret Permissions"
+8. Trykk på OK.
 
 Nå skal applikasjonen din ha tilgang til å lese secrets fra denne Key Vaulten.
