@@ -65,11 +65,11 @@ services.AddSingleton(new AzureStorageConfig
 });
 ```
 
-Når dette er gjort vil `Configuration` inneholde entries som hentes fra  Azure Key Vault.
+Når dette er gjort vil `Configuration` inneholde entries som hentes fra Azure Key Vault.
 
 ImageContainer kunne hentet fra appsettings på samme måte som før, siden dette ikke er sensitivt, men vi har her valt å legge den her.
 
-Gå til ImagesController og erstatt `IOptions<AzureStorageConfig> config` i ctor med `AzureStorageConfig storageConfig`.
+Gå til StorageService og erstatt `IOptions<AzureStorageConfig> config` i ctor med `AzureStorageConfig storageConfig`.
 
 Til slutt gjenstår det bare å kjøre applikasjonen og se at alt fortsatt fungerer. Trykk F5 og se at innstillingene fra Key Vault blir brukt.
 
