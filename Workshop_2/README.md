@@ -1,11 +1,13 @@
 # Workshop #2
 
-Denne workshop gir en generell innføring i skyplattformen Azure fra Microsoft.
+Denne workshop gir en innføring DevOps-teknikmker i skyplattformen Azure fra Microsoft.
+
+
 
 Forutsetninger for å gjennomføre workshop:
 * Et Azure-abonnement. Her har du flere muligheter:
   * Har du MSDN-abonnement så får man aktiver den i abonnementsportalen: http://my.visualstudio.com
-  * Hvis du ikke har MSDN, så kan du opprette trial abonnement og få $200 gratis credits med Dev Essentials her: http://my.visualstudio.com
+  * Hvis du ikke har MSDN, så kan du opprette trial abonnement og få $200 gratis credits med Dev Essentials her: http://my.visualstudio.com  
 * En Azure DevOps konto. 
   * Denne kan opprettes her: https://azure.microsoft.com/en-us/services/devops/
   * Er gratis opp til 5 brukere.
@@ -18,7 +20,7 @@ Forutsetninger for å gjennomføre workshop:
 
 Disse emnene vil bli gjennomgått i denne modulen:
 * Introduksjon til DevOps
-* Azure DevOps - Delivery Pipeline
+* Azure DevOps - Delivery Pipeline ()
 * Infrastructure as Code - ARM-templates
-* Monitorering og telimetri: Appl
+* Monitorering og telemetri: Application Insights
 
