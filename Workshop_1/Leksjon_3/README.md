@@ -35,19 +35,13 @@ For å opprette en storage account og en blob-container:
 
 1. Start et Azure Shell kommando ved å klikke på ">_" på toppen i portalen.
 2. Trykk ja når du får spørsmål om å opprette en storage account. Dette er en storage account som brukes Azure Shellet og som 
-4. Gå til denne siden for å lære hvordan du oppretter en egen Storage Account som du ønsker å bruke i applikasjonen din.
+4. Gå til denne siden for å lære hvordan du oppretter en egen Storage Account og en Container, som du ønsker å bruke i applikasjonen din.
 Powershell:
-https://docs.microsoft.com/en-us/azure/storage/common/storage-quickstart-create-account?tabs=powershell
-CLI: 
-https://docs.microsoft.com/en-us/azure/storage/common/storage-quickstart-create-account?tabs=azure-cli
-
-6. Opprett en blob-container i storage account.
-Powershell: 
 https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-powershell 
 CLI: 
 https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-cli
 
-7. Test containeren ved å laste opp en fil ved enten å bruke Storage Explorer eller i portalen.
+5. Test containeren ved å laste opp en fil ved enten å bruke Storage Explorer eller i portalen.
 
 
 ## Implementer servicen StorageService
