@@ -38,7 +38,7 @@ I denne øvelsen skal du teste å skalere opp (kraftigere App Service Plan/"VM")
 1. Gå til <appservicenavn>.azurewebsites.net og merk deg IP-adressen i høyre hjørne.
 2. Gå til din "App Service Plan" i portalen som du lagde i forrige oppgave.
 3. Gå til til valget "Scale up", endre denne til en plan i "Standard tier". Man kan kun skalere opp med flere instanser ved å bruke Standard eller Premium tier. Disse koster mer enn Free/Shared/Basic tier.
-4. Trykk så gjentatte ganger på F5 i nettleseren på websiden og se at IP-adressen har endret seg siden oppgave 1, men at den kun oppdaterer seg en gang. Dette fordi applikasjonen er flyttet til en større App Service Plan/"VM" og fått en ny IP-adresse.
+4. Dersom du refresher applikasjonen, samtidig som du ser på IP-adressen i høyre hjørne, så vil du se at den endrer seg én gang. Dette fordi applikasjonen er flyttet til en større App Service Plan/"VM" og fått en ny IP-adresse.
 4. Velg så "Scale out", og velg flere instanser enn 1 (f.eks. 3). Vent så til den er ferdig å skalere ut (visuelle indikatorer på toppen av siden).
 5. Trykk så gjentatte ganger på F5 i nettleseren på websiden din og se om IP-adressen endrer seg. Grunnen til at denne ikke endrer seg er fordi ARR Affinity er slått på, og dette gjør at requests fra samme nettleser blir tildelt samme server. Test gjerne med en annen type browser (hvis du har installert), og se om denne får en annen IP-adresse.
 6. I menyen for Web App'en din. Gå inn på Application Settings, og skru ARR Affinity til Off.
