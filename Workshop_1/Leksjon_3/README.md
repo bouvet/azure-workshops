@@ -56,7 +56,7 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
 
 1. Legg til NuGet-pakke for Azure Storage: WindowsAzure.Storage.
 
-2. Hent ut AccountName, AccountKey og ImageContainer navn for storage kontoen du opprettet tidligere og legg disse i appsettings.json.
+2. Hent ut StorageAccountName og AccountKey fra Access keys i menyen til Storage Account. Hent også ut navnet på blob-kontaineren du opprettet tidligere. Legg de inn i appsettings.json filen i webapplikasjonen.
 
 3. Implementer metoden for å laste opp fil:
 
