@@ -40,7 +40,6 @@ I denne øvelsen skal du teste å skalere opp (kraftigere App Service Plan/"VM")
 3. Gå til til valget "Scale up", endre denne til en plan i "Standard tier". Man kan kun skalere opp med flere instanser ved å bruke Standard eller Premium tier. Disse koster mer enn Free/Shared/Basic tier.
 4. Dersom du refresher applikasjonen, samtidig som du ser på IP-adressen i høyre hjørne, så vil du se at den endrer seg én gang. Dette fordi applikasjonen er flyttet til en større App Service Plan/"VM" og fått en ny IP-adresse.
 4. Velg så "Scale out", og velg flere instanser enn 1 (f.eks. 3). Vent så til den er ferdig å skalere ut (visuelle indikatorer på toppen av siden).
-5. Trykk så gjentatte ganger på F5 i nettleseren på websiden din og se om IP-adressen endrer seg. Grunnen til at denne ikke endrer seg er fordi ARR Affinity er slått på, og dette gjør at requests fra samme nettleser blir tildelt samme server. Test gjerne med en annen type browser (hvis du har installert), og se om denne får en annen IP-adresse.
-6. I menyen for Web App'en din. Gå inn på Application Settings, og skru ARR Affinity til Off.
-7. Trykk så gjentatte ganger på F5 for å se om IP-adressen nå endrer seg mellom hver gang.
-6. Sett så tilbake 1 instans og velg Free tier igjen.
+5. Selv om du trykker gjentatte ganger på F5 i nettleseren på websiden din, så vil du se at IP-adressen ikke endrer seg, selv om vi nå har flere servere som vi potensielt kan få svar fra. Grunnen til at denne ikke endrer seg er fordi ARR Affinity er slått på, og dette gjør at requests fra samme nettleser blir tildelt samme server. Test gjerne med en annen type browser (hvis du har installert), og se om denne får en annen IP-adresse.
+6. I menyen for Web App'en din, gå inn på Application Settings og skru ARR Affinity til Off, slik at vi ikke lenger kun får svar fra en server. Trykk så gjentatte ganger på F5 for å se om IP-adressen nå endrer seg mellom hver gang.
+7. Sett så tilbake 1 instans og velg Free tier igjen.
