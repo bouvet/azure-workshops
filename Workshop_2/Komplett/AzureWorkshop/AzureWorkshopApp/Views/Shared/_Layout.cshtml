@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.ApplicationInsights.AspNetCore
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -15,6 +16,7 @@
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
+    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body>
     <div class="container body-content">
