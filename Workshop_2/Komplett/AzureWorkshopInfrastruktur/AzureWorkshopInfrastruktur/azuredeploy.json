@@ -22,6 +22,7 @@
     },
     "appServiceSku": {
       "type": "string",
+      "defaultValue": "F1",
       "metadata": {
         "description":  "The SKU of the App Service Plan" 
       } 
@@ -73,9 +74,7 @@
             "[parameters('storageAccountName')]"
           ]
         }
-      ],
-      "outputs": {
-      }
+      ]
     }
   ]
 }

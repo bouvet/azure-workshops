@@ -9,7 +9,7 @@
       "value": ""
     },
     "blobContainerName": {
-      "value": ""
+      "value": "imagecontainer"
     }
   }
 }
