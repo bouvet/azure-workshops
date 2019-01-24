@@ -3,15 +3,17 @@
 I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen i prosjektet ditt.
 
 ## Bygge-pipeline 
-Lag en ny byggedefinisjon i Azure DevOps
+Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din
+til neste sted i Release-pipeline.
 
 1. Lag en by build-definisjon
 2. Velg "Empty template"
-2. Definisjonen skal kun inneholde et steg "Publish build artifacts".
+2. Definisjonen skal kun inneholde et steg "Publish build artifacts". 
+3. Legg inn et filter som 
 3. Velg så dette steget, og velg så stien til katalogen hvor  "Workshop_2/Komplett/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur"
 3. Trykk så på "Save and Queue" for å se at den kjører.
 
-Nå har du laget 
+Når du har fått steget til, går du videre
 
 ## Release-pipeline
 
@@ -27,15 +29,31 @@ Nå har du laget
 sett location til West eller North Europe.
 7. Under "Linked artifacts", velg template og parameter fil som ble publisert fra byggestedet ditt.
 4. Trykk så på "Save"
-5. Trykk så på "+Release" eller "Create a release
+5. Trykk så på "+Release" eller "Create a release"
+
+### Redeploy
+
+1. Slett hele ressursgruppen din.
+2. Kjør Redploy av releasen og se at det blir opprettet igjen.
+
+### Endring av miljø
+Du ønsker å gjøre det mulig å sette størrelsen på App Service Plan'en til forskjellige størrelse basert på om det er et test-miljø eller
+et produksjonsmiljø. For å gjøre dette må du legge inn et 
+
+1. Editer azuredeploy.json. Legg til en parameter til scriptet for å sette SKU. Referer så til denne parameteren lenger i nede i scriptet der SKU blir satt på App Service Plan.
+2. Editer så azuredeploy.parameters.json og sett. Sett så 
 
 
-## Legge til 
-I neste leksjon skal du bruke Application Insights. For å gjøre dette må du legge til 
-ARM-templates 
 
-- Deploy til test-miljø for å teste.
-- Legg til en komponent man trenger, deploy på nytt, og se at dette. 
+## Legge til ny ressurs
+
+I neste leksjon skal du bruke Application Insights for å overvåke løsning. For å gjøre dette må du legge til selve ressursen i miljøet ditt.
+
+1. Editer azuredeploy.json. Se https://docs.microsoft.com/en-us/azure/templates/microsoft.insights/2015-05-01/components for strukturen på denne komponenten. Legg også til en parameter til scriptet for navnet på komponenten.
+2. Editer azuredeploy.parameters.json, og legg til parameter som setter navnet på Application Insights-instansen din.
+3. Sjekk inn endringene dine, og vent til at 
+4. Lag en ny release og valider at komponenten blir opprettet. 
+
 
 - Lag en ny parameter-fil for et ny miljø, velg en større app service plan (som Production plane, f.eks. S1, som støtter slots, velg også antall instanser til 2) 
 - Lage et nytt miljø i Azure DevOps, med å klone
