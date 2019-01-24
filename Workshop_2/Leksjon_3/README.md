@@ -3,6 +3,43 @@
 - Deploy infrastructure
 - Sjekk, og se at komponenten er opprettet.
 
+## Legge til Application Insights i Visual Studio
+1. Åpne solution i Visual Studio
+2. Åpne Package Manager Console og skriv `Install-Package Microsoft.ApplicationInsights.AspNetCore` (evt bruk GUI til å legge til NuGet-Pakken `Microsoft.ApplicationInsights.AspNetCore`)
+
+Åpne filen `Program.cs` og modifiser koden slik at det nå står
+```c#
+    public static IWebHost BuildWebHost(string[] args) =>
+        WebHost.CreateDefaultBuilder(args)
+            .UseStartup<Startup>()
+            .UseApplicationInsights()
+            .Build();
+```
+og endre `main`-metoden til
+```c#
+  public static void Main(string[] args)
+  {
+       CreateWebHostBuilder(args).Run();
+  }
+```
+
+Åpne `_ViewImports.cshtml` og legg til følgende injection:
+```
+    @inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
+```
+
+Åpne deretter `_Layout.cshtml` og legg til følgende nederst i `<head>`
+```html
+    @Html.Raw(JavaScriptSnippet.FullScript)
+```
+
+Commit (skrive en bra commit-melding, f.eks `add ApplicationInsights telemetry`) og push slik at den nye koden blir deployet. 
+
+Når release er ferdig, naviger til azure-websiten og generer litt trafikk. Bonuspoeng for alle som klarer å lage en exception 
+
+_hint: last opp en `.txt-fil`, burde kræsje_
+
+
 
 - Genenerer litt trafikk mot websiden.(Eks. Powershell som automatisk genererer en del trafikk, også noen feil f.eks. )
 - Se at ting, og finn exceptions etc.
