@@ -90,9 +90,11 @@ Under "*VsTest - testAssemblies*" => "*Control Options*" slå av "*Enabled*".
 
 Nå kan du trykke "*Save & Queue*", lene deg tilbake og se at du har en pipeline som bygger koden din, og stapper den ut på en App Service i Azure. Når bygg agenten er ferdig å kjøre kan du gå browse App Servicen din og se at applikasjonen ligger der, klar til bruk. 
 
-Men nå har vi jo releasa appen vår gjennom bygg pipelinen vår. Hva er vitsen med release pipelines? Å release gjennom bygg er vell og bra for små applikasjoner med få miljøer. Men når du trenger litt mer kontroll over releasene dine kan du trenge en release pipeline.
+Men nå har vi jo releasa appen vår gjennom bygg pipelinen vår. Hva er vitsen med release pipelines? Å release gjennom bygg er vell og bra for små applikasjoner. Men når du trenger litt mer kontroll over releasene dine kan du trenge en release pipeline.
 
 Før vi gjør det kan du skru på testene dine igjen ved å editere build pipelinen din. Hvordan navigerer du deg til edit build pipeline og skrur på testene igjen? Left as an exercise to the developer. 
+
+I tillegg kan du skru av "*Azure App Service Deploy*" steget ettersom vi skal deploye i release pipeline i steden for build pipeline snart. 
 
 Når du har skrudd på testene igjen klikk "*Save & Queue*". Nå vil Azure DevOps lete etter en ledig agent for å kjøre bygg jobben igjen, og om alt er gjort riktig vil bygget feile på testingen. Hvorfor? Fordi noen glemte å kjøre testene lokalt før de sjekket inn, og det er din jobb å fikse det! 😈
 
@@ -117,17 +119,20 @@ Du må gjerne gi release pipelinen et navn ved å redigere det øverst i bildet.
 
 Vi har nå satt opp en release pipeline som går mot forskjellige miljøer i Azure. I tillegg må du approve en release før den går fra test til QA og fra QA til Prod.
 
-Nå er det på tide å se om alt snurrer.
+Nå er det på tide å se om alt snurrer. Men først... Hadde vi ikke en test som feila? 😏
 
 ## 5: Gjør endringer til kildekoden
+Clone repoet ned til lokal maskin. Du kan finne clone URLen øverst til høyre under "*Repos*". Hvordan du tar deg av autentiseringen opp mot Azure DevOps er opp til deg. 
 
+Bytt til Workshop2 branchen.
+>Vi bytter til Workshop2 branchen ettersom vi har satt opp build pipelinen til å gå mot den.
+
+Åpne `Workshop_2\Komplett\AzureWorkshop\AzureWorkshop.sln` og fiks testen.
+
+Når testen er fikset og koden er sjekket inn burde build pipelinen starte en ny jobb som bygger og tester den nye commiten. Når bygget er ferdig burde release pipelinen merke at en ny artifact er klar for deploy og trigge en ny deploy mot test miljøet. For at releasen skal deployes på QA og Prod må de godkjennes av deg først.
 
 ## 6: Deploy til alle miljøene
+Approve release mot QA og Prod og se at applikasjonen kjører i alle miljøene dine. 
 
-
-
-
-
-
-# TODOS:
-- [ ] Lag test assembly
+## Mer? Lek deg litt
+Prøv å gjøre endringer til applikasjonen og sjekk inn. Om du vil ha en utfordring kan du prøve å sette opp variabel substitution i appsettings.json på hvert av stagene dine. Får du til å postfikse tittelen i applikasjonen med miljøet du er i? 
