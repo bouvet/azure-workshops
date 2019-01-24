@@ -3,30 +3,29 @@
 I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen i prosjektet ditt.
 
 ## Bygge-pipeline 
-Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din
-til neste sted i Release-pipeline.
+Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din til neste steg i kjeden (release-pipeline).
 
 1. Lag en by build-definisjon
 2. Velg "Empty template"
 2. Definisjonen skal kun inneholde et steg "Publish build artifacts". 
-3. Legg inn et filter som 
-3. Velg så dette steget, og velg så stien til katalogen hvor  "Workshop_2/Komplett/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur"
-3. Trykk så på "Save and Queue" for å se at den kjører.
+3. Legg inn et filter som gjør at bygget trigges bare når endringer under AzureWorkshopInfracture 
+4. Velg så dette steget, og velg så stien til katalogen hvor  "Workshop_2/Komplett/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur"
+5. Trykk så på "Save and Queue" for å se at den kjører.
 
 Når du har fått steget til, går du videre
 
 ## Release-pipeline
 
+For å deploye infrastrukturen 
 
-1. Lag en ressursgruppe som du ønsker å deploye løsningen din til. 
+1. Lag en ressursgruppe (i portalen f.eks.) som du ønsker å deploye løsningen din til. 
 2. Lag så en egen release-pipeline for infrastruktur.
 3. Her velger du "Empty job", og ikke noen ferdig template.
 4. Velg artifact til venstre fra den build-pipelinen du laget i forrige oppgave, trykk Add.
 4. Gi release-pipelinen din et navn, f.eks. "Infrastruktur" (på toppen av siden).
-5. Gi steget "Stage 1" et nytt navn, og kall det "Test".
+5. Gi steget "Stage 1" et nytt navn, og kall det "Test". I 
 5. Åpne "Test"-steget (trykk på "Agent job") og legg til tasken "Azure Resource Group Deployment"
-6. Konfigurer så dette steget ved å velge Azure subscription, og velg ressursgruppen du laget i sted 1) og
-sett location til West eller North Europe.
+6. Konfigurer så dette steget ved å velge Azure subscription, velg ressursgruppen du laget i steg 1) og sett location til samme sted som ressursgruppen.
 7. Under "Linked artifacts", velg template og parameter fil som ble publisert fra byggestedet ditt.
 4. Trykk så på "Save"
 5. Trykk så på "+Release" eller "Create a release"
