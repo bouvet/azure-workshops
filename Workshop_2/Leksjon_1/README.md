@@ -39,7 +39,7 @@ Lag et nytt privat prosjekt med Git som version controll og Agile som work item 
 >- **Test Plans:** Herfra kan prosjektet ditt koordinere og planlegge testing av applikasjonen din. Om build pipelinen din har et test steg kan det konfigureres til å rapportere testens resultat hit. 
 >- **Artifacts:** Om flere av prosjektene dine har avhengigheter til sentrale komponenter som du ikke vil dele med hele verden kan de publiseres til artifacts. Dette er Azure DevOps interne nuget package feed som resten av prosjektene ditt kan ha avhengigheter til. 
 
-Gå til Repos og importer [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops).
+Gå til Repos og initialisere med VisualStudio gitignore. Clone repoet ned til din egen maskin. For autentisering mot Azure DevOps kan du enten sette opp et access token eller en alternativ innlogging. Gå til [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops) og hent filene. Dette kan du enten gjøre ved å clone det ned til egen maskin via git, eller laste ned som zip. Gå til `Workshop_2/Start` og kopier innholdet til ditt lokale Azure DevOps repo. Commit det og push det opp til Azure DevOps. 
 
 ## 2: Lag App Services i [Azure](https://portal.azure.com)
 For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, QA, og prod i [Azure](https://portal.azure.com). Husk å bruke samme brukeren i Azure som i Azure DevOps. 
@@ -64,15 +64,15 @@ Trykk på portrettet ditt oppe i høyre hjørne i Azure DevOps og trykk på "*Pr
 
 >Ettersom vi er (eller later som vi er) uerfarene DevOps-ere skal vi opt-out for YAML pipelines i dette leksjonen. 
 
-I Azure DevOps, gå til "*Pipelines*" => "*Builds*" => "*New pipeline*". Når du skal velge repo velger du det vi importerte til Azure DevOps prosjektet vårt i steg 1. Det er det som er valgt for oss som default. Men **vi skal ikke gå mot master, vi skal gå mot Workshop2 branchen**. 
+I Azure DevOps, gå til "*Pipelines*" => "*Builds*" => "*New pipeline*". Når du skal velge repo velger du det vi importerte til Azure DevOps prosjektet vårt i steg 1. Det er det som er valgt for oss som default om vi kun har et repo i prosjektet vårt.
 
 På neste steg kan vi velge å starte fra et template, en tom jobb, eller opprette en YAML fil. Vi velger "*Azure Web App for ASP.NET*". Denne templaten gir oss alt vi trenger for å komme i gang.
 
 >Nå har vi kommet til siden hvor vi kan sette opp bygg stegene våre. Her ser vi hva templaten vi valgte i forige steg inneholder. 
 
-Under "*pipeline*", set solution til `Workshop_2/Komplett/AzureWorkshop/AzureWorkshop.sln`.
+Under "*pipeline*", set solution til `AzureWorkshop/AzureWorkshop.sln`.
 
->Dette er et steg man må gjøre om man kun har lyst til å bygge spesifikke solutions. For vår del inneholder repoet et par kopier av `AzureWorkshop.sln` så vi må fortelle Azure DevOps hvilken solution vi vil targete.
+>For vår del inneholder repoet vårt kun en solution og kunne strengt tatt hatt defaulten som henter alle solutions i repoet. Men det er alltid en god ide å være spesifikk på hva man vil bygge, i tilfelle man vil legge til flere solutions i fremtiden, hvilket vi kommer til å gjøre senere.
 
 Finn Azure subscriptionen din under dropdownen på samme side og autentiser deg. Etter du har autentisert deg, velg test miljøet vi satt opp i steg 2.
 
@@ -122,12 +122,9 @@ Vi har nå satt opp en release pipeline som går mot forskjellige miljøer i Azu
 Nå er det på tide å se om alt snurrer. Men først... Hadde vi ikke en test som feila? 😏
 
 ## 5: Gjør endringer til kildekoden
-Clone repoet ned til lokal maskin. Du kan finne clone URLen øverst til høyre under "*Repos*". Hvordan du tar deg av autentiseringen opp mot Azure DevOps er opp til deg. 
+Clone repoet ned til lokal maskin. Du kan finne clone URLen øverst til høyre under "*Repos*". Hvordan du tar deg av autentiseringen opp mot Azure DevOps er opp til deg.
 
-Bytt til Workshop2 branchen.
->Vi bytter til Workshop2 branchen ettersom vi har satt opp build pipelinen til å gå mot den.
-
-Åpne `Workshop_2\Komplett\AzureWorkshop\AzureWorkshop.sln` og fiks testen.
+Åpne `AzureWorkshop\AzureWorkshop.sln` og fiks testen.
 
 Når testen er fikset og koden er sjekket inn burde build pipelinen starte en ny jobb som bygger og tester den nye commiten. Når bygget er ferdig burde release pipelinen merke at en ny artifact er klar for deploy og trigge en ny deploy mot test miljøet. For at releasen skal deployes på QA og Prod må de godkjennes av deg først.
 
