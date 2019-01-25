@@ -14,7 +14,7 @@ Til nå er disse modulene planlagt.
   * Azure DevOps
     * Continuous Delivery pipeline
   * ARM-templates / Infrastructure as Code
-  * Application Insights
+  * Application Insights 
 
 * Workshop #3: TBD
 

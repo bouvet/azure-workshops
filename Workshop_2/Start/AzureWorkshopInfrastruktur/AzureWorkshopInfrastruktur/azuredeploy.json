@@ -1,0 +1,113 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webSiteName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the web site."
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Azure Storage account."
+      }
+    },
+    "blobContainerName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the container for storing images."
+      }
+    },
+    "appServiceSku": {
+      "type": "string",
+      "defaultValue": "F1",
+      "metadata": {
+        "description": "The SKU of the App Service Plan"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The location in which the Azure Storage resources should be deployed."
+      }
+    }
+  },
+  "variables": {
+    "servicePlanName": "AppServicePlan" 
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-08-01",
+      "type": "Microsoft.Web/serverfarms",
+      "kind": "app",
+      "name": "[variables('servicePlanName')]",
+      "location": "[parameters('location')]",
+      "comments": "This app service plan is used for the web app and slots.",
+      "properties": {},
+      "dependsOn": [],
+      "sku": {
+        "name": "[parameters('appServiceSku')]"
+      }
+    },
+    {
+      "apiVersion": "2016-08-01",
+      "type": "Microsoft.Web/sites",
+      "kind": "app",
+      "name": "[parameters('webSiteName')]",
+      "location": "[parameters('location')]",
+      "comments": "This is the web app, also the default 'nameless' slot.",
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "AzureStorageConfig:AccountName",
+              "value": "[parameters('storageAccountName')]"
+            },
+            {
+              "name": "AzureStorageConfig:AccountKey",
+              "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
+            },
+            {
+              "name": "AzureStorageConfig:ImageContainer",
+              "value": "[parameters('blobContainerName')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]"
+      ]
+    },
+    {
+      "name": "[parameters('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-02-01",
+      "location": "[parameters('location')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "accessTier": "Hot"
+      },
+      "resources": [
+        {
+          "name": "[concat('default/', parameters('blobContainerName'))]",
+          "type": "blobServices/containers",
+          "apiVersion": "2018-03-01-preview",
+          "properties": {
+            "publicAccess": "Container"
+          },
+          "dependsOn": [
+            "[parameters('storageAccountName')]"
+          ]
+        }
+      ]
+    }
+  ]
+}
