@@ -39,19 +39,80 @@ Når release er ferdig, naviger til azure-websiten og generer litt trafikk. Bonu
 
 _hint: last opp en `.txt-fil`, burde kræsje_
 
+## Se på telemetri
+- Gå til portal.azure.com
+- Gå til ApplicationInsights-instansen
+- Landingssiden aka "Overview" viser grafer med _failed requests, server response time, server requests_ med mer
+- Dersom du lykkes med å generere en feil i forrige steg bør det være mulig å se denne under "Investigate -> Failures"
 
+### Log Analytics
+- Gå tilbake til _Overview_ og velg _Analytics_ fra toppmenyen 
+- Du vil nå ha mulighet til å skrive inn queries mot ApplicationInsights-loggene (på venstre side er den oversikt over tabeller)
 
-- Genenerer litt trafikk mot websiden.(Eks. Powershell som automatisk genererer en del trafikk, også noen feil f.eks. )
-- Se at ting, og finn exceptions etc.
-- Se på application map.
+Prøv å hent ut exceptions ved å skrive inn følgende og trykke _Run_:
+```
+exceptions | search "error"
+```
+Se https://docs.microsoft.com/en-us/azure/azure-monitor/log-query/get-started-portal for mer info om hvordan LogAnalytics kan brukes
 
-Custom Events.
-- Bruk TelemetryClient til å logge en custom-event, f.eks. størrelsen på filen som ble lastet opp.
+## Lage egne events
+Ved å lage våre egne events kan vi følge handlingene brukerne våre tar. Det gjør oss i stand til å kunne bekrefte eller avkrefte hypotesene vi har laget oss om hvordan en endring vil påvirke bruken av systemet. Dette er verdifull feedback som vi kan bruke til å forbedre utviklingsprosessen vår.
 
-Log Analytics queries:
-- Gå inn i log analytics queries, gjør seg litt kjent med det.
-- Finn frem exceptions etc.
-- Lag en custom query i Analytics for å hente ut custom event du laget med TelemeteryClient.
+Først må vi gå til Visual Studio og legge til TelemetryClient som dependency i startup:
 
-- Lage et nytt dashboard. Pin noen standard-metrikker fra fast.
-- Gå inn i Analytics igjen, bruk query du laget tidligere (ligger i history), lag en chart utav det, og pin den til dashboardet ditt.
+Gå til `Startup.cs` og metoden `public void ConfigureServices(IServiceCollection services)`
+
+Legg til følgende linje:
+```c#
+   services.AddApplicationInsightsTelemetry(Configuration);
+```
+Deretter skal vi konfigurere `ImagesController.cs` til å lage egendefinert telemetri
+- Åpne filen `ImagesController.cs`
+- Endre konstruktør og lokale variabler til følgende:
+```c#
+        private readonly IStorageService _storageService;
+        private readonly TelemetryClient _telemetryClient;
+
+        public ImagesController(IStorageService storageService, TelemetryClient telemetryClient)
+        {
+            _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
+            _telemetryClient = telemetryClient;
+        }
+```
+- Gå til metoden "Upload" og endre `foreach`-løkken til følgende:
+```c#
+        foreach (var formFile in files)
+        {
+            if (!FileFormatHelper.IsImage(formFile))
+            {
+                return new UnsupportedMediaTypeResult();
+            }
+            if (formFile.Length <= 0)
+            {
+                continue;
+            }
+
+            _telemetryClient.TrackEvent("UPLOADED_FILE", new Dictionary<string, string>
+            {
+                { "FILE_NAME", formFile.FileName},
+                { "CONTENT_LENGTH", formFile.Length.ToString()}
+            });
+
+            using (var stream = formFile.OpenReadStream())
+            {
+                if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
+                {
+                    return new AcceptedResult();
+                }
+            }
+        }
+```
+- Last opp et bilde
+- Gå til portal.azure.com og ApplicationInsights
+- Velg _Usage -> Events_ for å se eventen som ble laget
+- Gå til Analytics og kjør query på _customEvents_ for å se all info om eventen
+```
+customEvents | where name  == "UPLOADED_FILE"
+```
+- Trykk "Chart" for å se resultatet som en graf
+- Denne grafen kan vises på dashboardet i azure-portalen ved å trykke "Pin"
