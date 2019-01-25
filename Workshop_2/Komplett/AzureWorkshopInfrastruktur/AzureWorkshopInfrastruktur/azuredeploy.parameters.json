@@ -13,6 +13,9 @@
     },
     "blobContainerName": {
       "value": "imagecontainer"
-    }
+    },
+    "appInsightsName": {
+      "value": ""
+    } 
   }
 }
