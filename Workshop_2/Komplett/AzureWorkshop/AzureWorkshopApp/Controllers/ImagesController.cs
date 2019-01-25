@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureWorkshopApp.Helpers;
 using AzureWorkshopApp.Services;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +13,12 @@ namespace AzureWorkshopApp.Controllers
     public class ImagesController : Controller
     {
         private readonly IStorageService _storageService;
+        private readonly TelemetryClient _telemetryClient;
 
-        public ImagesController(IStorageService storageService)
+        public ImagesController(IStorageService storageService, TelemetryClient telemetryClient)
         {
             _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
+            _telemetryClient = telemetryClient;
         }
 
         // POST /api/images/upload

@@ -24,6 +24,7 @@ namespace AzureWorkshopApp
 
             services.AddScoped<IStorageService, StorageService>();
             services.Configure<AzureStorageConfig>(Configuration.GetSection("AzureStorageConfig"));
+            services.AddApplicationInsightsTelemetry(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
