@@ -28,7 +28,11 @@ og endre `main`-metoden til
     @inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
 ```
 
-Åpne deretter `_Layout.cshtml` og legg til følgende nederst i `<head>`
+Åpne deretter `_Layout.cshtml` og legg til følgende helt i toppen av filen 
+```
+@using Microsoft.ApplicationInsights.AspNetCore
+```
+og følgende nederst i `<head>`
 ```html
     @Html.Raw(JavaScriptSnippet.FullScript)
 ```
