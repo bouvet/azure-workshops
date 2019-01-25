@@ -1,25 +1,29 @@
 # Leksjon 2: Infrastructure as Code (ARM-templates)
 
-I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen i prosjektet ditt.
+
+
+
+I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen i prosjektet ditt. 
 
 ## Bygge-pipeline 
 Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din til neste steg i kjeden (release-pipeline).
 
-1. Lag en by build-definisjon
-2. Velg "Empty template"
-2. Definisjonen skal kun inneholde et steg "Publish build artifacts". 
-3. Legg inn et filter som gjør at bygget trigges bare når endringer under AzureWorkshopInfracture 
-4. Velg så dette steget, og velg så stien til katalogen hvor  "Workshop_2/Komplett/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur"
-5. Trykk så på "Save and Queue" for å se at den kjører.
+1. Lag en by build-definisjon (Trykk på Pipelines->Builds->New).
+2. Velg git-repoet du laget i forrige sted
+3. Velg "Empty job", og gi definisjonen et passende navn. Resten kan stå slik de står.
+4. Definisjonen skal kun inneholde et steg/task "Publish build artifacts". 
+5. Legg inn et filter som gjør at bygget trigges bare når endringer under AzureWorkshopInfracture 
+6. Velg så dette steget, og velg så stien til katalogen hvor din ARM-template finnes("Workshop_2/Start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur")
+7. Trykk så på "Save and Queue" for å se at den kjører.
 
-Når du har fått steget til, går du videre
+Når du har fått build-pipelinen din til å kjøre, sjekk at bygge-artefakten din inneholder ARM-templaten.
 
 ## Release-pipeline
 
-For å deploye infrastrukturen 
+For å deploye infrastrukturen trenger å opprette en Release-pipeline som tar et bygg og deployer det ut til et miljø.
 
-1. Lag en ressursgruppe (i portalen f.eks.) som du ønsker å deploye løsningen din til. 
-2. Lag så en egen release-pipeline for infrastruktur.
+1. Lag en ressursgruppe i portalen som du ønsker å deploye løsningen din til. 
+2. Lag så en egen release-pipeline for infrastruktur ()
 3. Her velger du "Empty job", og ikke noen ferdig template.
 4. Velg artifact til venstre fra den build-pipelinen du laget i forrige oppgave, trykk Add.
 4. Gi release-pipelinen din et navn, f.eks. "Infrastruktur" (på toppen av siden).
