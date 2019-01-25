@@ -5,6 +5,9 @@
     "webSiteName": {
       "value": ""
     },
+    "appServiceSku": {
+      "value": "D1"
+    },
     "storageAccountName": {
       "value": ""
     },
