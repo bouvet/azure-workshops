@@ -7,15 +7,21 @@ ARM-templates er Microsofts løsning for IoC i Azure. Det aller fleste tjenester
 
 I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen din. I tillegg skal du gjøre endringer på infrastrukturen ved å editere ARM-templates og så redeploye disse.
 
+## Klargjør parameter-filer for forskjellige miljøer
+
+1. Kopier azuredeploy.parameters.json til azuredeploy
+2. Editer så den nye filen ved å sette inn dine unike navn på de forskjellige tjenestene. Gi komponentene navn slik at man kan se på de hvilket miljø de tilhører.
+3. Sjekk inn og push oppdateringen din.
+
 ## Bygge-pipeline 
 Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din til neste steg i kjeden (release-pipeline).
 
 1. Lag en by build-definisjon (Trykk på Pipelines->Builds->New).
-2. Velg git-repoet du laget i forrige sted
+2. Velg git-repoet du laget i forrige sted.
 3. Velg "Empty job", og gi definisjonen et passende navn. Resten kan stå slik de står.
 4. Definisjonen skal kun inneholde et steg/task "Publish build artifacts". 
 5. Legg inn et filter som gjør at bygget trigges bare når endringer under AzureWorkshopInfracture 
-6. Velg så dette steget, og velg så stien til katalogen hvor din ARM-template finnes("Workshop_2/Start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur")
+6. Velg så dette steget, og velg så stien til katalogen hvor din ARM-template finnes("AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur")
 7. Trykk så på "Save and Queue" for å se at den kjører.
 
 Når du har fått build-pipelinen din til å kjøre, sjekk at bygge-artefakten din inneholder ARM-templaten.
@@ -37,22 +43,18 @@ For å deploye infrastrukturen trenger å opprette en Release-pipeline som tar e
 10. Trykk så på "Save" og "Ok".
 11. Trykk så på "+Release". Dersom du har valgt manuell deploy, så må du starte denne.
 
-
 ### Redeploy av miljø
-
 For å teste at ting faktisk blir opprettet på en konsistent, skal du nå slette og redeploye.
 
 1. Slett en ressurs i ressursgruppen din (f.eks.Storage Accounten).
 2. Kjør Redploy av releasen og se at det blir opprettet igjen.
-
-
 
 ### Endring av miljø
 Du ønsker å gjøre det mulig å sette størrelsen på App Service Plan'en til forskjellige størrelse basert på om det er et test-miljø eller
 et produksjonsmiljø. For å gjøre dette må du legge inn et 
 
 1. Editer azuredeploy.json. Legg til en parameter til scriptet for å sette SKU. Referer så til denne parameteren lenger i nede i scriptet der SKU (Stock Keeping Unit, bare en unik kode for det produktet du velger) blir satt på App Service Plan.
-2. Editer så azuredeploy.parameters.json og legg inn parameteren du nettopp laget. Sett denne verdien til en f.eks. D1.
+2. Editer så azuredeploy.parameters.test.json og legg inn parameteren du nettopp laget. Sett denne verdien til en f.eks. D1.
 3. Check så inn koden, lag et nytt bygg og kjør en release.
 
 Se så at SKU har oppdatert seg på App Service Planen din.
@@ -62,8 +64,28 @@ Se så at SKU har oppdatert seg på App Service Planen din.
 I neste leksjon skal du bruke Application Insights for å overvåke løsning. For å gjøre dette må du legge til selve ressursen i miljøet ditt.
 
 1. Editer azuredeploy.json. Se https://docs.microsoft.com/en-us/azure/templates/microsoft.insights/2015-05-01/components for strukturen på denne komponenten. Legg også til en parameter til scriptet for navnet på komponenten.
-2. Editer azuredeploy.parameters.json, og legg til parameter som setter navnet på Application Insights-instansen din.
-3. Sjekk inn endringene dine, og vent til at 
+2. Du må også legge til noen appSettings på website-ressursen din (i tillegg til de som allerede finnes), som peker til 
+```
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', parameters('appInsightsName')), '2014-04-01').InstrumentationKey]"
+            },
+            {
+              "name": "APPINSIGHTS_PORTALINFO",
+              "value": "ASP.NETCORE"
+            },
+            {
+              "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+              "value": "1.0.0"
+            },
+            {
+              "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+              "value": "1.0.0"
+            },
+```
+3. Editer azuredeploy.parameters.test.json, og legg til parameter som setter navnet på Application Insights-instansen din.
+3. Sjekk inn endringene dine, og vent til at bygget ditt har gått igjennom.
 4. Lag en ny release og valider at komponenten blir opprettet. 
 
 Du er nå klar for å begi deg ut på neste leksjon.
