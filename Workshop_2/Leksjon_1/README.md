@@ -56,7 +56,7 @@ Alle disse app servicene kan gjerne ha samme service plan med F1 pricing tier, m
 >
 >Microsoft anbefaler å sette opp et YAML script som definerer build pipelinen din. Dette er et forholdsvis nytt konsept hvor ikke alt er støttet enda. Fordelen med å definere build pipelinen din i et script er at man kan sjekke det inn i kildekoden. Azure DevOps vil lese YAML fila og sette opp pipelinen din som et steg før selve applikasjonen din kjøres gjennom den. På den måten kan man ikke bare endre selve applikasjonen ved en commit, men pipelinen også. Det blir i tillegg mulig å rulle tilbake selve pipelinen din om en feil skulle oppstå.
 >
->Den andre måten å gjøre det på er gjennom designeren. Det neggative med denne fremgangsmetoden er at definisjonen av pipelinen din ikke er lagret i kildekoden din, med alle implikasjoner det gir. Det fine med å bruke designeren er at man minimerer terskelen for å sette opp en pipeline for en uerfaren DevOps-er. Designeren er en fin måte å oppdage hvilke steg som finnes, og hvilke innstillinger som finnes til hvert av stegene. 
+>Den andre måten å gjøre det på er gjennom designeren. Det negative med denne fremgangsmetoden er at definisjonen av pipelinen din ikke er lagret i kildekoden din, med alle implikasjoner det gir. Det fine med å bruke designeren er at man minimerer terskelen for å sette opp en pipeline for en uerfaren DevOps-er. Designeren er en fin måte å oppdage hvilke steg som finnes, og hvilke innstillinger som finnes til hvert av stegene. 
 >
 >Azure DevOps gjør det forholdsvis enkelt å traversere mellom å bruke designeren og YAML filer om det skulle ønskes. Så man kan starte med designeren for så å konvertere pipelinen YAML om man skulle ønske det.
 
