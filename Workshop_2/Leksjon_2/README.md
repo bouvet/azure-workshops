@@ -1,17 +1,22 @@
 # Leksjon 2: Infrastructure as Code (ARM-templates)
 
-Infrastructure as Code (IaC) er at man oppretter og vedlikeholder IT-infrastrukt i form av maskinlesbare definisjons-filer, i stedet
+Infrastructure as Code (IaC) er at man oppretter og vedlikeholder IT-infrastruktur i form av maskinlesbare definisjons-filer, i stedet
 for manuell oppsett eller at man bruker programmer for å provisjonere infratrukturen sin. 
 
 ARM-templates er Microsofts løsning for IoC i Azure. Det aller fleste tjenester kan provisjoneres via ARM.
 
 I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen din. I tillegg skal du gjøre endringer på infrastrukturen ved å editere ARM-templates og så redeploye disse.
 
-## Klargjør parameter-filer for forskjellige miljøer
+## Klargjør parameter-filer for test-miljøet
 
-1. Kopier azuredeploy.parameters.json til azuredeploy
-2. Editer så den nye filen ved å sette inn dine unike navn på de forskjellige tjenestene. Gi komponentene navn slik at man kan se på de hvilket miljø de tilhører.
-3. Sjekk inn og push oppdateringen din.
+Parameter-filen i ARM-templates er en fil du bruker for å legge inn ting som er forskjellig fra f.eks. miljø til miljø. 
+
+1. Lag en ressursgruppe i portalen som du ønsker å deploye løsningen din til. Det er alltid lurt å lage separate ressursgrupper for forskjellige miljøer.
+2. Kopier azuredeploy.parameters.json til azuredeploy.test.parameters.json. Dette vil være parameter-filen din for test.
+3. Editer så den nye filen ved å sette inn dine unike navn på de forskjellige tjenestene. Gi komponentene navn slik at man kan se på de hvilket miljø de tilhører.
+4. Valider templaten din ved å gjøre en test-deploy ved å høyre-klikke på prosjektet og velg Deploy. Velg riktige filer og rett ressursgruppe i Azure. Publish.
+5. Sjekk inn og push oppdateringen din.
+6. Slett ressursene som du opprettet i ressurgruppen. Disse skal bli lagt inn av Azure DevOps.
 
 ## Bygge-pipeline 
 Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din til neste steg i kjeden (release-pipeline).
@@ -28,12 +33,11 @@ Når du har fått build-pipelinen din til å kjøre, sjekk at bygge-artefakten d
 
 ## Release-pipeline
 
-For å deploye infrastrukturen trenger å opprette en Release-pipeline som tar et bygg og deployer det ut til et miljø.
+For å deploye infrastrukturen trenger å opprette en Release-pipeline som tar et bygg og deployer det ut til et miljø. I denne øvelsen skal du kun deploye infrastrukturen fort test-miljøet.
 
-1. Lag en ressursgruppe i portalen som du ønsker å deploye løsningen din til. 
-2. Lag så en egen release-pipeline for infrastruktur (Pipelines->Releases-New)
-3. Her velger du "Empty job", og ikke noen ferdig template.
-4. Gi steget "Stage 1" et nytt navn, og kall det f.eks. "Test". Dette vil være navnet på miljøet ditt.
+1. Lag så en egen release-pipeline for infrastruktur (Pipelines->Releases->New)
+2. Her velger du "Empty job", og ikke noen ferdig template.
+3. Gi steget "Stage 1" et nytt navn, og kall det f.eks. "Test". Dette vil være navnet på miljøet ditt.
 4. Gi release-pipelinen din et navn, f.eks. "Infrastruktur" (på toppen av siden).
 5. Velg artifakt til venstre fra den build-pipelinen du laget i forrige oppgave, trykk "Add an artifact". Velg her den byggepipelinen du opprettet i forrige steg. Her kan du også velge om du vil spesifisere hvilken bygg du vil bruke for hver release, eller om den skal foreslå den siste bygg. Trykk så Add.
 6. Trykk så på "Pre-deployment conditions" for Test-miljøet ditt. Her kan du velge om du ønsker at det skal bli deployet automatisk når du oppretter en release, eller om du må gjøre dette manuelt.
@@ -47,7 +51,7 @@ For å deploye infrastrukturen trenger å opprette en Release-pipeline som tar e
 For å teste at ting faktisk blir opprettet på en konsistent, skal du nå slette og redeploye.
 
 1. Slett en ressurs i ressursgruppen din (f.eks.Storage Accounten).
-2. Kjør Redploy av releasen og se at det blir opprettet igjen.
+2. Kjør Redploy av releasen og se at det blir opprettet igjen (gå inn på selve releasen og trykk på miljøet, og velg Redeploy)
 
 ### Endring av miljø
 Du ønsker å gjøre det mulig å sette størrelsen på App Service Plan'en til forskjellige størrelse basert på om det er et test-miljø eller
@@ -63,7 +67,22 @@ Se så at SKU har oppdatert seg på App Service Planen din.
 
 I neste leksjon skal du bruke Application Insights for å overvåke løsning. For å gjøre dette må du legge til selve ressursen i miljøet ditt.
 
-1. Editer azuredeploy.json. Se https://docs.microsoft.com/en-us/azure/templates/microsoft.insights/2015-05-01/components for strukturen på denne komponenten. Legg også til en parameter til scriptet for navnet på komponenten.
+1. Editer azuredeploy.json. Se https://docs.microsoft.com/en-us/azure/templates/microsoft.insights/2015-05-01/components for strukturen på denne komponenten. Legg også til en parameter til scriptet for navnet på komponenten. Vår forslag er: 
+```
+    {
+      "name": "[parameters('appInsightsName')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2015-05-01",
+      "location": "[parameters('location')]",
+      "tags": {},
+      "kind": "string",
+      "properties": {
+        "Application_Type": "web",
+        "Flow_Type": "Bluefield",
+        "Request_Source": "rest"
+      }
+    }
+```
 2. Du må også legge til noen appSettings på website-ressursen din (i tillegg til de som allerede finnes), som peker til 
 ```
           "appSettings": [
@@ -84,8 +103,16 @@ I neste leksjon skal du bruke Application Insights for å overvåke løsning. Fo
               "value": "1.0.0"
             },
 ```
-3. Editer azuredeploy.parameters.test.json, og legg til parameter som setter navnet på Application Insights-instansen din.
-3. Sjekk inn endringene dine, og vent til at bygget ditt har gått igjennom.
-4. Lag en ny release og valider at komponenten blir opprettet. 
+3. Du må også legge inn en avhengighet mellom Web App-ressursen din og Application Insights-ressursen. Dette fordi at Application Insights må opprettes først, siden Web App har en referanse til denne. 
+Vår dependsOn på Web App ser slik ut:
+```
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
+        "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]"
+      ]
+```
+4. Editer azuredeploy.parameters.test.json, og legg til parameter som setter navnet på Application Insights-instansen din.
+5. Sjekk inn endringene dine, og vent til at bygget ditt har gått igjennom.
+6. Lag en ny release og valider at komponenten blir opprettet. 
 
 Du er nå klar for å begi deg ut på neste leksjon.
