@@ -127,9 +127,7 @@ Vi har nå satt opp en release pipeline som går mot forskjellige miljøer i Azu
 Nå er det på tide å se om alt snurrer. Men først... Hadde vi ikke en test som feila? 😏
 
 ## 5: Gjør endringer til kildekoden
-Clone repoet ned til lokal maskin. Du kan finne clone URLen øverst til høyre under "*Repos*". Hvordan du tar deg av autentiseringen opp mot Azure DevOps er opp til deg.
-
-Åpne `AzureWorkshop\AzureWorkshop.sln` og fiks testen.
+Åpne `[DittLokaleRepo]\AzureWorkshop\AzureWorkshop.sln` og fiks testen.
 
 Når testen er fikset og koden er sjekket inn burde build pipelinen starte en ny jobb som bygger og tester den nye commiten. Når bygget er ferdig burde release pipelinen merke at en ny artifact er klar for deploy og trigge en ny deploy mot test miljøet. For at releasen skal deployes på QA og Prod må de godkjennes av deg først.
 
