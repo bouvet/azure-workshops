@@ -44,10 +44,15 @@ Gå til Repos og initialisere med VisualStudio gitignore. Clone repoet ned til d
 ## 2: Lag App Services i [Azure](https://portal.azure.com)
 For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, QA, og prod i [Azure](https://portal.azure.com). Husk å bruke samme brukeren i Azure som i Azure DevOps. 
 
-Det anbefales at disse har hver sin ressurs gruppe med hver sin pricing tier. Vi trenger ikke noe kraftige greier så det er nok med pricing tier F1. Anbefaler i tillegg at dere gir ressurs gruppene, pricing tierene, og app servicene et navn som gjør det lett å få oversikt over hvilke Azure ressurser som hører til hvilket miljø. Dette gjør det lettere å identifisere miljøene når vi skal sette opp build pipelinen. Eksempelvis for app servicene:
+Det er som oftest lurt å lage separate ressursgrupper for forskjellige miljøer. Når det gjelder app service plan trenger vi ikke noen kraftige greier. Det holder med en F1 pricing tier. Anbefaler at dere gir ressurs gruppene, app service planene, og app servicene et navn som gjør det lett å få oversikt over hvilke Azure ressurser som hører til hvilket miljø. Dette gjør det lettere å identifisere miljøene når vi skal sette opp build pipelinen. Eksempelvis for app servicene:
 - **Test**: [NavnPåApp]Test
 - **QA**: [NavnPåApp]QA
 - **Prod**: [NavnPåApp]
+
+Fremgangsmåte:
+1. Gå til [Azure](https://portal.azure.com)
+2. Lag 3 resource groups, en for hvert av miljøene, med hver sin service plan 
+4. Lag 3 app services, en for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
 
 ## 3: Sett opp build pipeline
 >Nå som du har opprettet et prosjekt i Azure DevOps og importert et Git repo kan vi sette opp en build pipeline for å automatisere bygging og testing av applikasjonen. Azure DevOps har to måter å sette opp en build pipeline på:
