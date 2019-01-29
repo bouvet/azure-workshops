@@ -11,9 +11,9 @@ I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen d
 
 Parameter-filen i ARM-templates er en fil du bruker for å legge inn ting som er forskjellig fra f.eks. miljø til miljø. 
 
-1. Lag en ressursgruppe i portalen som du ønsker å deploye løsningen din til. Det er alltid lurt å lage separate ressursgrupper for forskjellige miljøer.
+1. Gjenbruk ressursgruppen du brukte for test-miljøet. Slett Web App'en og App Service Plan du opprettet i den gruppen. Merk deg navnet på Web App'en din, da du skal gjenbruke denne i steg 3. 
 2. Kopier azuredeploy.parameters.json til azuredeploy.test.parameters.json. Dette vil være parameter-filen din for test.
-3. Editer så den nye filen ved å sette inn dine unike navn på de forskjellige tjenestene. Gi komponentene navn slik at man kan se på de hvilket miljø de tilhører.
+3. Editer så den nye filen ved å sette inn dine unike navn på de forskjellige tjenestene, og gi Web App det samme. Gi komponentene navn slik at man kan se på de hvilket miljø de tilhører.
 4. Valider templaten din ved å gjøre en test-deploy ved å høyre-klikke på prosjektet og velg Deploy. Velg riktige filer og rett ressursgruppe i Azure. Publish.
 5. Sjekk inn og push oppdateringen din.
 6. Slett ressursene som du opprettet i ressurgruppen. Disse skal bli lagt inn av Azure DevOps.
