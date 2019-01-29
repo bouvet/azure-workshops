@@ -57,9 +57,8 @@ For å teste at ting faktisk blir opprettet på en konsistent, skal du nå slett
 Du ønsker å gjøre det mulig å sette størrelsen på App Service Plan'en til forskjellige størrelse basert på om det er et test-miljø eller
 et produksjonsmiljø. For å gjøre dette må du legge inn et 
 
-1. Editer azuredeploy.json. Legg til en parameter til scriptet for å sette SKU. Referer så til denne parameteren lenger i nede i scriptet der SKU (Stock Keeping Unit, bare en unik kode for det produktet du velger) blir satt på App Service Plan.
-2. Editer så azuredeploy.parameters.test.json og legg inn parameteren du nettopp laget. Sett denne verdien til en f.eks. D1.
-3. Check så inn koden, lag et nytt bygg og kjør en release.
+1. Editer så azuredeploy.parameters.test.json og legg inn parameter for _appServiceSku_. Sett denne verdien til en f.eks. D1, slik at den overskriver parameteren F1 som er satt som default verdi.
+2. Sjekk så inn koden, lag et nytt bygg og kjør en release.
 
 Se så at SKU har oppdatert seg på App Service Planen din.
 
