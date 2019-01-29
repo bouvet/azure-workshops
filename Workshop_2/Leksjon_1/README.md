@@ -44,7 +44,7 @@ Gå til Repos og initialisere med VisualStudio gitignore. Clone repoet ned til d
 ## 2: Lag App Services i [Azure](https://portal.azure.com)
 For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, QA, og prod i [Azure](https://portal.azure.com). Husk å bruke samme brukeren i Azure som i Azure DevOps. 
 
-Alle disse app servicene kan gjerne ha samme service plan med F1 pricing tier, men dette er helt opp til dere. Anbefaler at dere gir dem et navn som inneholder navnet på miljøet det skal hoste. Dette gjør det lettere å identifisere miljøene når vi skal sette opp build pipelinen. Eksempelvis:
+Det anbefales at disse har hver sin ressurs gruppe med hver sin pricing tier. Vi trenger ikke noe kraftige greier så det er nok med pricing tier F1. Anbefaler i tillegg at dere gir ressurs gruppene, pricing tierene, og app servicene et navn som gjør det lett å få oversikt over hvilke Azure ressurser som hører til hvilket miljø. Dette gjør det lettere å identifisere miljøene når vi skal sette opp build pipelinen. Eksempelvis for app servicene:
 - **Test**: [NavnPåApp]Test
 - **QA**: [NavnPåApp]QA
 - **Prod**: [NavnPåApp]
