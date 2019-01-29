@@ -25,7 +25,7 @@ Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det e
 2. Velg git-repoet du laget i forrige sted.
 3. Velg "Empty job", og gi definisjonen et passende navn. Resten kan stå slik de står.
 4. Definisjonen skal kun inneholde et steg/task "Publish build artifacts". 
-5. Legg inn et filter som gjør at bygget trigges bare når endringer under AzureWorkshopInfracture 
+5. Legg inn et filter som gjør at bygget trigges bare når endringer under AzureWorkshopInfracture. 
 6. Velg så dette steget, og velg så stien til katalogen hvor din ARM-template finnes("AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur")
 7. Trykk så på "Save and Queue" for å se at den kjører.
 
@@ -83,7 +83,7 @@ I neste leksjon skal du bruke Application Insights for å overvåke løsning. Fo
       }
     }
 ```
-2. Du må også legge til noen appSettings på website-ressursen din (i tillegg til de som allerede finnes), som peker til 
+2. Du må også legge til noen appSettings på website-ressursen din (i tillegg til de som allerede finnes), som peker til Application Insights-ressursen din.
 ```
           "appSettings": [
             {
