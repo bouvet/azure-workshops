@@ -14,6 +14,7 @@ Forutsetninger for å gjennomføre workshop:
 * Installere Visual Studio 2017 for Windows, eller Visual Studio for Mac. 
   * Hvis du ikke har lisens, velg Community.
   * Hvis du har lisens, velg Professional eller Enterprise.
+  * Hvis du allerede har Visual Studio 2017 installert, husk å oppdater til siste versjon.
 * En git-klient for å sjekke ut kode i github.
   * Windows: https://git-scm.com/download/win
   * Mac: https://git-scm.com/download/mac

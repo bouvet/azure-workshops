@@ -3,7 +3,7 @@
 Infrastructure as Code (IaC) er at man oppretter og vedlikeholder IT-infrastruktur i form av maskinlesbare definisjons-filer, i stedet
 for manuell oppsett eller at man bruker programmer for å provisjonere infratrukturen sin. 
 
-ARM-templates er Microsofts løsning for IoC i Azure. Det aller fleste tjenester kan provisjoneres via ARM.
+ARM-templates er Microsofts løsning for IaC i Azure. Det aller fleste tjenester i Azure kan provisjoneres via ARM-templates.
 
 I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen din. I tillegg skal du gjøre endringer på infrastrukturen ved å editere ARM-templates og så redeploye disse.
 
@@ -14,19 +14,20 @@ Parameter-filen i ARM-templates er en fil du bruker for å legge inn ting som er
 1. Gjenbruk ressursgruppen du brukte for test-miljøet. Slett Web App'en og App Service Plan du opprettet i den gruppen. Merk deg navnet på Web App'en din, da du skal gjenbruke denne i steg 3. 
 2. Kopier azuredeploy.parameters.json til azuredeploy.test.parameters.json. Dette vil være parameter-filen din for test.
 3. Editer så den nye filen ved å sette inn dine unike navn på de forskjellige tjenestene, og gi Web App det samme. Gi komponentene navn slik at man kan se på de hvilket miljø de tilhører.
-4. Valider templaten din ved å gjøre en test-deploy ved å høyre-klikke på prosjektet og velg Deploy. Velg riktige filer og rett ressursgruppe i Azure. Publish.
-5. Sjekk inn og push oppdateringen din.
+4. Valider templaten din ved å gjøre en test-deploy ved å høyre-klikke på prosjektet og velg Deploy. Velg riktige filer og rett ressursgruppe i Azure. Publish. (Dersom du får spørsmål om navn på ressursgruppe., kan det være noen problemer med Visual Studio-versjonen din, og da må du fylle ut dette manuelt).
+5. Sjekk inn og push oppdateringen din i git.
 6. Slett ressursene som du opprettet i ressurgruppen. Disse skal bli lagt inn av Azure DevOps.
 
 ## Bygge-pipeline 
 Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din til neste steg i kjeden (release-pipeline).
 
-1. Lag en by build-definisjon (Trykk på Pipelines->Builds->New).
+1. Lag en ny build-definisjon (Trykk på Pipelines->Builds->+New->New Build pileline).
 2. Velg git-repoet du laget i forrige sted.
 3. Velg "Empty job", og gi definisjonen et passende navn. Resten kan stå slik de står.
-4. Definisjonen skal kun inneholde et steg/task "Publish build artifacts". 
-5. Legg inn et filter som gjør at bygget trigges bare når endringer under AzureWorkshopInfracture. 
-6. Velg så dette steget, og velg så stien til katalogen hvor din ARM-template finnes("AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur")
+4. Trykk så på +-tegnet ved "Agent job 1". Definisjonen skal kun inneholde et steg/task "Publish Build Artifacts" (ikke forveksle med "Publish Pipeline Artifact").
+5. Velg så dette steget, og velg så stien til katalogen hvor din ARM-template finnes
+("Workshop_2/Komplett/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur")
+5. Legg inn et filter som gjør at bygget trigges bare når endringer under AzureWorkshopInfracture. Dette gjøres under fanen Triggers, hvor du velger "Enable continuous integration", og setter opp path-filters til å peke til katalogen med dine ARM-templates.
 7. Trykk så på "Save and Queue" for å se at den kjører.
 
 Når du har fått build-pipelinen din til å kjøre, sjekk at bygge-artefakten din inneholder ARM-templaten.
