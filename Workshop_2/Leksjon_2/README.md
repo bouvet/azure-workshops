@@ -27,31 +27,33 @@ Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det e
 4. Trykk så på +-tegnet ved "Agent job 1". Definisjonen skal kun inneholde et steg/task "Publish Build Artifacts" (ikke forveksle med "Publish Pipeline Artifact").
 5. Velg så dette steget, og velg så stien til katalogen hvor din ARM-template finnes
 ("Workshop_2/Komplett/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur")
-5. Legg inn et filter som gjør at bygget trigges bare når endringer under AzureWorkshopInfracture. Dette gjøres under fanen Triggers, hvor du velger "Enable continuous integration", og setter opp path-filters til å peke til katalogen med dine ARM-templates.
+5. Dersom du ønsker, kan du sette opp continuous ingeration(CI) slik at bygg blir trigget automatisk når man sjekker inn ny kode i git. Du ønsker da å legge inn et filter som gjør at bygget bare trigges når endringer under AzureWorkshopInfracture. Dette gjøres under fanen Triggers, hvor du velger "Enable continuous integration", og setter opp path-filters til å peke til katalogen med dine ARM-templates. Katalogen som angis må være hele stien, og ha vanlige slasher: Eks. "/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur". Hvis du ikke setter opp CI, så må du manuelt trigge bygg når du skal bygge.
 7. Trykk så på "Save and Queue" for å se at den kjører.
 
-Når du har fått build-pipelinen din til å kjøre, sjekk at bygge-artefakten din inneholder ARM-templaten.
+Når du har fått build-pipelinen din til å kjøre, sjekk at bygge-artefakten din inneholder ARM-templaten. Dette gjøres ved å gå inn på selve bygget, og så trykk på "Artifacts" øverst i høyre hjørne.
 
 ## Release-pipeline
 
-For å deploye infrastrukturen trenger å opprette en Release-pipeline som tar et bygg og deployer det ut til et miljø. I denne øvelsen skal du kun deploye infrastrukturen fort test-miljøet.
+For å deploye infrastrukturen trenger å opprette en Release-pipeline som tar et bygg og deployer det ut til et miljø. I denne øvelsen skal du kun deploye infrastrukturen for test-miljøet.
 
-1. Lag så en egen release-pipeline for infrastruktur (Pipelines->Releases->New)
+1. Lag en egen release-pipeline for infrastruktur (Pipelines->Releases->New).
 2. Her velger du "Empty job", og ikke noen ferdig template.
 3. Gi steget "Stage 1" et nytt navn, og kall det f.eks. "Test". Dette vil være navnet på miljøet ditt.
 4. Gi release-pipelinen din et navn, f.eks. "Infrastruktur" (på toppen av siden).
-5. Velg artifakt til venstre fra den build-pipelinen du laget i forrige oppgave, trykk "Add an artifact". Velg her den byggepipelinen du opprettet i forrige steg. Her kan du også velge om du vil spesifisere hvilken bygg du vil bruke for hver release, eller om den skal foreslå den siste bygg. Trykk så Add.
+5. Velg artefakt til venstre fra den build-pipelinen du laget i forrige oppgave, trykk "Add an artifact". Velg her den byggepipelinen du opprettet i forrige steg. Her kan du også velge om du vil spesifisere hvilken bygg du vil bruke for hver release, eller om den skal foreslå den siste bygg. Trykk så Add.
 6. Trykk så på "Pre-deployment conditions" for Test-miljøet ditt. Her kan du velge om du ønsker at det skal bli deployet automatisk når du oppretter en release, eller om du må gjøre dette manuelt.
 7. Åpne så Stage-Task (ved å trykk på linken i miljøet) og legg til tasken "Azure Resource Group Deployment". 
-8. På Action lar du det bare stå på "Create or update resource group". Konfigurer så dette steget ved å velge Azure subscription, velg ressursgruppen du laget i steg 1) og sett location til samme sted som ressursgruppen.
+8. På Action lar du det bare stå på "Create or update resource group". Konfigurer så dette steget ved å velge Azure subscription, velg ressursgruppen du har laget og sett location til samme sted som ressursgruppen.
 9. Under "Template", velg template og parameter fil som ble publisert fra byggestedet ditt.
 10. Trykk så på "Save" og "Ok".
 11. Trykk så på "+Release". Dersom du har valgt manuell deploy, så må du starte denne.
 
+Se nå at releasen blir deployet ut til test-miljøet ditt.
+
 ### Redeploy av miljø
 For å teste at ting faktisk blir opprettet på en konsistent, skal du nå slette og redeploye.
 
-1. Slett en ressurs i ressursgruppen din (f.eks.Storage Accounten).
+1. Slett en ressurs i ressursgruppen din (f.eks. Storage Accounten).
 2. Kjør Redploy av releasen og se at det blir opprettet igjen (gå inn på selve releasen og trykk på miljøet, og velg Redeploy)
 
 ### Endring av miljø
