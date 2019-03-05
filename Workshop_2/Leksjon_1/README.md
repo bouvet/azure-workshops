@@ -42,17 +42,16 @@ Lag et nytt privat prosjekt med Git som version controll og Agile som work item 
 Gå til Repos og initialisere med VisualStudio gitignore. Clone repoet ned til din egen maskin. For autentisering mot Azure DevOps kan du enten sette opp et access token eller en alternativ innlogging. Gå til [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops) og hent filene. Dette kan du enten gjøre ved å clone det ned til egen maskin via git, eller laste ned som zip. Gå til `Workshop_2/Start` og kopier innholdet til ditt lokale Azure DevOps repo. Commit det og push det opp til Azure DevOps. 
 
 ## 2: Lag App Services i [Azure](https://portal.azure.com)
-For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, QA, og prod i [Azure](https://portal.azure.com). Husk å bruke samme brukeren i Azure som i Azure DevOps. 
+For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, og en for prod i [Azure](https://portal.azure.com). Husk å bruke samme brukeren i Azure som i Azure DevOps. 
 
 Det er som oftest lurt å lage separate ressursgrupper for forskjellige miljøer. Når det gjelder app service plan trenger vi ikke noen kraftige greier. Det holder med en F1 pricing tier. Anbefaler at dere gir ressurs gruppene, app service planene, og app servicene et navn som gjør det lett å få oversikt over hvilke Azure ressurser som hører til hvilket miljø. Dette gjør det lettere å identifisere miljøene når vi skal sette opp build pipelinen. Eksempelvis for app servicene:
 - **Test**: [NavnPåApp]Test
-- **QA**: [NavnPåApp]QA
 - **Prod**: [NavnPåApp]
 
 Fremgangsmåte:
 1. Gå til [Azure](https://portal.azure.com)
-2. Lag 3 resource groups, en for hvert av miljøene, med hver sin service plan 
-4. Lag 3 app services, en for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
+2. Lag en resource group for hvert av miljøene, med hver sin service plan 
+4. Lag en app service for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
 
 ## 3: Sett opp build pipeline
 >Nå som du har opprettet et prosjekt i Azure DevOps og importert et Git repo kan vi sette opp en build pipeline for å automatisere bygging og testing av applikasjonen. Azure DevOps har to måter å sette opp en build pipeline på:
@@ -116,23 +115,23 @@ Etter artifacten er lagt til, trykk på lyn ikonet over artifakten og slå på "
 
 Trykk "*Add a stage*", velg "*Azure App Service deployment*" templaten, og kall den nye stagen for "Test". 
 
-Kopier test staget du akkurat lagde og kall den for "QA". Trykk på "*Pre-deployment conditions*" (ikonet med et lyn og en person) på QA stagen. Enable "*Pre-deployment approvals*" og sett deg selv som approver. Etter dette, kopier QA staget og kall det for "Prod".
+Kopier test staget du akkurat lagde og kall den for "Prod". Trykk på "*Pre-deployment conditions*" (ikonet med et lyn og en person) på prod stagen. Enable "*Pre-deployment approvals*" og sett deg selv som approver. 
 
-Trykk på "*Tasks*" tabben øverst i bildet og velg "*Test*". Koble denne stagen opp mot test App Servicen på samme måte som vi gjorde i steg 3. Gjør det samme for QA og Prod, mot sine respektive miljøer.
+Trykk på "*Tasks*" tabben øverst i bildet og velg "*Test*". Koble denne stagen opp mot test App Servicen på samme måte som vi gjorde i steg 3. Gjør det samme for Prod.
 
 Du må gjerne gi release pipelinen et navn ved å redigere det øverst i bildet. Når du er ferdig, trykk "*Save*" øverst i høyre hjørne og lagre release pipelinen under root mappa. 
 
-Vi har nå satt opp en release pipeline som går mot forskjellige miljøer i Azure. I tillegg må du approve en release før den går fra test til QA og fra QA til Prod.
+Vi har nå satt opp en release pipeline som går mot forskjellige miljøer i Azure. I tillegg må du approve en release før den går fra test til Prod.
 
 Nå er det på tide å se om alt snurrer. Men først... Hadde vi ikke en test som feila? 😏
 
 ## 5: Gjør endringer til kildekoden
 Åpne `[DittLokaleRepo]\AzureWorkshop\AzureWorkshop.sln` og fiks testen.
 
-Når testen er fikset og koden er sjekket inn burde build pipelinen starte en ny jobb som bygger og tester den nye commiten. Når bygget er ferdig burde release pipelinen merke at en ny artifact er klar for deploy og trigge en ny deploy mot test miljøet. For at releasen skal deployes på QA og Prod må de godkjennes av deg først.
+Når testen er fikset og koden er sjekket inn burde build pipelinen starte en ny jobb som bygger og tester den nye commiten. Når bygget er ferdig burde release pipelinen merke at en ny artifact er klar for deploy og trigge en ny deploy mot test miljøet. For at releasen skal deployes på Prod må de godkjennes av deg først.
 
 ## 6: Deploy til alle miljøene
-Approve release mot QA og Prod og se at applikasjonen kjører i alle miljøene dine. 
+Approve release mot Prod og se at applikasjonen kjører i begge miljøene dine. 
 
 ## Mer? Lek deg litt
 Prøv å gjøre endringer til applikasjonen og sjekk inn. Om du vil ha en utfordring kan du prøve å sette opp variabel substitution i appsettings.json på hvert av stagene dine. Får du til å postfikse tittelen i applikasjonen med miljøet du er i? 
