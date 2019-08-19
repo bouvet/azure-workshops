@@ -15,8 +15,8 @@ Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal o
 3. Velg edit og pass på at settingene stemmer, klikk så add.
 4. Klikk Manage secrets stored in this Key Vault. Dette tar deg til azureportalen.
 5. Klikk Generate/Import
-6. Lag en nøkkel med navn AzureStorageAccountName og value som den står i AccountName fra appsettings.json
-7. Lag en nøkkel med navn AzureStorageAccountKey og value som den står i AccountKey fra appsettings.json
+6. Lag en nøkkel med navn AzureStorageConfig--AccountName og value som den står i AccountName fra appsettings.json
+7. Lag en nøkkel med navn AzureStorageConfig--AccountKey og value som den står i AccountKey fra appsettings.json
 
 ### Bruk key vault
 
