@@ -55,8 +55,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 ```
 
-Gå til StorageService og erstatt `IOptions<AzureStorageConfig> config` i ctor med `AzureStorageConfig storageConfig`.
-
 Til slutt gjenstår det bare å kjøre applikasjonen og se at alt fortsatt fungerer. Trykk F5 og se at innstillingene fra Key Vault blir brukt.
 
 
