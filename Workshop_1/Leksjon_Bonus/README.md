@@ -55,20 +55,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 ```
 
-Gå til Startup.cs og erstatt configurasjonen av `AzureStorageConfig` med:
-```
-services.AddSingleton(new AzureStorageConfig
-{
-    AccountKey = Configuration["AzureStorageAccountKey"],
-    AccountName = Configuration["AzureStorageAccountName"],
-    ImageContainer = "imagecontainer"
-});
-```
-
-Når dette er gjort vil `Configuration` inneholde entries som hentes fra Azure Key Vault.
-
-ImageContainer kunne hentet fra appsettings på samme måte som før, siden dette ikke er sensitivt, men vi har her valt å legge den her.
-
 Gå til StorageService og erstatt `IOptions<AzureStorageConfig> config` i ctor med `AzureStorageConfig storageConfig`.
 
 Til slutt gjenstår det bare å kjøre applikasjonen og se at alt fortsatt fungerer. Trykk F5 og se at innstillingene fra Key Vault blir brukt.
