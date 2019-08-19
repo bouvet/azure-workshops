@@ -22,7 +22,7 @@ For å opprette ressurser med portalen i Azure, så går du til https://portal.a
 
 ##  Deploy 
 
-I denne øvelsen skal du deploye start-versjonen av web-applikasjonen. Dette er en "fungerende" applikasjonen, men har ikke funksjonaliteten for å laste opp bilder.
+I denne øvelsen skal du deploye start-versjonen av web-applikasjonen. Dette er en "fungerende" applikasjon, men har ikke funksjonaliteten for å laste opp bilder.
 
 1. Åpne solution som ligger i mappen Workshop_1/Start.
 2. Bygg prosjektet. 
