@@ -1,4 +1,4 @@
-# Leksjon 2: Azure Storage Account
+# Leksjon 3: Azure Storage Account
 
 Denne leksjonen tar for seg Azure Storage. Azure Storage er en lagringstjeneste hvor man kan lagre data i Azure på en forholdsvis rimelig måte. En Storage Account kan inneholde forkjellige typer Storage:
 
