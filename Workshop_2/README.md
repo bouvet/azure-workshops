@@ -1,8 +1,6 @@
 # Workshop #2
 
-Denne workshop gir en innføring DevOps-teknikmker i skyplattformen Azure fra Microsoft.
-
-
+Denne workshop gir en innføring DevOps-teknikker i skyplattformen Azure fra Microsoft.
 
 Forutsetninger for å gjennomføre workshop:
 * Et Azure-abonnement. Her har du flere muligheter:
