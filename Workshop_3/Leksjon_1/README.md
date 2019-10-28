@@ -10,3 +10,4 @@
 
 Azure Security Center.
 Azure Monitor
+Azure Sentinel
