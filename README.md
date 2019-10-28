@@ -16,6 +16,10 @@ Til nå er disse modulene planlagt.
   * ARM-templates / Infrastructure as Code
   * Application Insights 
 
-* Workshop #3: TBD
+* Workshop #3: Sikkerhet
+  * Introduksjon til sikkerthet i Azure
+  * Azure Active Directory - autentisering.
+  * SAS-tokens i Azure Storage
+  * Introduksjon til infrastruktur-sikkerhet
 
 * Workshop #4: TBD
