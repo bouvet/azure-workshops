@@ -138,12 +138,10 @@
             var imageLinksEqual = _.isEqual(_.sortBy(gallery.map(s => s.split("?")[0])),
                 _.sortBy(fetchedImageLinks.map(s => s.split("?")[0])));
             if (!imageLinksEqual) {
-                var newImageLinks = _.difference(fetchedImageLinks.map(s => s.split("?")[0]),
-                    gallery.map(s => s.split("?")[0]));
 
                 var divContainer = document.getElementById("stored-images");
 
-                _.forEach(newImageLinks, x => {
+                _.forEach(fetchedImageLinks, x => {
 
                     var imageWrapper = document.createElement("span");
                     imageWrapper.className = "image-wrapper";

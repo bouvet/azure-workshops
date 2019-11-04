@@ -65,6 +65,11 @@ namespace AzureWorkshopApp.Services
             CloudBlobContainer container = blobClient.GetContainerReference(_storageConfig.ImageContainer);
 
             BlobContinuationToken continuationToken = null;
+            var sasToken = container.GetSharedAccessSignature(new SharedAccessBlobPolicy()
+            {
+                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(3),
+                Permissions = SharedAccessBlobPermissions.Read
+            });
 
             //Call ListBlobsSegmentedAsync and enumerate the result segment returned, while the continuation token is non-null.
             //When the continuation token is null, the last page has been returned and execution can exit the loop.
@@ -76,7 +81,7 @@ namespace AzureWorkshopApp.Services
 
                 foreach (var blobItem in resultSegment.Results)
                 {
-                    imageUrls.Add(blobItem.StorageUri.PrimaryUri.ToString());
+                    imageUrls.Add(blobItem.StorageUri.PrimaryUri.ToString() + sasToken);
                 }
 
                 //Get the continuation token.
