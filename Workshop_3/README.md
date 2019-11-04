@@ -1,3 +1,4 @@
+# Workshop #3 - Sikkerhet i Azure (H)
 # Workshop #2
 
 Denne workshop gir en innføring DevOps-teknikker i skyplattformen Azure fra Microsoft.
@@ -9,7 +10,7 @@ Forutsetninger for å gjennomføre workshop:
 * En Azure DevOps konto. 
   * Denne kan opprettes her: https://azure.microsoft.com/en-us/services/devops/
   * Er gratis opp til 5 brukere.
-* Installere Visual Studio 2017 for Windows, eller Visual Studio for Mac. 
+* Installere Visual Studio 2019 for Windows, eller Visual Studio for Mac. 
   * Hvis du ikke har lisens, velg Community.
   * Hvis du har lisens, velg Professional eller Enterprise.
   * Hvis du allerede har Visual Studio 2017 installert, husk å oppdater til siste versjon.
@@ -18,8 +19,8 @@ Forutsetninger for å gjennomføre workshop:
   * Mac: https://git-scm.com/download/mac
 
 Disse emnene vil bli gjennomgått i denne modulen:
-* Introduksjon til DevOps
-* Azure DevOps - Delivery Pipeline ()
-* Infrastructure as Code - ARM-templates
-* Monitorering og telemetri: Application Insights
+* Leksjon 1: Introduksjon til sikkerhet i Azure
+* Leksjon 2: Azure AD / Autentisering mot Azure AD.
+* Bonus-leksjon: Introduksjon til infrastruktur-sikkerhet.
+
 
