@@ -2,22 +2,24 @@
 
 ## Azure AD
 
-
-
-I denne leksjonen skal vi lage innlogging for applikasjonen. 
+I denne leksjonen skal vi lage innlogging for applikasjonen vår 
 
 Denne applikasjonen vil kun tillate 
 
-### App registration
+### App registrering - Klargjøre for innlogging i applikasjonen i Azure AD
 
 1. Logg inn i Azure-portalen (https://portal.azure.com).
 2. Velg "Azure Active Directory" i menyen til venstre.
 3. Velg "App registrations", så trykk på "+ New registration"
-4. Gi applikasjonen din et navn, og merk dette navnet slik at du vet at denne er for lokal debugging (eksempel: Image-localhost)
-5. Du kan velge hvem Om det er kun brukere som er registrert i din egen Azure AD, hvilken som helst organisasjon i Azure AD eller 
-6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "http://localhost:2389/
+4. Gi applikasjonen din et navn, og merk dette navnet slik at du vet at denne er for lokal debugging (eksempel: <navn>-dev)
+5. Velg "Accounts in this organizational directory only." 
+6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://localhost:51350/". Dette vil være
+   Web-applikasjonen din når du kjører lokal utvikling. Trykk register.
+7. Gå så til Authentication, og legg til "https://localhost:51350/signin-oidc" som et ekstra redirect URL. Trykk "Save"
+8. Under "Logout URL", skriv inn "https://localhost:51350/signout-oidc"
+9. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere.
 
-Gjenta prosessen over en gang til, men gi applikasjonen et nytt navn, og gi i 6) til "https://<dinapplikasjon>.azurewebsites.net". Dette vil være URL'en i Azure som du blir 
+Gjenta prosessen over en gang til, men gi applikasjonen et nytt navn med navnet produksjon, og endre url i  6) til "https://<dinapplikasjon>.azurewebsites.net". Dette vil være URL'en i Azure som du blir redirected
 
 - Identity, SSO (pres)
 - Generell (pres)
@@ -25,9 +27,54 @@ Gjenta prosessen over en gang til, men gi applikasjonen et nytt navn, og gi i 6)
 
 Satt opp innlogging på applikasjonen.
 
+
+https://docs.microsoft.com/en-us/azure/active-directory/develop/identity-platform-integration-checklist
+
+
+OAuth 2.0 og OpenID Connect
+
+https://login.microsoftonline.com
+
 ### Klargjør
-For å kunne bruke innloggingsfunksjonaliteten, så trenger du to verdier. Det ene er 
-. Det andre er tenantid som 
+
+Kode for authentisering:
+{
+  "AzureAd": {
+    "Instance": "https://login.microsoftonline.com/",
+
+    // Azure AD Audience among:
+    // - the tenant Id as a GUID obtained from the azure portal to sign-in users in your organization
+    // - "organizations" to sign-in users in any work or school accounts
+    // - "common" to sign-in users with any work and school account or Microsoft personal account
+    // - "consumers" to sign-in users with Microsoft personal account only
+    "TenantId": "bd4f7f1a-5006-4dd1-b922-b440e1561dd6",
+
+    // Client Id (Application ID) obtained from the Azure portal
+    "ClientId": "bdb44b85-3815-497b-bcdc-c7305dad6b55",
+    "CallbackPath": "/signin-oidc",
+    "SignedOutCallbackPath ": "/signout-oidc"
+  }
+}
+
+
+
+
+
+
+For å fi
+
+
+Legg inn kode for autentisering.
+Konfigurer applikasjon.
+Test at innlogging fungerer.
+
+
+Microsoft Identity Platform 2.0 https://docs.microsoft.com/en-us/azure/active-directory/develop/
+består av:
+OAuth 2.0 and OpenID Connect standard-compliant authentication service
+- Jobb eller skole-kontoer.
+- Personlige-kontoer
+
 
 
 
@@ -35,6 +82,17 @@ For å kunne bruke innloggingsfunksjonaliteten, så trenger du to verdier. Det e
 
 
 ## Sikre bilder
+
+Nå når du har laget innlogging i applikasjonen, så er det viktig at poent. Til nå har bildene kun ligget i en 
+
+
+
+Legge inn slik at SAS-token.
+Et SAS-token (Shared Access Signature) er en begrenset rettighet til.
+
+Merk; dersom 
+
+
 
 Skru public til private.
 Se om RBAC og innlogget identity kan brukes.

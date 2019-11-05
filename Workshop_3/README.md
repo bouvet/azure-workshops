@@ -1,7 +1,6 @@
 # Workshop #3 - Sikkerhet i Azure (H)
-# Workshop #2
 
-Denne workshop gir en innføring DevOps-teknikker i skyplattformen Azure fra Microsoft.
+Denne workshop gir en innføring på sikkerhet i skyplattformen Azure fra Microsoft.
 
 Forutsetninger for å gjennomføre workshop:
 * Et Azure-abonnement. Her har du flere muligheter:
@@ -19,8 +18,6 @@ Forutsetninger for å gjennomføre workshop:
   * Mac: https://git-scm.com/download/mac
 
 Disse emnene vil bli gjennomgått i denne modulen:
-* Leksjon 1: Introduksjon til sikkerhet i Azure
+* Leksjon 1: Introduksjon til sikkerhet i Azure.
 * Leksjon 2: Azure AD / Autentisering mot Azure AD.
 * Bonus-leksjon: Introduksjon til infrastruktur-sikkerhet.
-
-
