@@ -1,5 +1,12 @@
 # Sikre infrastruktur (PA)
 
+Oppdater koden til å bruke sas token, slik at APIet returnerer bilde url-er med sastoken.
+Hint: Endringene kan gjøres i disse filene
+* StorageService
+* Index
+
+----------
+
 - Pass på at container er private access. Dette finner du under spesifikk container sin Access level.
 	- Finn Storage Accounten i portalen. 
 	- Trykk containers, finn containeren du vil endre på og trykk på den. 
