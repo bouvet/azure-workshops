@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace AzureWorkshopApp.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IConfiguration _configuration;

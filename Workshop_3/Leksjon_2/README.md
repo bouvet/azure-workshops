@@ -29,6 +29,10 @@ Satt opp innlogging på applikasjonen.
 For å kunne bruke innloggingsfunksjonaliteten, så trenger du to verdier. Det ene er 
 . Det andre er tenantid som 
 
+Legg til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1.
+
+
+
 
 
 
