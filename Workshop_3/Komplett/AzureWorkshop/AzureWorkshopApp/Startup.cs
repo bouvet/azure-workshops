@@ -44,7 +44,6 @@ namespace AzureWorkshopApp
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddMvc();
             services.AddOptions();
 
             services.AddScoped<IStorageService, StorageService>();
