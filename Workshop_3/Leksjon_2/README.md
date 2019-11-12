@@ -1,8 +1,9 @@
 # Leksjon 2: Azure AD (HE)
 
-## Azure AD
+## Azure AD - Autentisering.
 
-I denne leksjonen skal vi lage innlogging for applikasjonen vår 
+I denne leksjonen skal vi lage innlogging for applikasjonen vår, slik at kun brukere som har en bruker i Azure AD (for din tenant) har tilgang
+til applikasjonen. Vi skal
 
 Denne applikasjonen vil kun tillate 
 
@@ -56,17 +57,22 @@ Kode for authentisering:
   }
 }
 
-
-
-
-
-
 For å fi
 
 
 Legg inn kode for autentisering.
 Konfigurer applikasjon.
 Test at innlogging fungerer.
+
+
+
+
+## Autorisasjon
+
+Autorisasjon 
+
+Nå skal vi sette opp slik at  
+
 
 
 Microsoft Identity Platform 2.0 https://docs.microsoft.com/en-us/azure/active-directory/develop/
@@ -85,7 +91,7 @@ Legg til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget pakke (Viktig: vel
 
 
 
-## Sikre bilder
+## Sikre bilder (bør flyttes til Leksjon 1)
 
 Nå når du har laget innlogging i applikasjonen, så er det viktig at poent. Til nå har bildene kun ligget i en 
 
