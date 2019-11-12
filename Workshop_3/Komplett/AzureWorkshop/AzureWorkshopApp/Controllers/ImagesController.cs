@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using AzureWorkshopApp.Helpers;
 using AzureWorkshopApp.Services;

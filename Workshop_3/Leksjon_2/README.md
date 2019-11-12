@@ -38,7 +38,7 @@ https://login.microsoftonline.com
 
 ### Klargjør
 
-Kode for authentisering:
+Kode for authentisering. Legg
 {
   "AzureAd": {
     "Instance": "https://login.microsoftonline.com/",
@@ -63,15 +63,50 @@ For å fi
 Legg inn kode for autentisering.
 Konfigurer applikasjon.
 Test at innlogging fungerer.
-
-
-
+Lage redirect som hetner kun for en bruker? 
 
 ## Autorisasjon
 
 Autorisasjon 
 
-Nå skal vi sette opp slik at  
+Nå skal vi sette opp applikasjonen slik at kun noen brukere for laste opp bilder, mens
+alle som er innlogget får se bildene. Brukere som ikke er logget inn skal ikke ha mulighet til å se bildene.
+
+Rollebasert autorisasjon, slik at 
+
+Bildeapplikasjonen vil være en 
+
+
+Først må du legge til rollen du ønsker å ha i 
+Legge til rolle
+1. Gå til Azure-portalen (https://portal.azure.com) og gå så til menyen for Active
+  Directory.
+2. Gå så til App Registrations, og finn applikasjonen du laget i forrige oppgave.
+3. Gå til undermenyen "Manifest", og erstatt verdien for appRoles med denne:
+``{
+			"allowedMemberTypes": [
+				"User"
+			],
+			"description": "Uploaders have access to upload images.",
+			"displayName": "Uploader",
+			"id": "7d957fab-2c16-48aa-b4d8-d9d3a219c19d",
+			"isEnabled": true,
+			"lang": null,
+			"origin": "Application",
+			"value": "Uploader"
+		}
+``
+4. Trykk save.
+
+Dette vil lage rollen "Uploader" og returnere dette i tokenet når man autentiserer seg mot denne applikasjonen.
+
+Så skal du oppdatere applikasjonen til kun å tillatte brukere som har rollen "Uploader"
+
+
+
+1. Skjul v
+
+2. Selv om du skjuler opplastings-funksjonaliteten i brukergrensesnittet, er det viktig at man også krever 
 
 
 
@@ -85,15 +120,9 @@ OAuth 2.0 and OpenID Connect standard-compliant authentication service
 Legg til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1.
 
 
-
-
-
-
-
-
 ## Sikre bilder (bør flyttes til Leksjon 1)
 
-Nå når du har laget innlogging i applikasjonen, så er det viktig at poent. Til nå har bildene kun ligget i en 
+Nå når du har laget innlogging i applikasjonen, så er det viktig at poeng at . Til nå har bildene kun ligget åpen container i Storage Accounts, og 
 
 
 
