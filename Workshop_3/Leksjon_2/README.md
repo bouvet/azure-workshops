@@ -72,12 +72,13 @@ Autorisasjon
 Nå skal vi sette opp applikasjonen slik at kun noen brukere for laste opp bilder, mens
 alle som er innlogget får se bildene. Brukere som ikke er logget inn skal ikke ha mulighet til å se bildene.
 
-Rollebasert autorisasjon, slik at 
-
+Vi ønsker å implementere rollebasert autorisasjon i applikasjonen, slik at kun en rolle (Uploader)
+skal ha mulighet til å 
 Bildeapplikasjonen vil være en 
 
 
-Først må du legge til rollen du ønsker å ha i 
+Først må du legge til rollen du ønsker Azure AD skal returnere dersom brukeren som autentiserer 
+seg med.
 Legge til rolle
 1. Gå til Azure-portalen (https://portal.azure.com) og gå så til menyen for Active
   Directory.
