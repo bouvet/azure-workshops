@@ -6,6 +6,8 @@
 - 
 
 
+Kanskje ha noe 
+
 ##  Litt generelt Azure sikkerthet
 
 Azure Security Center.

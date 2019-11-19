@@ -1,13 +1,16 @@
 # Leksjon 2: Azure AD (HE)
 
+I denne leksjonen skal vi lage innlogging for applikasjonen vår, slik at kun brukere som har en bruker i Azure AD (for din tenant) har tilgang til applikasjonen. Vi skal også legge på 
+rollebasert autentisering som styres i Azure AD, slik at kun brukere som har en spesiell rolle
+(Uploader) har lov til å laste opp bilder. 
+
 ## Azure AD - Autentisering.
 
-I denne leksjonen skal vi lage innlogging for applikasjonen vår, slik at kun brukere som har en bruker i Azure AD (for din tenant) har tilgang
-til applikasjonen. Vi skal
-
-Denne applikasjonen vil kun tillate 
+Vi begynner med å legge på autentisering på applikasjonen.
 
 ### App registrering - Klargjøre for innlogging i applikasjonen i Azure AD
+
+Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Registrering for applikasjonen vår.
 
 1. Logg inn i Azure-portalen (https://portal.azure.com).
 2. Velg "Azure Active Directory" i menyen til venstre.
@@ -20,25 +23,14 @@ Denne applikasjonen vil kun tillate
 8. Under "Logout URL", skriv inn "https://localhost:51350/signout-oidc"
 9. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere.
 
-Gjenta prosessen over en gang til, men gi applikasjonen et nytt navn med navnet produksjon, og endre url i  6) til "https://<dinapplikasjon>.azurewebsites.net". Dette vil være URL'en i Azure som du blir redirected
+Gjenta prosessen over en gang til, men gi applikasjonen et nytt navn med navnet test, og endre url i  6) til "https://<dinapplikasjon>.azurewebsites.net". Dette vil være URL'en i Azure som du blir redirected til etter at du har autentisert deg i Azure AD.
 
-- Identity, SSO (pres)
-- Generell (pres)
-- RBAC (pres)
+### Konfigurasjon: 
+For å kunne 
 
-Satt opp innlogging på applikasjonen.
-
-
-https://docs.microsoft.com/en-us/azure/active-directory/develop/identity-platform-integration-checklist
-
-
-OAuth 2.0 og OpenID Connect
-
-https://login.microsoftonline.com
-
-### Klargjør
-
-Kode for authentisering. Legg
+1. Legg til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1)
+2. Editer filen appsettings.json og legg inn konfigurasjon for AzureID. Fyll inn verdiene for TenantID og ClientID som du fikk tak i forrige.
+```
 {
   "AzureAd": {
     "Instance": "https://login.microsoftonline.com/",
@@ -48,14 +40,21 @@ Kode for authentisering. Legg
     // - "organizations" to sign-in users in any work or school accounts
     // - "common" to sign-in users with any work and school account or Microsoft personal account
     // - "consumers" to sign-in users with Microsoft personal account only
-    "TenantId": "bd4f7f1a-5006-4dd1-b922-b440e1561dd6",
+    "TenantId": "<TenantID>",
 
     // Client Id (Application ID) obtained from the Azure portal
-    "ClientId": "bdb44b85-3815-497b-bcdc-c7305dad6b55",
+    "ClientId": "<ClientID>",
     "CallbackPath": "/signin-oidc",
     "SignedOutCallbackPath ": "/signout-oidc"
   }
 }
+```
+3. Editer så filen Startup.cs, og legg inn koden for å laste autentisering middleware (kode er her lagt inn som kommentar.)
+
+
+### Klargjør
+
+Kode for authentisering. Legg
 
 For å fi
 
@@ -75,7 +74,6 @@ alle som er innlogget får se bildene. Brukere som ikke er logget inn skal ikke 
 Vi ønsker å implementere rollebasert autorisasjon i applikasjonen, slik at kun en rolle (Uploader)
 skal ha mulighet til å 
 Bildeapplikasjonen vil være en 
-
 
 Først må du legge til rollen du ønsker Azure AD skal returnere dersom brukeren som autentiserer 
 seg med.
@@ -104,10 +102,21 @@ Dette vil lage rollen "Uploader" og returnere dette i tokenet når man autentise
 Så skal du oppdatere applikasjonen til kun å tillatte brukere som har rollen "Uploader"
 
 
+### Skjul upload-funksjonalitet for brukere som ikke har tilgang. 
 
-1. Skjul v
+I denne leksjonen skal du 
 
+2. Oppdater filen Views/Home
 2. Selv om du skjuler opplastings-funksjonaliteten i brukergrensesnittet, er det viktig at man også krever 
+
+
+### Fjern 
+
+Selv om man har fjernet upload-funksjonaliteten i viewet, så må vi også blokkere selve 
+
+
+
+
 
 
 
@@ -118,7 +127,7 @@ OAuth 2.0 and OpenID Connect standard-compliant authentication service
 - Personlige-kontoer
 
 
-Legg til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1.
+
 
 
 ## Sikre bilder (bør flyttes til Leksjon 1)
@@ -138,3 +147,20 @@ Skru public til private.
 Se om RBAC og innlogget identity kan brukes.
 Sikre at ingen eksterne får tilgang til bildene.
 Bildene lagres per bruker (GUID)
+
+
+
+
+- Identity, SSO (pres)
+- Generell (pres)
+- RBAC (pres)
+
+Satt opp innlogging på applikasjonen.
+
+
+https://docs.microsoft.com/en-us/azure/active-directory/develop/identity-platform-integration-checklist
+
+
+OAuth 2.0 og OpenID Connect
+
+https://login.microsoftonline.com
