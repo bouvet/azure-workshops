@@ -25,11 +25,11 @@ namespace AzureWorkshopApp.Services
             return StorageConfigValidator.Validate(_storageConfig);
         }
 
-        public async Task<bool> UploadFileToStorage(Stream fileStream, string fileName)
+        public async Task<bool> UploadFileToStorage(Stream fileStream, string fileName, string containerName)
         {
             // Create storagecredentials object by reading the values from the configuration (appsettings.json)
             StorageCredentials storageCredentials = new StorageCredentials(_storageConfig.AccountName, _storageConfig.AccountKey);
-
+            
             // Create cloudstorage account by passing the storagecredentials
             CloudStorageAccount storageAccount = new CloudStorageAccount(storageCredentials, true);
 
@@ -37,7 +37,9 @@ namespace AzureWorkshopApp.Services
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
             // Get reference to the blob container by passing the name by reading the value from the configuration (appsettings.json)
-            CloudBlobContainer container = blobClient.GetContainerReference(_storageConfig.ImageContainer);
+            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+
+            await container.CreateIfNotExistsAsync();
 
             // Get the reference to the block blob from the container
             CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
@@ -48,7 +50,7 @@ namespace AzureWorkshopApp.Services
             return await Task.FromResult(true);
         }
 
-        public async Task<List<string>> GetImageUrls()
+        public async Task<List<string>> GetImageUrls(string containerName)
         {
             List<string> imageUrls = new List<string>();
 
@@ -62,7 +64,9 @@ namespace AzureWorkshopApp.Services
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
             // Get reference to the container
-            CloudBlobContainer container = blobClient.GetContainerReference(_storageConfig.ImageContainer);
+            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+
+            await container.CreateIfNotExistsAsync();
 
             BlobContinuationToken continuationToken = null;
             var sasToken = container.GetSharedAccessSignature(new SharedAccessBlobPolicy()
