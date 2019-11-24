@@ -1,0 +1,79 @@
+trigger:
+- master
+
+stages: 
+  - stage: Build
+    jobs: 
+    - job: build_solution
+      displayName: "Build solution"
+      pool:
+        vmImage: 'windows-2019'
+      variables:
+        BuildConfiguration: Release
+        BuildPlatform: 'any cpu'
+        Solution: 'AzureWorkshop/AzureWorkshop.sln'
+      steps:
+      - task: NuGetToolInstaller@0
+        displayName: 'Use NuGet 4.4.1'
+        inputs:
+          versionSpec: 4.4.1
+      - task: NuGetCommand@2
+        displayName: 'NuGet restore'
+        inputs:
+          restoreSolution: '$(Solution)'
+      - task: VSBuild@1
+        displayName: 'Build AzureWorkshop.sln'
+        inputs:
+          solution: '$(Solution)'
+          msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactstagingdirectory)\\"'
+          platform: '$(BuildPlatform)'
+          configuration: '$(BuildConfiguration)'
+      - task: VSTest@2
+        enabled: false
+        displayName: 'VsTest - testAssemblies'
+        inputs:
+          testAssemblyVer2: |
+            **\$(BuildConfiguration)\*tests*.dll
+            !**\obj\**
+            platform: '$(BuildPlatform)'
+            configuration: '$(BuildConfiguration)'
+      - task: PublishSymbols@2
+        enabled: false
+        displayName: 'Publish symbols path'
+        inputs:
+          SearchPattern: '**\bin\**\*.pdb'
+          PublishSymbols: false
+        continueOnError: true
+            
+      - powershell: gci env:* | sort-object name | Format-Table -AutoSize | Out-File $env:BUILD_ARTIFACTSTAGINGDIRECTORY/environment-variables.txt
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact: drop'
+        inputs:
+          PathtoPublish: '$(build.artifactstagingdirectory)'
+        condition: succeededOrFailed()
+
+
+  - stage: Deploy
+    jobs:
+    # track deployments on the environment
+    - deployment: DeployWeb
+      displayName: Deploy Web App
+      environment: Test
+     
+      pool:
+        vmImage: 'windows-2019'
+      strategy:
+        # default deployment strategy, more coming...
+        runOnce:
+          deploy:
+            steps:
+            - powershell: gci env:* | sort-object name | Format-Table -AutoSize
+            - task: AzureRmWebAppDeployment@4
+              displayName: "Deploy web application"
+              inputs:
+                azureSubscription: $(Subscription)
+                appType: webApp
+                WebAppName: $(WebAppName)
+                package: $(Agent.BuildDirectory)/drop/AzureWorkshopApp.zip
+                
