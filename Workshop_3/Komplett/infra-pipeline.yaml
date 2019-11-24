@@ -1,0 +1,11 @@
+trigger: 
+  - master
+
+steps: 
+  - task: AzureResourceGroupDeployment@2
+    inputs: 
+      azureSubscription: 'Azure subscription'
+      resourceGroupName: 'AzureskolenTest'
+      location: westeurope # norwayeast
+      csmFile:  $(Build.Repository.LocalPath)/AzureWorkshop/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur/azuredeploy.json
+      csmParametersFile:  $(Build.Repository.LocalPath)/AzureWorkshop/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur/azuredeploy.parameters.json
