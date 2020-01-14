@@ -16,7 +16,7 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 2. Velg "Azure Active Directory" i menyen til venstre.
 3. Velg "App registrations", så trykk på "+ New registration"
 4. Gi applikasjonen din et navn, og merk dette navnet slik at du vet at denne er for lokal debugging (eksempel: <navn>-dev)
-5. Velg "Accounts in this organizational directory only." 
+5. Velg "Accounts in this organizational directory only.". Dette betyr at kun brukere som er registrert i din AD har mulighet til å logge inn her.
 6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://localhost:51350/". Dette vil være
    Web-applikasjonen din når du kjører lokal utvikling. Trykk register.
 7. Gå så til Authentication, og legg til "https://localhost:51350/signin-oidc" som et ekstra redirect URL. Trykk "Save"
@@ -66,18 +66,16 @@ Lage redirect som hetner kun for en bruker?
 
 ## Autorisasjon
 
-Autorisasjon er 
-
-Nå skal vi sette opp applikasjonen slik at kun noen brukere for laste opp bilder, mens
-alle som er innlogget får se bildene. Brukere som ikke er logget inn skal ikke ha mulighet til å se bildene.
+Autorisasjon er hva en autentisert bruker har lov til å gjøre. Nå skal vi sette opp applikasjonen slik at kun noen brukere for 
+lov til å  laste opp bilder, mensalle som er innlogget får se bildene. 
 
 Vi ønsker å implementere rollebasert autorisasjon i applikasjonen, slik at kun en rolle (Uploader)
 skal ha mulighet til å 
-Bildeapplikasjonen vil være en 
 
 Først må du legge til rollen du ønsker Azure AD skal returnere dersom brukeren som autentiserer 
 seg med.
-Legge til rolle
+Legge til rolle i manifestet for applikasjonen.
+
 1. Gå til Azure-portalen (https://portal.azure.com) og gå så til menyen for Active
   Directory.
 2. Gå så til App Registrations, og finn applikasjonen du laget i forrige oppgave.
@@ -108,6 +106,12 @@ I denne leksjonen skal du
 
 2. Oppdater filen Views/Home
 2. Selv om du skjuler opplastings-funksjonaliteten i brukergrensesnittet, er det viktig at man også krever 
+
+
+
+### Gi en bruker rollen Uploader
+
+Gå så til App Registrationen
 
 
 ### Fjern 
