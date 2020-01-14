@@ -2,7 +2,7 @@
 
 I denne leksjonen skal vi lage innlogging for applikasjonen vår, slik at kun brukere som har en bruker i Azure AD (for din tenant) har tilgang til applikasjonen. Vi skal også legge på 
 rollebasert autentisering som styres i Azure AD, slik at kun brukere som har en spesiell rolle
-(Uploader) har lov til å laste opp bilder. 
+(Uploader) har lov til å laste opp bilder. Andre som logger seg inn har mulighet til å se bilder, men ikke laste opp.
 
 ## Azure AD - Autentisering.
 
@@ -23,7 +23,7 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 8. Under "Logout URL", skriv inn "https://localhost:51350/signout-oidc"
 9. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere.
 
-Gjenta prosessen over en gang til, men gi applikasjonen et nytt navn med navnet test, og endre url i  6) til "https://<dinapplikasjon>.azurewebsites.net". Dette vil være URL'en i Azure som du blir redirected til etter at du har autentisert deg i Azure AD.
+Gjenta prosessen over en gang til, men gi applikasjonen et nytt navn med navnet test, og endre url i  6) til "https://<webappname>.azurewebsites.net". Dette vil være URL'en i Azure som du blir redirected til etter at du har autentisert deg i Azure AD. `webappname` vil her være navnet på applikasjonen din fra Leksjon 1.
 
 ### Konfigurasjon: 
 For å kunne 
@@ -66,7 +66,7 @@ Lage redirect som hetner kun for en bruker?
 
 ## Autorisasjon
 
-Autorisasjon 
+Autorisasjon er 
 
 Nå skal vi sette opp applikasjonen slik at kun noen brukere for laste opp bilder, mens
 alle som er innlogget får se bildene. Brukere som ikke er logget inn skal ikke ha mulighet til å se bildene.
@@ -125,10 +125,6 @@ består av:
 OAuth 2.0 and OpenID Connect standard-compliant authentication service
 - Jobb eller skole-kontoer.
 - Personlige-kontoer
-
-
-
-
 
 ## Sikre bilder (bør flyttes til Leksjon 1)
 
