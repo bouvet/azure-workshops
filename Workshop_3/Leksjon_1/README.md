@@ -51,9 +51,10 @@ Som forrige gang, velg "Azure Repos Git", velg repositoriet ditt og velg å konf
 
 Under `Review your pipeline` må du nå angi noen Variable. Trykk "Variables" og angi følgende variable
 
-|Navn|Verdi|
-|Subscription|Azure subscription|
-|WebAppName|"Navnet du anga i infrastrukturparametre"|
+| Navn         | Verdi                                   |
+|--------------|-----------------------------------------|
+| Subscription | Azure subscription                      |
+| WebAppName   |"Navnet du anga i infrastrukturparametre"|
 
 Deretter kjører du pipelinen ved å trykke "Run".
 
