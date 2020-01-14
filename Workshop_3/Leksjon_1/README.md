@@ -63,10 +63,46 @@ Til slutt litt opprydding igjen. Gå til `Pipelines` og velg den du nettopp oppr
 ### Oppsummering 
 Nå skal det være opprettet en ressursgruppe med alle Azure-tjenestene applikasjonen trenger, og applikasjonen skal være deployet til Azure. Du kan nå teste den ved å gå til https://"webappnavn".azurewebsites.net og laste opp et bilde.
 
+##  Azure Security Center
+
+Azure Security Center er en tjeneste i Azure som overvåker tjenestene dine, og leter etter mulige konfigurasjoner som kan gjøre tjenestene
+dine usikre. 
+
+I Basic tier så får du gratis 
+
+I tillegg har den 
+
+### App Service
+
+Nå skal du se om du får noen anbefalinger fra Security Center på App Servicen din. 
+
+* Gå til `webappnavn` som du opprettet i forrige oppgave.
+* Trykk så på `Security`, og du kommer til et skjermbilde som viser alerts.
+* Se om du har noen sårbarheter som bør utbedres.
+
+Når du nå ser at den gir, så kan det være fristende å trykke `Remediate`, som vil fikse problemet med en gang. Men, i og med at vi 
+praktiserer "Infrastructure as Code", så må vi gjøre. Trykk på `View remediation logic` for å se hva du må legge til ARM-templaten din:
+
+* I Infrastruktur-prosjektet ditt, åpne azuredeploy.json.
+* Editer filen, slik at dette er:
+* Commit endringen din og push endringen din til Azure DevOps.
+* Sjekk at Infrastruktur-prosjektet ditt blir bygd og deployet.
+
+Det tar gjerne noen minutter fra du gjør en endring, til at endringen vises i Azure Security Center.
+
+Gjør så tilsvarende øvelse for Storage Account'en din, og se om du får noen anbefalinger der.
+
+### Advanced Threat Protection (Usikker på om denne skal være med)
+Advanced Threat Protection er en tilleggstjeneste på storage account, slik at storage accounten din blir overvåket for angrep og unormal oppførsel. Dersom Security Center oppdager noe unormalt som den mener du bør se på, så vil du motta en epost med varsling om hva som har 
+skjedd.
+
+Gå til din Storage Account som ble opprettet, og trykk på `Advanced Security`. Trykk på `Enable Seucirty
+
+Siden dette koster ekstra penger, og vi har vurdert til at dette ikke er noe som er nødvendig velger vi å ikke skru på denne i dette tilfelle.
+
+Du kan lese mer om dette ved en senere anledning her:
+https://docs.microsoft.com/en-us/azure/storage/common/storage-advanced-threat-protection?tabs=azure-portal
 
 
-##  Litt generelt Azure sikkerthet
-
-Azure Security Center.
-Azure Monitor
-Azure Sentinel
+### Oppsummering
+I denne øvelsen har du stiftet kjennskap til Azure Security Center
