@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AzureWorkshopApp.Controllers
 {
-    [Authorize]
+    [Authorize] 
     [Route("api/[controller]")]
     public class ImagesController : Controller
     {
@@ -26,6 +26,7 @@ namespace AzureWorkshopApp.Controllers
         }
 
         // POST /api/images/upload
+        [Authorize(Roles = "Uploader")] // Krever rollen Uploader
         [HttpPost("[action]")]
         public async Task<IActionResult> Upload(ICollection<IFormFile> files)
         {

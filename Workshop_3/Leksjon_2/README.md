@@ -97,8 +97,8 @@ seg har denne rollen. Legge til rolle i manifestet for applikasjonen.
 1. Gå til Azure-portalen (https://portal.azure.com) og gå så til menyen for Active
   Directory.
 2. Gå så til App Registrations, og finn applikasjonen du laget i forrige oppgave.
-3. Gå til undermenyen "Manifest", og erstatt verdien for appRoles med denne:
-``{
+3. Gå til undermenyen "Manifest", og erstatt verdien for appRoles ([])med denne:
+`` [{
 			"allowedMemberTypes": [
 				"User"
 			],
@@ -109,22 +109,18 @@ seg har denne rollen. Legge til rolle i manifestet for applikasjonen.
 			"lang": null,
 			"origin": "Application",
 			"value": "Uploader"
-		}
+		}]
 ``
 4. Trykk save.
 
 Dette vil lage rollen "Uploader" og returnere dette i id-tokenet (dersom man er av denne rollen) når man autentiserer seg mot denne applikasjonen.
 
-
-### Skjul upload-funksjonalitet for brukere som ikke har tilgang. 
+### Skjul upload-funksjonalitet for brukere som ikke har tilgang.
 
 I denne leksjonen skal du skjule muligheten til å laste opp bilder fra websiden.
 
 1. Oppdater filen Views/Home/.
 2. Selv om du skjuler opplastings-funksjonaliteten i brukergrensesnittet.
-
-
-
 
 3. Editer selve controlleren. Her vil du legge 
 
@@ -143,7 +139,7 @@ Legg til [Autorize]
 
 
 ### Gi en bruker rollen Uploader
-For å nå kunne gi 
+For å nå kunne gi brukeren din rollen Uploader.
 
 1. Fra hovedmenyen til Azure AD, trykk til "Enterprise Application".
 2. Gå til "Users and groups"

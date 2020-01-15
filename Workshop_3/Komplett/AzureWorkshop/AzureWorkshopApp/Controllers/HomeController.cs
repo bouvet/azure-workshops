@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace AzureWorkshopApp.Controllers
 {
-    [Authorize]
+    [Authorize] // Må være innlogget for
     public class HomeController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -17,6 +17,7 @@ namespace AzureWorkshopApp.Controllers
         public IActionResult Index()
         {
             ViewData.Add("test", _configuration["Parent:ChildOne"]);
+
             return View();
         }
     }
