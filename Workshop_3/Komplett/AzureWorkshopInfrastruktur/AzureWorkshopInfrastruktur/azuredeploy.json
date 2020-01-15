@@ -97,6 +97,30 @@
             {
               "name": "AzureStorageConfig:ImageContainer",
               "value": "[parameters('blobContainerName')]"
+            },
+            {
+              "name": "AzureAd:Instance",
+              "value": "https://login.microsoftonline.com/"
+            },
+            {
+              "name": "AzureAd:Instance",
+              "value": "https://login.microsoftonline.com/"
+            },
+            {
+              "name": "AzureAd:TenantId",
+              "value": "<Directory (tenant) ID>"
+            },
+            {
+              "name": "AzureAd:ClientId",
+              "value": "<Application (client) ID>"
+            },
+            {
+              "name": "AzureAd:CallbackPath",
+              "value": "https://<webappnavn>.azurewebsites.net/signin-oidc"
+            },
+            {
+              "name": "AzureAd:SignedOutCallbackPath",
+              "value": "https://<webappnavn>.azurewebsites.net/signout-oidc"
             }
           ]
         }
