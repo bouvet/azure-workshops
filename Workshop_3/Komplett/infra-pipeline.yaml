@@ -1,5 +1,11 @@
-trigger: 
-  - master
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - azure-pipelines.yaml
+    - AzureWorkshopInfrastruktur/*
 
 steps: 
   - task: AzureResourceGroupDeployment@2

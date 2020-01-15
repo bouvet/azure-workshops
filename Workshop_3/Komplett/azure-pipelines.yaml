@@ -1,6 +1,12 @@
 trigger:
-- master
-
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - azure-pipelines.yaml
+    - AzureWorkshop/*
+    
 stages: 
   - stage: Build
     jobs: 

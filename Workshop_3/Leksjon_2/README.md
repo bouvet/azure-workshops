@@ -20,7 +20,7 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://localhost:51350/". Dette vil være
    Web-applikasjonen din når du kjører lokal utvikling. Trykk register.
 7. Gå så til Authentication, og legg til "https://localhost:51350/signin-oidc" som et ekstra redirect URL. Trykk "Save"
-8. Under "Logout URL", skriv inn "https://localhost:51350/signout-oidc"
+8. Under "Logout URL", skriv inn "https://localhost:51350/signout-oidc" og "https://<webappname>.azurewebsites.net/signout-oidc". 
 9. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere.
 
 Gjenta prosessen over en gang til, men gi applikasjonen et nytt navn med navnet test, og endre url i  6) til "https://<webappname>.azurewebsites.net". Dette vil være URL'en i Azure som du blir redirected til etter at du har autentisert deg i Azure AD. `webappname` vil her være navnet på applikasjonen din fra Leksjon 1.
@@ -28,7 +28,6 @@ Gjenta prosessen over en gang til, men gi applikasjonen et nytt navn med navnet 
 ### Konfigurasjon: 
 For å kunne 
 
-1. Legg til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1)
 2. Editer filen appsettings.json og legg inn konfigurasjon for AzureID. Fyll inn verdiene for TenantID og ClientID som du fikk tak i forrige.
 ```
 {
@@ -49,32 +48,34 @@ For å kunne
   }
 }
 ```
-3. Editer så filen Startup.cs, og legg inn koden for å laste autentisering middleware (kode er her lagt inn som kommentar.)
+
+1. Legg til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1)
+2. Editer så filen Startup.cs, og legg inn koden for å laste autentisering middleware (kode er her lagt inn som kommentar).
 
 
-### Klargjør
 
-Kode for authentisering. Legg
+## Konfigurer
+Når du er klar til 
+Så må de 
+I Infrastruktur-prosjektet gjør du disse 
 
-For å fi
+
+For at konfigurasjonsveridnene
 
 
-Legg inn kode for autentisering.
-Konfigurer applikasjon.
-Test at innlogging fungerer.
-Lage redirect som hetner kun for en bruker? 
+4. Commit og push.
 
-## Autorisasjon
+
+## Autorisasjon - legg til roller
 
 Autorisasjon er hva en autentisert bruker har lov til å gjøre. Nå skal vi sette opp applikasjonen slik at kun noen brukere for 
-lov til å  laste opp bilder, mensalle som er innlogget får se bildene. 
+lov til å  laste opp bilder, mens alle som er innlogget får se bildene.
 
 Vi ønsker å implementere rollebasert autorisasjon i applikasjonen, slik at kun en rolle (Uploader)
-skal ha mulighet til å 
+skal ha mulighet til å laste opp bilder. Her skal vi bruke AppRoles.
 
 Først må du legge til rollen du ønsker Azure AD skal returnere dersom brukeren som autentiserer 
-seg med.
-Legge til rolle i manifestet for applikasjonen.
+seg har denne rollen. Legge til rolle i manifestet for applikasjonen.
 
 1. Gå til Azure-portalen (https://portal.azure.com) og gå så til menyen for Active
   Directory.
@@ -97,26 +98,25 @@ Legge til rolle i manifestet for applikasjonen.
 
 Dette vil lage rollen "Uploader" og returnere dette i tokenet når man autentiserer seg mot denne applikasjonen.
 
-Så skal du oppdatere applikasjonen til kun å tillatte brukere som har rollen "Uploader"
+Så skal du oppdatere applikasjonen til kun å tillatte brukere som har rollen "Uploader".
 
 
 ### Skjul upload-funksjonalitet for brukere som ikke har tilgang. 
 
-I denne leksjonen skal du 
+I denne leksjonen skal du skjule muligheten til å laste opp bilder fra websiden.
 
-2. Oppdater filen Views/Home
-2. Selv om du skjuler opplastings-funksjonaliteten i brukergrensesnittet, er det viktig at man også krever 
-
-
+1. Oppdater filen Views/Home/.
+2. Selv om du skjuler opplastings-funksjonaliteten i brukergrensesnittet.
+3. Editer selve Controlleren med .
 
 ### Gi en bruker rollen Uploader
 
-Gå så til App Registrationen
+Gå så til "Enterprise App Registrations", fi
 
 
 ### Fjern 
 
-Selv om man har fjernet upload-funksjonaliteten i viewet, så må vi også blokkere selve 
+Selv om man har fjernet upload-funksjonaliteten i viewet, så må vi også blokkere selve opplastingen av bilde
 
 
 

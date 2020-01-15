@@ -17,6 +17,7 @@ Gå til Repos og initialiser et nytt repository, gjerne med VisualStudio gitigno
 
 ### Konfigurer Pipelines
 I rotkatalogen til det nye git-repositoriet finnes det nå to .yaml-filer Disse inneholder definisjonen for to pipelines som vi skal sette opp, en for infrastruktur og en for applikasjon.
+
 #### Service connection
 Før vi kan deploye må vi gi Azure DevOps tilgang til ressuser i Azure Subscription. Dette gjør vi ved å opprett en _Service Connection_. Fra Azure DevOps, velg `Project settings`, deretter `Service connections` under `Pipelines`.  Trykk `New service connection`, og velg `Azure Resource Manager som type. Gi service connection navnet "Azure subscription". Sjekk at Scope level er satt til "Subscription" og "Subscription" inneholder ditt Azure-subscription. La "ResourceGrop" stå tom.
 
@@ -41,7 +42,6 @@ Siste steg er `Review your pipeline`. Her kan du se hvordan pipelinen er definer
 
 Til slutt må vi rydde litt siden vi skal lage en pipeline til. Gå til `Pipelines` og velg den du nettopp opprettet. På kontekstmenyknappen [...] velger du "Rename" og gir pipelinen navnet "Infrastruktur"
 
-
 Nå skal det være opprettet en Ressursgruppe som heter `AzureskolenTest`, som vi skal deploye applikasjonen til. Sjekk gjerne dette i [portalen](https://portal.azure.com)
 
 #### Applikasjon
@@ -63,22 +63,22 @@ Til slutt litt opprydding igjen. Gå til `Pipelines` og velg den du nettopp oppr
 ### Oppsummering 
 Nå skal det være opprettet en ressursgruppe med alle Azure-tjenestene applikasjonen trenger, og applikasjonen skal være deployet til Azure. Du kan nå teste den ved å gå til https://"webappnavn".azurewebsites.net og laste opp et bilde.
 
-##  Azure Security Center
+## Azure Security Center
 
 Azure Security Center er en tjeneste i Azure som overvåker tjenestene dine, og leter etter mulige konfigurasjoner som kan gjøre tjenestene
-dine usikre. 
+dine usikre.
 
-I Basic tier så får du gratis 
+I Basic tier så får du gratis anbefalinger på tiltak du kan gjøre for å forbedre sikkerheten i tjenestene dine.
 
-I tillegg har den 
+I tillegg har den et Standard tier, som tilbyr utvidet overvåkning av tjenestene. Dette må settes opp per tjeneste og koster ekstra.
 
 ### App Service
 
-Nå skal du se om du får noen anbefalinger fra Security Center på App Servicen din. 
+Nå skal du se om du får noen anbefalinger fra Security Center på App Servicen din.
 
 * Gå til `webappnavn` som du opprettet i forrige oppgave.
 * Trykk så på `Security`, og du kommer til et skjermbilde som viser alerts.
-* Se om du har noen sårbarheter som bør utbedres.
+* Se om du har noen sårbarheter som bør utbedres. Her vil du mest sannsynlig se en melding om at det anbefales å skru på slik at kun
 
 Når du nå ser at den gir, så kan det være fristende å trykke `Remediate`, som vil fikse problemet med en gang. Men, i og med at vi 
 praktiserer "Infrastructure as Code", så må vi gjøre. Trykk på `View remediation logic` for å se hva du må legge til ARM-templaten din:
@@ -90,7 +90,7 @@ praktiserer "Infrastructure as Code", så må vi gjøre. Trykk på `View remedia
 
 Det tar gjerne noen minutter fra du gjør en endring, til at endringen vises i Azure Security Center.
 
-Gjør så tilsvarende øvelse for Storage Account'en din, og se om du får noen anbefalinger der.
+(dersom du har tid til overs, kan du gjøre øvelse for Storage Account'en din, og se om du får noen anbefalinger der).
 
 ### Advanced Threat Protection (Usikker på om denne skal være med)
 Advanced Threat Protection er en tilleggstjeneste på storage account, slik at storage accounten din blir overvåket for angrep og unormal oppførsel. Dersom Security Center oppdager noe unormalt som den mener du bør se på, så vil du motta en epost med varsling om hva som har 
@@ -101,8 +101,7 @@ Gå til din Storage Account som ble opprettet, og trykk på `Advanced Security`.
 Siden dette koster ekstra penger, og vi har vurdert til at dette ikke er noe som er nødvendig velger vi å ikke skru på denne i dette tilfelle.
 
 Du kan lese mer om dette ved en senere anledning her:
-https://docs.microsoft.com/en-us/azure/storage/common/storage-advanced-threat-protection?tabs=azure-portal
-
+[Storage advanced threat protection](https://docs.microsoft.com/en-us/azure/storage/common/storage-advanced-threat-protection?tabs=azure-portal)
 
 ### Oppsummering
-I denne øvelsen har du stiftet kjennskap til Azure Security Center
+I denne øvelsen har du stiftet kjennskap til Azure Security Center. Du har sett hvordan 

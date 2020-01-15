@@ -66,6 +66,7 @@
       "location": "[parameters('location')]",
       "comments": "This is the web app, also the default 'nameless' slot.",
       "properties": {
+        "httpsOnly": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
         "siteConfig": {
           "appSettings": [
