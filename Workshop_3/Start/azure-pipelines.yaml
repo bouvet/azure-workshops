@@ -75,6 +75,13 @@ stages:
           deploy:
             steps:
             - powershell: gci env:* | sort-object name | Format-Table -AutoSize
+            - download: none
+            - task: DownloadBuildArtifacts@0
+              inputs:
+                artifactName: 'drop'
+                buildType: 'current'
+                downloadType: 'single'
+                downloadPath: '$(Agent.BuildDirectory)'
             - task: AzureRmWebAppDeployment@4
               displayName: "Deploy web application"
               inputs:
