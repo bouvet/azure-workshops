@@ -25,7 +25,7 @@ namespace AzureWorkshopApp.Services
             return StorageConfigValidator.Validate(_storageConfig);
         }
 
-        public async Task<bool> UploadFileToStorage(Stream fileStream, string fileName, string containerName)
+        public async Task<bool> UploadFileToStorage(Stream fileStream, string fileName)
         {
             // Create storagecredentials object by reading the values from the configuration (appsettings.json)
             StorageCredentials storageCredentials = new StorageCredentials(_storageConfig.AccountName, _storageConfig.AccountKey);
@@ -37,7 +37,7 @@ namespace AzureWorkshopApp.Services
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
             // Get reference to the blob container by passing the name by reading the value from the configuration (appsettings.json)
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+            CloudBlobContainer container = blobClient.GetContainerReference(_storageConfig.ImageContainer);
 
             await container.CreateIfNotExistsAsync();
 
@@ -50,7 +50,7 @@ namespace AzureWorkshopApp.Services
             return await Task.FromResult(true);
         }
 
-        public async Task<List<string>> GetImageUrls(string containerName)
+        public async Task<List<string>> GetImageUrls()
         {
             List<string> imageUrls = new List<string>();
 
@@ -64,7 +64,7 @@ namespace AzureWorkshopApp.Services
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
             // Get reference to the container
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+            CloudBlobContainer container = blobClient.GetContainerReference(_storageConfig.ImageContainer);
 
             await container.CreateIfNotExistsAsync();
 

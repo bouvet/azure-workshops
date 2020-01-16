@@ -8,7 +8,7 @@ namespace AzureWorkshopApp.Services
     public interface IStorageService
     {
         AzureStorageConfigValidationResult ValidateConfiguration();
-        Task<bool> UploadFileToStorage(Stream fileStream, string fileName, string containerName);
-        Task<List<string>> GetImageUrls(string containerName);
+        Task<bool> UploadFileToStorage(Stream fileStream, string fileName);
+        Task<List<string>> GetImageUrls();
     }
 }

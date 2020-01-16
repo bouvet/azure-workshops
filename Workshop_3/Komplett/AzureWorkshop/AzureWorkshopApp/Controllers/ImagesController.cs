@@ -16,29 +16,18 @@ namespace AzureWorkshopApp.Controllers
     {
         private readonly IStorageService _storageService;
         private readonly TelemetryClient _telemetryClient;
-        private readonly IHttpContextAccessor _contextAccessor;
 
-        public ImagesController(IStorageService storageService, TelemetryClient telemetryClient, IHttpContextAccessor contextAccessor)
+        public ImagesController(IStorageService storageService, TelemetryClient telemetryClient)
         {
             _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
-            _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
             _telemetryClient = telemetryClient;
         }
 
         // POST /api/images/upload
-        [Authorize(Roles = "Uploader")] // Krever rollen Uploader
+        [Authorize(Roles = "Uploader")] 
         [HttpPost("[action]")]
         public async Task<IActionResult> Upload(ICollection<IFormFile> files)
         {
-            var user = _contextAccessor.HttpContext.User;
-
-            if (user == null)
-                return BadRequest("User could not be determined.");
-
-            var userId = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
-
-            if (userId == null) 
-                return BadRequest("User could not be determined.");
 
             var configValidation = _storageService.ValidateConfiguration();
 
@@ -67,7 +56,7 @@ namespace AzureWorkshopApp.Controllers
 
                 using (var stream = formFile.OpenReadStream())
                 {
-                    if (await _storageService.UploadFileToStorage(stream, formFile.FileName, userId))
+                    if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
                     {
                         return new AcceptedResult();
                     }
@@ -81,21 +70,11 @@ namespace AzureWorkshopApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetImages()
         {
-            var user = _contextAccessor.HttpContext.User;
-            
-            if (user == null)
-                return BadRequest("User could not be determined.");
-
-            var userId = User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value;
-
-            if (userId == null)
-                return BadRequest("User could not be determined.");
-
-
             var configValidation = _storageService.ValidateConfiguration();
+
             if (!configValidation.IsValid()) return BadRequest(configValidation.GetErrors());
 
-            var imageUrls = await _storageService.GetImageUrls(userId);
+            var imageUrls = await _storageService.GetImageUrls();
 
             return new ObjectResult(imageUrls);
         }
