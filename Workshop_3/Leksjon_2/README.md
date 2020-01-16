@@ -17,8 +17,8 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 3. Velg "App registrations", så trykk på "+ New registration"
 4. Gi applikasjonen din et navn, og merk dette navnet slik at du vet at dette er din applikasjon.
 5. Velg "Accounts in this organizational directory only.". Dette betyr at kun brukere som er registrert i din AD har mulighet til å logge inn her.
-6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://<webappname>.azurewebsites.net/signin-oidc". Dette vil være OpenID Connect endepunktet som Azure AD vil sende deg videre etter at du har blitt autentisert. Trykk register.
-7. Under "Logout URL", skriv inn "https://<webappname>.azurewebsites.net/signout-oidc".
+6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://\<webappname>.azurewebsites.net/signin-oidc". Dette vil være OpenID Connect endepunktet som Azure AD vil sende deg videre etter at du har blitt autentisert. Trykk register.
+7. Under "Logout URL", skriv inn "https://\<webappname>.azurewebsites.net/signout-oidc".
 8. Du må også krysse av for "ID token" under authentication.
 9. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere.
 
