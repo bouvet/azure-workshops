@@ -1,0 +1,17 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - azure-pipelines.yaml
+    - AzureWorkshopInfrastruktur/*
+
+steps: 
+  - task: AzureResourceGroupDeployment@2
+    inputs: 
+      azureSubscription: 'Azure subscription'
+      resourceGroupName: 'AzureskolenTest'
+      location: westeurope # norwayeast
+      csmFile:  $(Build.Repository.LocalPath)/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur/azuredeploy.json
+      csmParametersFile:  $(Build.Repository.LocalPath)/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur/azuredeploy.parameters.json

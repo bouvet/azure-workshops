@@ -1,0 +1,194 @@
+﻿@using System.Net
+@using System.Net.Sockets
+@{
+    ViewData["Title"] = "Home Page";
+    ViewData["IpAddress"] = Dns.GetHostAddresses(Dns.GetHostName()).FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
+}
+
+<!-- Client side libs required  -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.css" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+<style>
+    html {
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    }
+
+    main {
+        margin: 20px;
+        text-align: center;
+    }
+
+    body {
+        background: #0f0c29; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        color: white;
+    }
+
+    #errors {
+        color: red;
+        font-weight: bold;
+    }
+
+    .form-wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    .stored-images {
+        display: flex;
+        -moz-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+        -o-flex-wrap: wrap;
+        -webkit-flex-wrap: wrap;
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+
+    .image-wrapper {
+        margin: auto;
+    }
+
+    .image {
+        width: calc(33% - 20px);
+        margin: 10px;
+        -webkit-box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.48);
+        -moz-box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.48);
+        box-shadow: 2px 2px 5px -1px rgba(0,0,0,0.48);
+    }
+
+    @@media only screen and (min-device-width : 320px) and (max-device-width : 700px) {
+        .image {
+            width: 100%;
+        }
+    }
+
+    #ip-address {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding-top: 10px;
+        padding-right: 16px;
+    }
+
+    .dropzone {
+        border: 3px dashed #D5C383;
+        background: #8E7931;
+        color: #D5C383;
+        margin: 25px;
+        -ms-border-radius: 5px;
+        border-radius: 5px;
+        max-width: 400px;
+    }
+
+        .dropzone .dz-message {
+            font-weight: 300;
+        }
+
+            .dropzone .dz-message .note {
+                font-family: sans-serif;
+                font-size: 18px;
+                font-weight: 200;
+                display: block;
+                margin-top: 1.5rem;
+            }
+</style>
+
+
+<main>
+    <div class="box header">
+        <h1><span class="fa fa-user-circle-o"></span> <span id="page-title">Blob storage</span></h1>
+    </div>
+
+    <aside id="ip-address">IP: @ViewData["IpAddress"]</aside>
+
+    <div class="box content">
+        <hr>
+        @if (User != null && User.IsInRole("Uploader"))
+        {
+            <div class="form-wrapper">
+                <form action="/api/images/upload"
+                      class="dropzone needsclick dz-clickable"
+                      id="image-upload"
+                      method="post"
+                      enctype="multipart/form">
+
+                    <div class="dz-message needsclick">
+                        <span class="note needsclick">
+                            Drop images here or click to upload.
+                        </span>
+                    </div>
+                </form>
+            </div>
+        }
+            <div id="stored-images"></div>
+            <div id="errors"></div>
+        </div>
+</main>
+
+<script>
+    var gallery = [];
+
+    function fetchImageLinks() {
+        $.get("api/Images", function (fetchedImageLinks) {
+            if (_.isEmpty(fetchedImageLinks)) {
+                return;
+            }
+
+            var imageLinksEqual = _.isEqual(_.sortBy(gallery.map(s => s.split("?")[0])),
+                _.sortBy(fetchedImageLinks.map(s => s.split("?")[0])));
+            if (!imageLinksEqual) {
+
+                var divContainer = document.getElementById("stored-images");
+
+                _.forEach(fetchedImageLinks, x => {
+
+                    var imageWrapper = document.createElement("span");
+                    imageWrapper.className = "image-wrapper";
+
+                    var imageElement = document.createElement("img");
+                    imageElement.src = x;
+                    imageElement.className = "image";
+
+                    imageWrapper.appendChild(imageElement);
+
+                    divContainer.appendChild(imageWrapper);
+                });
+
+                gallery = fetchedImageLinks;
+            }
+
+        }).fail(error => {
+            var errorContainer = document.getElementById("errors");
+            var paragraph = document.createElement("p");
+            paragraph.appendChild(document.createTextNode(error.responseText ? error.responseText : error.statusCode));
+            errorContainer.appendChild(paragraph);
+        });
+    }
+
+    fetchImageLinks();
+
+    // Poll for changes
+    setInterval(function () {
+        fetchImageLinks();
+    },
+        5000);
+
+    /* Dropzone */
+    // "imageUpload" is the camelized version of the HTML element's ID
+    Dropzone.options.imageUpload = {
+        paramName: "files", // The name that will be used to transfer the file
+        dictDefaultMessage: "Drop files here or Click to Upload",
+        addRemoveLinks: true, // Allows for cancellation of file upload and remove thumbnail
+        init: function () {
+            myDropzone = this;
+            myDropzone.on("success", function (file, response) {
+                console.log("Success");
+                myDropzone.removeFile(file);
+            });
+        }
+    };
+</script>
