@@ -4,7 +4,8 @@ using Microsoft.Extensions.Configuration;
 
 namespace AzureWorkshopApp.Controllers
 {
-    [Authorize] // Må være innlogget for
+    // TODO: Legg til attributt for at bruker må være innlogget for å aksessere controller
+    // [Authorize] 
     public class HomeController : Controller
     {
         private readonly IConfiguration _configuration;

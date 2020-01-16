@@ -141,6 +141,7 @@
         "tier": "Standard"
       },
       "properties": {
+        "supportsHttpsTrafficOnly": true,
         "accessTier": "Hot"
       },
       "resources": [

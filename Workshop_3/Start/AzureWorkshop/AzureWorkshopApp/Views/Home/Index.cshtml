@@ -107,26 +107,28 @@
 
     <div class="box content">
         <hr>
-        @if (User != null && User.IsInRole("Uploader"))
-        {
-            <div class="form-wrapper">
-                <form action="/api/images/upload"
-                      class="dropzone needsclick dz-clickable"
-                      id="image-upload"
-                      method="post"
-                      enctype="multipart/form">
+        @* TODO: Legg inn kode for å sjekke om brukeren har rollen Uploader.
+            @if (User != null && User.IsInRole("Uploader"))
+         { *@
+        <div class="form-wrapper">
+            <form action="/api/images/upload"
+                  class="dropzone needsclick dz-clickable"
+                  id="image-upload"
+                  method="post"
+                  enctype="multipart/form">
 
-                    <div class="dz-message needsclick">
-                        <span class="note needsclick">
-                            Drop images here or click to upload.
-                        </span>
-                    </div>
-                </form>
-            </div>
-        }
-            <div id="stored-images"></div>
-            <div id="errors"></div>
+                <div class="dz-message needsclick">
+                    <span class="note needsclick">
+                        Drop images here or click to upload.
+                    </span>
+                </div>
+            </form>
         </div>
+        @* TODO: Legg inn 
+         } *@
+        <div id="stored-images"></div>
+        <div id="errors"></div>
+    </div>
 </main>
 
 <script>

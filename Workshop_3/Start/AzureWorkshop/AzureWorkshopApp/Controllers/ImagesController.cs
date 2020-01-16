@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AzureWorkshopApp.Controllers
 {
-    [Authorize] 
+    // TODO: Legg til attributt for at bruker må være innlogget for å aksessere controller
+    // [Authorize] 
     [Route("api/[controller]")]
     public class ImagesController : Controller
     {
@@ -23,8 +24,10 @@ namespace AzureWorkshopApp.Controllers
             _telemetryClient = telemetryClient;
         }
 
+
+        // TODO: Legg til attributt for at bruker må være innlogget og ha rollen Uploader for å laste oppe bilde.
+        // [Authorize(Roles = "Uploader")]
         // POST /api/images/upload
-        [Authorize(Roles = "Uploader")] 
         [HttpPost("[action]")]
         public async Task<IActionResult> Upload(ICollection<IFormFile> files)
         {

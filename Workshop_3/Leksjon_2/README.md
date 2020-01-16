@@ -1,7 +1,8 @@
-# Leksjon 2: Azure AD (HE)
+# Leksjon 2: Azure AD
 
 I denne leksjonen skal vi lage innlogging for applikasjonen vår, slik at kun brukere som har en bruker i Azure AD (for din tenant) har tilgang til applikasjonen. Vi skal også legge på autentisering som styres i Azure AD, slik at kun brukere som har en spesiell rolle
-(Uploader) har lov til å laste opp bilder. Andre som logger seg inn har mulighet til å se bilder, men ikke laste opp.
+(Uploader) har lov til å laste opp bilder. Andre som logger seg inn har mulighet til å se bilder,
+men ikke laste opp.
 
 ## Azure AD - Autentisering.
 
@@ -16,9 +17,12 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 3. Velg "App registrations", så trykk på "+ New registration"
 4. Gi applikasjonen din et navn, og merk dette navnet slik at du vet at dette er din applikasjon.
 5. Velg "Accounts in this organizational directory only.". Dette betyr at kun brukere som er registrert i din AD har mulighet til å logge inn her.
-6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://<webappname>.azurewebsites.net/signout-oidc". Dette vil være OpenID Connect endepunktet som Azure AD vil sende deg videre etter at du har blitt autentisert. Trykk register.
-7. Under "Logout URL", skriv inn "https://localhost:51350/signout-oidc" og "https://<webappname>.azurewebsites.net/signout-oidc". 
+6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://<webappname>.azurewebsites.net/signin-oidc". Dette vil være OpenID Connect endepunktet som Azure AD vil sende deg videre etter at du har blitt autentisert. Trykk register.
+7. Under "Logout URL", skriv inn "https://<webappname>.azurewebsites.net/signout-oidc".
 8. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere.
+
+(Dersom du ønsker å debugge lokalt, må du også legge inn "https://localhost:51350/signin-oidc" som "Redirect URI "og "https://localhost:51350/signout-oidc" som "Logout URL".
+Ideelt bør man opprette en egen App Registration for lokal debugging, men for dette test-formålet, og for å spare tid gjør vi ikke det her)
 
 ### Konfigurasjon
 
@@ -47,98 +51,64 @@ Denne legges inn under "Microsoft.Web/sites/properties/siteConfig/appSettings" i
               "value": "https://<webappnavn>.azurewebsites.net/signin-oidc"
             },
             {
-              "name": "AzureAd:SignedOutCallbackPath",
-              "value": "httpSignedOut/<webappnavn>.azurewebsites.net/signout-oidc"
+              "name": "AzureAd:CallbackPath",
+              "value": "http/<webappnavn>.azurewebsites.net/signout-oidc"
             },
 
 ```
 
-Commit og push endringen. SeSignedOut Azure DevOps automatisk pusher endringen ut.
+Commit og push endringen. Se at Azure DevOps automatisk pusher endringen ut.
 
-(Dersom du skulle trenge å dSignedOutgge lokalt, så må de samme verdiene settes i appsettings.json)
-Editer filen appsettings.jsoSignedOutg legg inn konfigurasjon for AzureID. Fyll inn verdiene for TenantID og ClientID som du fikk tak i forrige.
+(Dersom du skulle trenge å degge lokalt, så må de samme verdiene settes i appsettings.json
+Editer filen appsettings.json legg inn konfigurasjon for AzureID. Fyll inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave.)
 
-```
-{
-  "AzureAd": {
-    "Instance": "https://logSignedOutmicrosoftonline.com/",
-    "TenantId": "<TenantID>"SignedOut
-    "ClientId": "<ClientID>"SignedOut
-    "CallbackPath": "/signinSignedOutdc",
-    "SignedOutCallbackPath "SignedOut/signout-oidc"
-  }
-}
-```
-Du må også legge til 
+### Legg til autentisering
 
+Nå når er det på tide å legge til funksjonaliteten. Dette gjøres i Start-folderen som har en fungerende.
 
-##
+Først må du legge til Microsoft.AspNete.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1) som har funksjonalitet for autentisering mot Azure AD.
 
-Nå når
+I denne workshoppen har vi valgt å legge inn kodeendringer som kommentarer som må kommenteres inn/ut for å få den funksjonaliten. Alle endringer har TODO: foran, slik at man lett
+kan finne dem. Alle stier til filer er gitt fra.
 
+1. Startup.cs: Legg inn lasting av middleware for autentisering og cookies.
+2. Views/Shared/\_Layout.cshtml: Legg inn inkludering av et partial view som har login- og logout-grensesnitt.
+3. Controllers/HomeController.cs: Legg til Authorize-attributt som krever at man må være logget inn, og videresender til Azure AD for autentisering hvis ikke.
+4. Controllers/ImageController.cs: Legg til Authorize-attributt på controlleren for å kreve innlogging også her.
 
-1. Legg til Microsoft.AspNetSignedOute.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1)
+Du kan nå teste innlogging, samt opplasting av bilder.
 
-2. Editer så filen Startup.cSignedOutog legg inn koden for å laste autentisering middleware (kode er her lagt inn som kommentar).
+## Autorisasjon - legg til roller
 
+Autorisasjon er hva en autentisert bruker har lov til å gjøre. Nå skal vi sette opp applikasjonen slik at kun noen brukere for
+lov til å laste opp bilder, mens alle som er innlogget får se bildene.
 
+Vi ønsker å implementere rollebasert autorisasjon i applikasjonen, slik at kun en rolle (Uploader)
+skal ha mulighet til å laste opp bilder. Her skal vi bruke AppRoles, som er en innebygged funksjon i Azure AD.
 
-## Autorisasjon - legg til rSignedOuter
-
-Autorisasjon er hva en autenSignedOutert bruker har lov til å gjøre. Nå skal vi sette opp applikasjonen slik at kun noen brukere for 
-lov til å  laste opp bilder,SignedOutns alle som er innlogget får se bildene.
-
-Vi ønsker å implementere rolSignedOutasert autorisasjon i applikasjonen, slik at kun en rolle (Uploader)
-skal ha mulighet til å lasteSignedOutp bilder. Her skal vi bruke AppRoles.
-
-Først må du legge til rollen du ønsker Azure AD skal returnere dersom brukeren som autentiserer 
+Først må du legge til rollen du ønsker Azure AD skal returnere dersom brukeren som autentiserer
 seg har denne rollen. Legge til rolle i manifestet for applikasjonen.
 
 1. Gå til Azure-portalen (https://portal.azure.com) og gå så til menyen for Active
-  Directory.
+   Directory.
 2. Gå så til App Registrations, og finn applikasjonen du laget i forrige oppgave.
 3. Gå til undermenyen "Manifest", og erstatt verdien for appRoles ([])med denne:
-`` [{
-			"allowedMemberTypes": [
-				"User"
-			],
-			"description": "Uploaders have access to upload images.",
-			"displayName": "Uploader",
-			"id": "7d957fab-2c16-48aa-b4d8-d9d3a219c19d",
-			"isEnabled": true,
-			"lang": null,
-			"origin": "Application",
-			"value": "Uploader"
-		}]
-``
+   `[{ "allowedMemberTypes": [ "User" ], "description": "Uploaders have access to upload images.", "displayName": "Uploader", "id": "7d957fab-2c16-48aa-b4d8-d9d3a219c19d", "isEnabled": true, "lang": null, "origin": "Application", "value": "Uploader" }]`
 4. Trykk save.
 
 Dette vil lage rollen "Uploader" og returnere dette i id-tokenet (dersom man er av denne rollen) når man autentiserer seg mot denne applikasjonen.
 
-### Skjul upload-funksjonalitet for brukere som ikke har tilgang.
+### Kun Uploader skal ha mulighet til å laste opp bilder
 
-I denne leksjonen skal du skjule muligheten til å laste opp bilder fra websiden.
+Nå ønsker du gjøre slik at det kun er brukere som har rollen Uploader mulighet til å laste opp bilder.
 
-1. Oppdater filen Views/Home/.
-2. Selv om du skjuler opplastings-funksjonaliteten i brukergrensesnittet.
+1. Views/Index.cshtml: Gjør slik at upload-boksen skjules for brukere som ikke er Uploader.
+2. Controllers/ImageController.cs: Du må også sperre selve metoden Upload(), slik at kun brukere som er Uploader har lov til å laste opp.
 
-3. Editer selve controlleren. Her vil du legge 
+Når du er ferdig med å gjøre endringer. Nå kan du teste applikasjonen, og du skal ikke ha mulighet til å laste opp bilder.
 
+### Tillegg rolle til bruker
 
-Når du er ferdig med å gjøre endringer. Commit og push endringene dine til Azure DevOps.
-
-
-### Fjern 
-
-Selv om man har fjernet upload-funksjonaliteten i viewet, så må vi også blokkere selve opplastingen av bilde
-
-Legg til [Autorize]
-
-
-###
-
-
-### Gi en bruker rollen Uploader
 For å nå kunne gi brukeren din rollen Uploader.
 
 1. Fra hovedmenyen til Azure AD, trykk til "Enterprise Application".
@@ -147,4 +117,4 @@ For å nå kunne gi brukeren din rollen Uploader.
 4. Legg til deg selv, og velg gruppen "Uploader"
 5. Trykk save.
 
-Nå kan du logge inn i applikasjonen din og teste at uploading fungerer.
+Når du nå logger inn, så skal du igjen ha mulighet til å laste inn bilder.

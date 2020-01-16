@@ -30,9 +30,9 @@
     "appInsightsName": {
       "type": "string",
       "metadata": {
-        "description": "The name of the Application Insights instance" 
-      } 
-    }, 
+        "description": "The name of the Application Insights instance"
+      }
+    },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -42,7 +42,7 @@
     }
   },
   "variables": {
-    "servicePlanName": "AppServicePlan" 
+    "servicePlanName": "AppServicePlan"
   },
   "resources": [
     {
@@ -52,8 +52,10 @@
       "name": "[variables('servicePlanName')]",
       "location": "[parameters('location')]",
       "comments": "This app service plan is used for the web app and slots.",
-      "properties": {},
-      "dependsOn": [],
+      "properties": {
+      },
+      "dependsOn": [
+      ],
       "sku": {
         "name": "[parameters('appServiceSku')]"
       }
@@ -66,7 +68,6 @@
       "location": "[parameters('location')]",
       "comments": "This is the web app, also the default 'nameless' slot.",
       "properties": {
-        "httpsOnly": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
         "siteConfig": {
           "appSettings": [
@@ -97,30 +98,6 @@
             {
               "name": "AzureStorageConfig:ImageContainer",
               "value": "[parameters('blobContainerName')]"
-            },
-            {
-              "name": "AzureAd:Instance",
-              "value": "https://login.microsoftonline.com/"
-            },
-            {
-              "name": "AzureAd:Instance",
-              "value": "https://login.microsoftonline.com/"
-            },
-            {
-              "name": "AzureAd:TenantId",
-              "value": "<Directory (tenant) ID>"
-            },
-            {
-              "name": "AzureAd:ClientId",
-              "value": "<Application (client) ID>"
-            },
-            {
-              "name": "AzureAd:CallbackPath",
-              "value": "https://<webappnavn>.azurewebsites.net/signin-oidc"
-            },
-            {
-              "name": "AzureAd:SignedOutCallbackPath",
-              "value": "https://<webappnavn>.azurewebsites.net/signout-oidc"
             }
           ]
         }
@@ -162,7 +139,8 @@
       "type": "Microsoft.Insights/components",
       "apiVersion": "2015-05-01",
       "location": "[parameters('location')]",
-      "tags": {},
+      "tags": {
+      },
       "kind": "string",
       "properties": {
         "Application_Type": "web",
