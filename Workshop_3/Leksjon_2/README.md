@@ -18,7 +18,7 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 4. Gi applikasjonen din et navn, og merk dette navnet slik at du vet at dette er din applikasjon.
 5. Velg "Accounts in this organizational directory only.". Dette betyr at kun brukere som er registrert i din AD har mulighet til å logge inn her.
 6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://\<webappname>.azurewebsites.net/signin-oidc". Dette vil være OpenID Connect endepunktet som Azure AD vil sende deg videre etter at du har blitt autentisert. Trykk register.
-7. Under "Logout URL", skriv inn "https://\<webappname>.azurewebsites.net/signout-oidc".
+7. På venstre side trykker du på Authentication og under Advanced settings "Logout URL", legg inn "https://\<webappname>.azurewebsites.net/signout-oidc".
 8. Du må også krysse av for "ID token" under authentication.
 9. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere.
 
@@ -27,14 +27,10 @@ Ideelt bør man opprette en egen App Registration for lokal debugging, men for d
 
 ### Konfigurasjon
 
-Vi må sette noen konfigurasjonsverdier i applikasjonen vår. For å gjrøe
-Denne legges inn under "Microsoft.Web/sites/properties/siteConfig/appSettings" i AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur:
+Vi må sette noen konfigurasjonsverdier i applikasjonen vår.
+Åpne filen AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur/azuredeploy.json. Søk etter "Microsoft.Web/sites" i dette objectet under "properties/siteConfig/appSettings" legger du til:
 
 ```
-            {
-              "name": "AzureAd:Instance",
-              "value": "https://login.microsoftonline.com/"
-            },
             {
               "name": "AzureAd:Instance",
               "value": "https://login.microsoftonline.com/"
@@ -49,28 +45,28 @@ Denne legges inn under "Microsoft.Web/sites/properties/siteConfig/appSettings" i
             },
             {
               "name": "AzureAd:CallbackPath",
-              "value": "https://<webappnavn>.azurewebsites.net/signin-oidc"
+              "value": "/signin-oidc"
             },
             {
-              "name": "AzureAd:CallbackPath",
-              "value": "http/<webappnavn>.azurewebsites.net/signout-oidc"
-            },
+              "name": "AzureAd:SignedOutCallbackPath",
+              "value": "/signout-oidc"
+            }
 
 ```
 
 Commit og push endringen. Se at Azure DevOps automatisk pusher endringen ut.
 
-(Dersom du skulle trenge å degge lokalt, så må de samme verdiene settes i appsettings.json
-Editer filen appsettings.json legg inn konfigurasjon for AzureID. Fyll inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave.)
+(Dersom du skulle trenge å logge deg på lokalt, så må de samme verdiene settes i appsettings.json
+Editer filen AzureWorkshop/AzureWorkshopApp/appsettings.json legg inn konfigurasjon for AzureID. Fyll inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave.)
 
 ### Legg til autentisering
 
-Nå når er det på tide å legge til funksjonaliteten. Dette gjøres i Start-folderen som har en fungerende.
+Nå når er det på tide å legge til funksjonaliteten til AzureWorkshop prosjektet. 
 
-Først må du legge til Microsoft.AspNete.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1) som har funksjonalitet for autentisering mot Azure AD.
+Først må du legge til Microsoft.AspNet.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1) som har funksjonalitet for autentisering mot Azure AD.
 
 I denne workshoppen har vi valgt å legge inn kodeendringer som kommentarer som må kommenteres inn/ut for å få den funksjonaliten. Alle endringer har TODO: foran, slik at man lett
-kan finne dem. Alle stier til filer er gitt fra.
+kan finne dem. Alle filstier som må endres: 
 
 1. Startup.cs: Legg inn lasting av middleware for autentisering og cookies.
 2. Views/Shared/\_Layout.cshtml: Legg inn inkludering av et partial view som har login- og logout-grensesnitt.
@@ -113,9 +109,10 @@ Når du er ferdig med å gjøre endringer. Nå kan du teste applikasjonen, og du
 For å nå kunne gi brukeren din rollen Uploader.
 
 1. Fra hovedmenyen til Azure AD, trykk til "Enterprise Application".
-2. Gå til "Users and groups"
-3. Trykk på "+ Add user"
-4. Legg til deg selv, og velg gruppen "Uploader"
-5. Trykk save.
+2. Finn applikasjonen du lagde (bruk søkefeltet)
+3. Gå til "Users and groups"
+4. Trykk på "+ Add user"
+5. Legg til deg selv, og velg gruppen "Uploader"
+6. Trykk save.
 
 Når du nå logger inn, så skal du igjen ha mulighet til å laste inn bilder.

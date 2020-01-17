@@ -84,7 +84,7 @@ Når du nå ser at den gir, så kan det være fristende å trykke `Remediate`, s
 praktiserer "Infrastructure as Code", så må vi gjøre. Trykk på `View remediation logic` for å se hva du må legge til ARM-templaten din:
 
 * I Infrastruktur-prosjektet ditt, åpne azuredeploy.json.
-* Editer filen, slik at dette er:
+* Editer filen, slik at dette er i samsvar med hva 'View remediation logic' viste, hvis det er ingen forslag så trenger du ikke gjøre noe.
 * Commit endringen din og push endringen din til Azure DevOps.
 * Sjekk at Infrastruktur-prosjektet ditt blir bygd og deployet.
 
