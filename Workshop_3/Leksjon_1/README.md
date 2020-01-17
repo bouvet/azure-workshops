@@ -78,7 +78,7 @@ Nå skal du se om du får noen anbefalinger fra Security Center på App Servicen
 
 * Gå til `webappnavn` som du opprettet i forrige oppgave.
 * Trykk så på `Security`, og du kommer til et skjermbilde som viser alerts.
-* Se om du har noen sårbarheter som bør utbedres. Her vil du mest sannsynlig se en melding om at det anbefales å skru på slik at kun
+* Se om du har noen sårbarheter som bør utbedres. Her vil du mest sannsynlig se en melding om at det anbefales å skru på https slik at det kun går over sikker kanal.
 
 Når du nå ser at den gir, så kan det være fristende å trykke `Remediate`, som vil fikse problemet med en gang. Men, i og med at vi 
 praktiserer "Infrastructure as Code", så må vi gjøre. Trykk på `View remediation logic` for å se hva du må legge til ARM-templaten din:
@@ -90,9 +90,9 @@ praktiserer "Infrastructure as Code", så må vi gjøre. Trykk på `View remedia
 
 Det tar gjerne noen minutter fra du gjør en endring, til at endringen vises i Azure Security Center.
 
-(dersom du har tid til overs, kan du gjøre øvelse for Storage Account'en din, og se om du får noen anbefalinger der).
+(Dersom du har tid til overs, kan du gjøre samme øvelse for Storage Account'en din, og se om du får noen anbefalinger der).
 
-### Advanced Threat Protection (Usikker på om denne skal være med)
+### Advanced Threat Protection 
 Advanced Threat Protection er en tilleggstjeneste på storage account, slik at storage accounten din blir overvåket for angrep og unormal oppførsel. Dersom Security Center oppdager noe unormalt som den mener du bør se på, så vil du motta en epost med varsling om hva som har 
 skjedd.
 
