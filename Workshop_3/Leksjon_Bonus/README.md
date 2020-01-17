@@ -1,13 +1,13 @@
-# Sikre infrastruktur (PA)
+# Bonus Leksjon: Sikre infrastruktur
 
-Oppdater koden til å bruke sas token, slik at APIet returnerer bilde url-er med sastoken.
-Hint: Endringene kan gjøres i disse filene
-* StorageService
-* Index
+Nå skal du ha en sikker applikasjon som tillater kun en innlogget bruker å lagre bilder. Et problem som fortsatt eksisterer er at Storage kontoen kan være tilgjengelig for alle over internett. Derfor kan observante personer få tilgang til bilder du laster opp uten å være innlogget. Under veiviseren, i portalen, når du lager en Storage Account så får du muligheten til å sette Connectivity method (under Networking), her kan man sette Public endpoint (all networks), Public networks (selected networks) og private endpoint. Som oftest velger man Public endpoint (all networks) fordi det er raskest å få til å fungere.
 
-----------
+--------- 
 
-- Pass på at container er private access. Dette finner du under spesifikk container sin Access level.
+Før vi låser ned Storage Accounten så er det viktig å sjekke at applikasjonen er klar. I StorageService finnes det en metode som heter GetImageUrls, sjekk at denne lager en SharedAccessSignature.
+
+For å sikre Storage Accounten så må vi gå i portalen og sjekke/endre litt
+- Pass på at container er private access. Dette finner du under Container sin Access level.
 	- Finn Storage Accounten i portalen. 
 	- Trykk containers, finn containeren du vil endre på og trykk på den. 
 	- Ovenfor alle filene vil det være et par valg, trykk på change access level og velg Private og trykk OK
@@ -17,6 +17,7 @@ Hint: Endringene kan gjøres i disse filene
 	- Her inne legger du til et virituelt nettverk. 
 		- Hvis du ikke har et fra før så kan du lage det gjennom "Add new virtual network" valget. Trykk her og følg oppsettet. Husk å trykke Save etter å ha laget VNet
 -------------
+
 Test så at applikasjonen din ikke fungerer lengre. Hvorfor ikke? Du har jo sas token?
 Hvis du fulgte litt godt med så så du kanskje valget med Firewall og legg til din IP-addresse? Huk av for den og trykk lagre på nytt. Nå skal applikasjonen din fungere igjen.
 Valget med IP-addressen finnes i Storage Account under Firewalls and Virtual Networks.
@@ -33,20 +34,4 @@ Nå har du muligheten til å velge hvem som har tilgang til alle ressursene som 
 Man kan gjøre det mulig å kontakte Storage Accounten fra spesifikke tjenester som ligger i vnettet, f.eks. virituelle maskiner
 Ettersom det tar litt tid før endringene du gjør i NSGen faktisk blir aktive, så anbefales det at man venter så mye som 20 minutter før du prøver en annen regel.
 For en applikasjon sånn som dette, så ville det vært lurt å ikke bruke virituelt nettverk på Storage kontoen, men det finnes mange scenarioer der du ikke vil at dataene dine skal kunne komme på utsiden av dine applikasjoner og da er slike restriksjoner veldig fine å bruke. Da er det bare å sette opp VNET og NSG og så få på plass reglene man trenger for sin arkitektur.
-
-
-
-
------------------------------------------------ 
-- Opprette VNET,
-- Flytte App Service til VNET.
-- Opprette Service Endpoint til Web App.
-- Sikre at kun Web App har tilgang til Storage Account.
-- Filene må vel streames ut i stedet for å tilby SAS-tokens.
--- Hvis Storage Account flyttes inn i vnet må det skrives om en del i service laget og i cshtml filen.
-- NSG, policies.
-- Public
-- Gjøres i Portal, og ikke arm templates
-
-
 
