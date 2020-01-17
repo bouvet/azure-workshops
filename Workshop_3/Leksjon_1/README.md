@@ -104,4 +104,4 @@ Du kan lese mer om dette ved en senere anledning her:
 [Storage advanced threat protection](https://docs.microsoft.com/en-us/azure/storage/common/storage-advanced-threat-protection?tabs=azure-portal)
 
 ### Oppsummering
-I denne øvelsen har du stiftet kjennskap til Azure Security Center. Du har sett hvordan 
+I denne øvelsen har du stiftet kjennskap til Azure Security Center. 
