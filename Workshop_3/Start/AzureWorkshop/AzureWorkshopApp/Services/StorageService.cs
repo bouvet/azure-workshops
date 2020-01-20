@@ -69,11 +69,14 @@ namespace AzureWorkshopApp.Services
             await container.CreateIfNotExistsAsync();
 
             BlobContinuationToken continuationToken = null;
-            var sasToken = container.GetSharedAccessSignature(new SharedAccessBlobPolicy()
-            {
-                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(3),
-                Permissions = SharedAccessBlobPermissions.Read
-            });
+
+            // TODO: Kommenter inn denne for å generere et Shared Access Signature token (SAS-token)
+            // Tokenet gir kun lesetilgang til bildet (blob) i 15 minutter.
+            //var sasToken = container.GetSharedAccessSignature(new SharedAccessBlobPolicy
+            //{
+            //    SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(15),
+            //    Permissions = SharedAccessBlobPermissions.Read
+            //});
 
             //Call ListBlobsSegmentedAsync and enumerate the result segment returned, while the continuation token is non-null.
             //When the continuation token is null, the last page has been returned and execution can exit the loop.
@@ -85,7 +88,11 @@ namespace AzureWorkshopApp.Services
 
                 foreach (var blobItem in resultSegment.Results)
                 {
-                    imageUrls.Add(blobItem.StorageUri.PrimaryUri.ToString() + sasToken);
+                    // TODO: Kommenter inn denne for å bruke SAS-token.
+                    //imageUrls.Add(blobItem.StorageUri.PrimaryUri + sasToken);
+                    
+                    // TODO: Kommenter ut denne.
+                    imageUrls.Add(blobItem.StorageUri.PrimaryUri.ToString());
                 }
 
                 //Get the continuation token.

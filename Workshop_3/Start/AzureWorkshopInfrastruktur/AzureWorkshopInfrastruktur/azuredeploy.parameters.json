@@ -3,19 +3,19 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "webSiteName": {
-      "value": ""
+      "value": "ws3havardetest-web"
     },
     "appServiceSku": {
       "value": "D1"
     },
     "storageAccountName": {
-      "value": ""
+      "value": "ws3havardetestsa"
     },
     "blobContainerName": {
       "value": "imagecontainer"
     },
     "appInsightsName": {
-      "value": ""
+      "value": "ws3havardetestai"
     } 
   }
 }
