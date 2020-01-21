@@ -56,6 +56,8 @@ Vi må sette noen konfigurasjonsverdier i applikasjonen vår.
 
 ```
 
+Fyll inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave.
+
 Deploy så endringen din til Azure.
 
 (Dersom du skulle trenge å logge deg på lokalt, så må de samme verdiene settes i appsettings.json
@@ -103,7 +105,7 @@ Nå ønsker du gjøre slik at det kun er brukere som har rollen Uploader mulighe
 1. Views/Index.cshtml: Gjør slik at upload-boksen skjules for brukere som ikke er Uploader.
 2. Controllers/ImageController.cs: Du må også sperre selve metoden Upload(), slik at kun brukere som er Uploader har lov til å laste opp.
 
-Når du er ferdig med å gjøre endringer. Nå kan du teste applikasjonen, og du skal ikke ha mulighet til å laste opp bilder.
+Når du er ferdig med å gjøre endringer så deploy på nytt. Nå kan du teste applikasjonen, og du skal ikke ha mulighet til å laste opp bilder.
 
 ### Tillegg rolle til bruker
 
