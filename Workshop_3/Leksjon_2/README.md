@@ -17,7 +17,7 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 3. Velg "App registrations", så trykk på "+ New registration"
 4. Gi applikasjonen din et navn, og merk dette navnet slik at du vet at dette er din applikasjon.
 5. Velg "Accounts in this organizational directory only.". Dette betyr at kun brukere som er registrert i din AD har mulighet til å logge inn her.
-6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://\<webappname>.azurewebsites.net/signin-oidc". Dette vil være OpenID Connect endepunktet som Azure AD vil sende deg videre etter at du har blitt autentisert. 
+6. Velg så "Web" under "Redirect URI", og skriv inn adressen brukeren skal bli sendt videre "https://\<webappname>.azurewebsites.net/signin-oidc". Dette vil være OpenID Connect endepunktet som Azure AD vil sende deg videre etter at du har blitt autentisert.
 7. Trykk register.
 8. På venstre side trykker du på Authentication og under Advanced settings "Logout URL", legg inn "https://\<webappname>.azurewebsites.net/signout-oidc".
 9. Du må også krysse av for "ID token" under authentication.
@@ -63,9 +63,9 @@ Editer filen AzureWorkshop/AzureWorkshopApp/appsettings.json legg inn konfiguras
 
 ### Legg til autentisering
 
-Nå når er det på tide å legge til funksjonaliteten til AzureWorkshop prosjektet. 
+Nå når er det på tide å legge til funksjonaliteten til AzureWorkshop prosjektet.
 
-Først må du legge til Microsoft.AspNet.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1) som har funksjonalitet for autentisering mot Azure AD.
+Først må du legge til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1) som har funksjonalitet for autentisering mot Azure AD.
 
 I denne workshoppen har vi valgt å legge inn kodeendringer som kommentarer som må kommenteres inn/ut for å få den funksjonaliten. Alle endringer har TODO: foran, slik at man lettkan finne dem. Alle filer som må endres:
 
