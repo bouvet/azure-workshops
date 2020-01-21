@@ -4,7 +4,7 @@ I denne leksjonen skal vi lage innlogging for applikasjonen vår, slik at kun br
 (Uploader) har lov til å laste opp bilder. Andre som logger seg inn har mulighet til å se bilder,
 men ikke laste opp.
 
-## Azure AD - Autentisering.
+## Azure AD - Autentisering
 
 Vi begynner med å legge på autentisering på applikasjonen.
 
@@ -56,7 +56,7 @@ Vi må sette noen konfigurasjonsverdier i applikasjonen vår.
 
 ```
 
-Commit og push endringen. Se at Azure DevOps automatisk pusher endringen ut.
+Deploy så endringen din til Azure.
 
 (Dersom du skulle trenge å logge deg på lokalt, så må de samme verdiene settes i appsettings.json
 Editer filen AzureWorkshop/AzureWorkshopApp/appsettings.json legg inn konfigurasjon for AzureID. Fyll inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave.)
@@ -67,15 +67,14 @@ Nå når er det på tide å legge til funksjonaliteten til AzureWorkshop prosjek
 
 Først må du legge til Microsoft.AspNet.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1) som har funksjonalitet for autentisering mot Azure AD.
 
-I denne workshoppen har vi valgt å legge inn kodeendringer som kommentarer som må kommenteres inn/ut for å få den funksjonaliten. Alle endringer har TODO: foran, slik at man lett
-kan finne dem. Alle filstier som må endres: 
+I denne workshoppen har vi valgt å legge inn kodeendringer som kommentarer som må kommenteres inn/ut for å få den funksjonaliten. Alle endringer har TODO: foran, slik at man lettkan finne dem. Alle filer som må endres:
 
 1. Startup.cs: Legg inn lasting av middleware for autentisering og cookies.
 2. Views/Shared/\_Layout.cshtml: Legg inn inkludering av et partial view som har login- og logout-grensesnitt.
 3. Controllers/HomeController.cs: Legg til Authorize-attributt som krever at man må være logget inn, og videresender til Azure AD for autentisering hvis ikke.
 4. Controllers/ImageController.cs: Legg til Authorize-attributt på controlleren for å kreve innlogging også her.
 
-Du kan nå teste innlogging, samt opplasting av bilder.
+Deploy så til Azure og du kan nå teste innlogging, samt opplasting av bilder.
 
 ## Autorisasjon - legg til roller
 
