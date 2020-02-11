@@ -2,18 +2,18 @@
 
 Denne leksjonen tar for seg Azure Storage. Azure Storage er en lagringstjeneste hvor man kan lagre data i Azure på en forholdsvis rimelig måte. En Storage Account kan inneholde forkjellige typer Storage:
 
-* Blobs - For å lagre filer i Containere. 
-* Tables - NoSQL, No-Schema database.
-* Queues - Persistente køer.
-* Files - Filer som oppfører seg om et filshare.
+- Blobs - For å lagre filer i Containere.
+- Tables - NoSQL, No-Schema database.
+- Queues - Persistente køer.
+- Files - Filer som oppfører seg om et filshare.
 
 I denne leksjonen skal vi jobbe med blobs for å lagre bildene til app'en i.
 
 Det er flere måter å manipulere data på i Azure Storage:
 
-* Portalen: Ved å velge Data Explorer.
-* Visual Studio: I Cloud Explorer i Visual Studio kan man gjøre.
-* Azure Storage Explorer: Azure Storage Explorer er en klient fra Microsoft for å administrere og bruke Storage Accounts: https://azure.microsoft.com/en-us/features/storage-explorer/
+- Portalen: Ved å velge Data Explorer.
+- Visual Studio: I Cloud Explorer i Visual Studio kan man gjøre.
+- Azure Storage Explorer: Azure Storage Explorer er en klient fra Microsoft for å administrere og bruke Storage Accounts: https://azure.microsoft.com/en-us/features/storage-explorer/
 
 Du velger selv hvilken metode du ønsker å prøve ut.
 
@@ -21,28 +21,26 @@ Du velger selv hvilken metode du ønsker å prøve ut.
 
 Det er flere metoder for å opprette ressurser i Azure. De mest vanlige er her:
 
-* Portalen. Manuelt opprette ressurser med pek- og klikk. 
-* Powershell: Det finnes egne Powershell-moduler (AzureRM f.eks.) for å administrere Azure. Powershell også kjøres i Azure Shell i nettleseren.
-* Azure CLI. Kryss-plattform shell som blant annet finnes både på Windows, Mac og Linux.
-* ARM-templates - deklarativ beskrivelse av Azure-komponenter og infrastruktur i JSON-format. 
+- Portalen. Manuelt opprette ressurser med pek- og klikk.
+- Powershell: Det finnes egne Powershell-moduler (AzureRM f.eks.) for å administrere Azure. Powershell også kjøres i Azure Shell i nettleseren.
+- Azure CLI. Kryss-plattform shell som blant annet finnes både på Windows, Mac og Linux.
+- ARM-templates - deklarativ beskrivelse av Azure-komponenter og infrastruktur i JSON-format.
 
 I denne leksjonen skal du bruke Powershell eller Azure CLI for å opprette en Storage Account og en Blob-Container. Hovedregelen er at alt du kan gjøre i portalen kan du også gjøre via Powershell/Azure CLI, og det er også mye mer du kan gjøre via kommandolinje.
 
-Powershell er fint å bruk i Windows miljøer, mens Azure CLI er kryssplatform og kan. Begge er tilgjengelige i Azure Shell.
+Powershell er fint å bruk i Windows miljøer, mens Azure CLI er kryssplatform og kan brukes både på Linux, Mac og Windows. Begge er tilgjengelige i Azure Shell.
 
+For å opprette en storage account og en blob-container:
 
-For å opprette en storage account og en blob-container: 
+1. Start et Azure Shell kommando ved å klikke på ">\_" på toppen i portalen.
+2. Trykk ja når du får spørsmål om å opprette en storage account. Dette er en storage account som bruker Azure Shellet og som lever bak kulissene for at man skal kunne lagre filer og lignende, mens man er i shellet. Det er ikke mulig å bruke denne storage accounten i applikasjonen.
+3. Gå til denne siden for å lære hvordan du oppretter en egen Storage Account og en Container, som du ønsker å bruke i applikasjonen din.
+   Powershell:
+   https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-powershell
+   CLI:
+   https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-cli
 
-1. Start et Azure Shell kommando ved å klikke på ">_" på toppen i portalen.
-2. Trykk ja når du får spørsmål om å opprette en storage account. Dette er en storage account som brukes Azure Shellet og som 
-4. Gå til denne siden for å lære hvordan du oppretter en egen Storage Account og en Container, som du ønsker å bruke i applikasjonen din.
-Powershell:
-https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-powershell 
-CLI: 
-https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-cli
-
-5. Test containeren ved å laste opp en fil ved enten å bruke Storage Explorer eller i portalen.
-
+4. Test containeren ved å laste opp en fil ved enten å bruke Storage Explorer eller i portalen.
 
 ## Implementer servicen StorageService
 
@@ -54,34 +52,32 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
 
 3. Implementer metoden for å laste opp fil:
 
-   __UploadFileToStorage (Stream fileStream, string fileName)__
-   
+   **UploadFileToStorage (Stream fileStream, string fileName)**
+
    Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
 
    | Klasse              | Metoder               |
-   |---------------------|-----------------------|
+   | ------------------- | --------------------- |
    | StorageCredentials  |                       |
    | CloudStorageAccount | CreateCloudBlobClient |
    | CloudBlobClient     | GetContainerReference |
    | CloudBlobContainer  | GetBlockBlobReference |
    | CloudBlockBlob      | UploadFromStreamAsync |
-   
-   Dersom du står fast eller ønsker å se et ferdig eksempel så kan du se [her](https://github.com/bouvet/azure-workshops/blob/master/Workshop_1/Komplett/AzureWorkshop/AzureWorkshopApp/Services/StorageService.cs).
-    
-4. Implementer metoden for å hente ut URL-er til blob-ene.
-   
-   __GetImageUrls ()__
-   
-   Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
-   
-   | Klasse              | Metoder               |
-   |---------------------|-----------------------|
-   | StorageCredentials  |                       |
-   | CloudStorageAccount | CreateCloudBlobClient |
-   | CloudBlobClient     | GetContainerReference |
-   | CloudBlobContainer  | GetBlockBlobReference, ListBlobsSegmentedAsync |
-   | BlobContinuationToken | Lag for eksempel en do-while. Start med å kalle ListBlobsSegmentedAsync og enumerer resultat-segmentet som returneres. Fortsett å gjøre dette så lenge continuation token i resultat-segmentet ikke er null. Når continuation tokenet er null, så har det siste segmentet blitt returnert og loopen kan brytes. |
-   
-      Dersom du står fast eller ønsker å se et ferdig eksempel så kan du se [her](https://github.com/bouvet/azure-workshops/blob/master/Workshop_1/Komplett/AzureWorkshop/AzureWorkshopApp/Services/StorageService.cs).
-   
 
+   Dersom du står fast eller ønsker å se et ferdig eksempel så kan du se [her](https://github.com/bouvet/azure-workshops/blob/master/Workshop_1/Komplett/AzureWorkshop/AzureWorkshopApp/Services/StorageService.cs).
+
+4. Implementer metoden for å hente ut URL-er til blob-ene.
+
+   **GetImageUrls ()**
+
+   Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
+
+   | Klasse                | Metoder                                                                                                                                                                                                                                                                                                         |
+   | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | StorageCredentials    |                                                                                                                                                                                                                                                                                                                 |
+   | CloudStorageAccount   | CreateCloudBlobClient                                                                                                                                                                                                                                                                                           |
+   | CloudBlobClient       | GetContainerReference                                                                                                                                                                                                                                                                                           |
+   | CloudBlobContainer    | GetBlockBlobReference, ListBlobsSegmentedAsync                                                                                                                                                                                                                                                                  |
+   | BlobContinuationToken | Lag for eksempel en do-while. Start med å kalle ListBlobsSegmentedAsync og enumerer resultat-segmentet som returneres. Fortsett å gjøre dette så lenge continuation token i resultat-segmentet ikke er null. Når continuation tokenet er null, så har det siste segmentet blitt returnert og loopen kan brytes. |
+
+   Dersom du står fast eller ønsker å se et ferdig eksempel så kan du se [her](https://github.com/bouvet/azure-workshops/blob/master/Workshop_1/Komplett/AzureWorkshop/AzureWorkshopApp/Services/StorageService.cs).
