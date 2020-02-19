@@ -86,7 +86,7 @@ I tillegg har den et Standard tier, som tilbyr utvidet overvåkning av tjenesten
 
 Nå skal du se om du får noen anbefalinger fra Security Center på App Servicen din.
 
-- Logg inn i Azure-portalen (https://portal.azure.com)
+- Logg inn i Azure-portalen (https://portal.azure.com).
 - Gå til `webappnavn` som du opprettet i forrige oppgave.
 - Trykk så på `Security`, og du kommer til et skjermbilde som viser alerts.
 - Se om du har noen sårbarheter som bør utbedres. Her vil du mest sannsynlig se en melding om at det anbefales å skru på https slik at det kun går over sikker kanal.
