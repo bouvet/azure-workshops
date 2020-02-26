@@ -73,7 +73,7 @@ For å kunne gi de brukerne som skal se bilder tilgang til bilder, skal vi bruke
 Nå skal du igjen se bildene, og hvis du høyreklikker på bildet og ser URL'en, så ser du at SAS-tokenet er lagt til på slutten. Du tenker
 kanskje at alle har fortsatt tilgang, men det skal vi gjøre noe med i leksjon 2.
 
-## Azure Security Center
+## Azure Security Center (1)
 
 Azure Security Center er en tjeneste i Azure som overvåker tjenestene dine, og leter etter mulige konfigurasjoner som kan gjøre tjenestene
 dine usikre.
@@ -82,36 +82,14 @@ I Basic tier så får du gratis anbefalinger på tiltak du kan gjøre for å for
 
 I tillegg har den et Standard tier, som tilbyr utvidet overvåkning av tjenestene. Dette må settes opp per tjeneste og koster ekstra.
 
-### App Service
-
-Nå skal du se om du får noen anbefalinger fra Security Center på App Servicen din.
+Azure Security Center bruker litt tid for å scanne tjenestene dine etter at de er opprettet, derfor skal du i denne øvelsen bare gjøre deg
+litt kjent med Azure Security Center:
 
 - Logg inn i Azure-portalen (https://portal.azure.com).
-- Gå til `webappnavn` som du opprettet i forrige oppgave.
-- Trykk så på `Security`, og du kommer til et skjermbilde som viser alerts.
-- Se om du har noen sårbarheter som bør utbedres. Her vil du mest sannsynlig se en melding om at det anbefales å skru på https slik at det kun går over sikker kanal.
+- Finn Azure Security Center fra menyen på venstre.
+- Klikk litt rundt i tjenesten og gjør deg litt kjent med hva som finnes her. Er tjenestene dine dukket opp, og er det kommet noen anbefalinger allerede?
 
-Når du nå ser at den gir, så kan det være fristende å trykke `Remediate`, som vil fikse problemet med en gang. Men, i og med at vi
-praktiserer "Infrastructure as Code", så må vi gjøre endringen permanent i scriptene være. Trykk på `View remediation logic` for å se hva du må legge til ARM-templaten din:
-
-- I Infrastruktur-prosjektet ditt, åpne azuredeploy.json.
-- Editer filen, slik at dette er i samsvar med hva 'View remediation logic' viste, hvis det er ingen forslag så trenger du ikke gjøre noe.
-- Redeploy Infrastruktur-prosjektet.
-
-Det tar gjerne noen minutter fra du gjør en endring, til at endringen vises i Azure Security Center. Men, du kan sjekke at applikasjonen
-kun tillatter https uansett.
-
-(Dersom du har tid til overs, kan du gjøre samme øvelse for Storage Account'en din, og se om du får noen anbefalinger der).
-
-### Advanced Threat Protection
-
-Advanced Threat Protection er en tilleggstjeneste på storage account, slik at storage accounten din blir overvåket for angrep og unormal oppførsel. Dersom Security Center oppdager noe unormalt som den mener du bør se på, så vil du motta en epost med varsling om hva som har
-skjedd.
-
-Gå til din Storage Account som ble opprettet, og trykk på `Advanced Security`. Siden dette koster ekstra penger, og vi har vurdert til at dette ikke er noe som er nødvendig velger vi å ikke skru på denne i dette tilfelle.
-
-Du kan lese mer om dette ved en senere anledning her:
-[Storage advanced threat protection](https://docs.microsoft.com/en-us/azure/storage/common/storage-advanced-threat-protection?tabs=azure-portal)
+Vi kommer tilbake til Azure Security Center i leksjon 3, hvor vi skal se om vi får utbedret noen sårbarheter.
 
 ## Oppsummering
 
