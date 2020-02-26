@@ -7,7 +7,7 @@ I denne leksjonen skal vi:
 
 - Forberede og deploye applikasjonen til Azure.
 - Fjerne tilganger i storage account, slik at bilde-Containeren vår ikke er åpen for public adgang.
-- Gjøre oss litt kjent med Azure Security Center og gjøre noen tiltak.
+- Gjøre oss litt kjent med Azure Security Center.
 
 ## Første deploy av applikasjonen
 
