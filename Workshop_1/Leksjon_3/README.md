@@ -42,12 +42,11 @@ For å opprette en storage account og en blob-container:
    * Azure CLI:
    https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-cli
 
-4. Opprett en container i Blob Servicen som Storage Accounten tilbyr. Denne skal ha Public Access Level satt til: 
-    ```sh
-    Blob (anonymous read access for blobs only).
-    ```
+4. Opprett en container i Blob Servicen som Storage Accounten tilbyr. Denne skal ha Public Access Level satt til:  
+   >Blob (anonymous read access for blobs only).
+
    
-1. Test containeren ved å laste opp en fil ved enten å bruke <a href="https://azure.microsoft.com/en-us/features/storage-explorer/">Storage Explorer</a> eller i <a href="https://portal.azure.com">Azure Portalen</a>.
+5. Test containeren ved å laste opp en fil ved enten å bruke <a href="https://azure.microsoft.com/en-us/features/storage-explorer/">Storage Explorer</a> eller i <a href="https://portal.azure.com">Azure Portalen</a>.
 
 
 ## Implementer servicen StorageService
