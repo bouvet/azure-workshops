@@ -10,18 +10,18 @@ Les mer her: https://docs.microsoft.com/en-in/azure/key-vault/key-vault-whatis
 
 Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal opprette et key vault og kode om applikasjonen til å benytte dette.
 
-1. I Visual Studio, klikk på "Project" øverst til venstre, derretter velg "Add Connected Service".
-2. Klikk på + tegnet ved siden av "Service Dependencies"
+1. I Visual Studio, klikk på `Project` øverst til venstre, derretter velg `Add Connected Service`.
+2. Klikk på + tegnet ved siden av `Service Dependencies`
 3. Velg Azure Key Vault 
 4. Opprett Azure Key Vault ved å trykke på + tegnet og skriv inn følgende verdier:
 
-    | Azure Key Vault | Verdi                                                  |
-    | --------------- | ------------------------------------------------------ |
-    | Resource name   | `Valgfritt`                                            |
-    | Subscription    | `Visual Studio Professional | Den du har tilgjengelig` |
-    | Resource Group  | `Den du opprettet tidlig`                              |
-    | Location        | `Anbefalt Norway East | Valgfritt`                     |
-    | SKU             | `Standard`                                             |
+    | Azure Key Vault | Verdi                                                   |
+    | --------------- | ------------------------------------------------------- |
+    | Resource name   | `Valgfritt`                                             |
+    | Subscription    | `Visual Studio Professional || Den du har tilgjengelig` |
+    | Resource Group  | `Den du opprettet tidlig`                               |
+    | Location        | `Anbefalt Norway East || Valgfritt`                     |
+    | SKU             | `Standard`                                              |
     
 
 5. Klikk deg videre, sørg for at alle "Project changes" er huket på derretter klikk på "Finish"
@@ -93,12 +93,12 @@ Det du finner ut er mest sannsynlig at Web App'en din ikke har tilgang til å le
 vi å bruke Managed Service Identity (MSI), som gjør at man kan opprette en identitet (Service Principal/"bruker") for Web App'en din som man igjen kan gi de tilganger man vil til andre tjenester i Azure (her i Key Vault).
 
 1. Gå til Web Appen din i Azureportalen.
-2. Velg så "Identity" under Settings, og trykk på "On" og trykk Save. Kopier samtidig "Object ID" til din utklippstavle.
+2. Velg så `Identity` under Settings, og trykk på `On` og trykk Save. Kopier samtidig `Object ID` til din utklippstavle.
 3. Gå så til Key Vault'en din.
-4. Velg "Access policies" under settings.
-5. Trykk "Add Access Policies".
-6. På "Select principal", søker du opp navnet på Web App'en din eller limer inn Object ID om du husket å kopiere denne i steg 2.
-7. Velg så "Get" og "List" under "Secret Permissions"
+4. Velg `Access policies` under settings.
+5. Trykk `Add Access Policies`.
+6. På `Select principal`, søker du opp navnet på Web App'en din eller limer inn `Object ID` om du husket å kopiere denne i steg 2.
+7. Velg så `Get` og `List` under `Secret Permissions`
 8. Trykk på OK.
 
 Nå skal applikasjonen din ha tilgang til å lese secrets fra denne Key Vaulten.
