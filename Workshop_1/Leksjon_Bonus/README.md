@@ -10,25 +10,47 @@ Les mer her: https://docs.microsoft.com/en-in/azure/key-vault/key-vault-whatis
 
 Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal opprette et key vault og kode om applikasjonen til å benytte dette.
 
-1. I Visual Studio, høyreklikk på Connected Services i for prosjektet og velg Add connected service.
-2. Velg secure Secrets with Azure Key Vault
-3. Velg edit og pass på at settingene stemmer, klikk så add.
-4. Klikk Manage secrets stored in this Key Vault. Dette tar deg til azureportalen.
-5. Klikk Generate/Import
-6. Lag en nøkkel med navn AzureStorageConfig--AccountName og value som den står i AccountName fra appsettings.json
-7. Lag en nøkkel med navn AzureStorageConfig--AccountKey og value som den står i AccountKey fra appsettings.json
+1. I Visual Studio, klikk på "Project" øverst til venstre, derretter velg "Add Connected Service".
+2. Klikk på + tegnet ved siden av "Service Dependencies"
+3. Velg Azure Key Vault 
+4. Opprett Azure Key Vault ved å trykke på + tegnet og skriv inn følgende verdier:
+
+    | Azure Key Vault | Verdi                                                  |
+    | --------------- | ------------------------------------------------------ |
+    | Resource name   | `Valgfritt`                                            |
+    | Subscription    | `Visual Studio Professional | Den du har tilgjengelig` |
+    | Resource Group  | `Den du opprettet tidlig`                              |
+    | Location        | `Anbefalt Norway East | Valgfritt`                     |
+    | SKU             | `Standard`                                             |
+    
+
+5. Klikk deg videre, sørg for at alle "Project changes" er huket på derretter klikk på "Finish"
+6. Gå til <a href="https://portal.azure.com/">Azure Portalen</a>, og finn din nylige opprettede Azure Key Vault.
+7. Gå til Settings -> Secrets og klikk Generate/Import
+8. Lag en nøkkel for Storage account name opprettet i forrige leksjon. Den skal ha følgende verdier:
+
+    | Name                              | Value (secret)                                        |
+    | --------------------------------- | ----------------------------------------------------- |
+    | `AzureStorageConfig--AccountName` | `Verdien som står i AccountName fra appsettings.json` |
+    
+9.  Lag en nøkkel for Storage Account Key opprettet i forrige leksjon. Den skal ha følgende verdier:
+
+    | Name                             | Value (secret)                                       |
+    | -------------------------------- | ---------------------------------------------------- |
+    | `AzureStorageConfig--AccountKey` | `Verdien som står i AccountKey fra appsettings.json` |
 
 ### Bruk key vault
 
 Vi ønsker nå at applikasjonen skal bruke verdiene satt i Key Vault fremfor den gamle config-filen. Heldigvis er det god støtte i .net core for å ta i bruk dette.
 
-Start med å gå til appsettings.json og slett seksjonen AzureStorageConfig. Denne skal vi ikke bruke lenger.
-
-Vi må så legge til noen nuget-pakker (dette kan du gjøre i Nuget Console):
-
-* Install-Package Microsoft.Azure.KeyVault
-* Install-Package Microsoft.Azure.Services.AppAuthentication
-* Install-Package Microsoft.Extensions.Configuration.AzureKeyVault
+Start med å gå til appsettings.json og slett verdien i AccountName og AccountKey, slik at AzureStorageConfig ser slik ut: 
+```
+  "AzureStorageConfig": {
+    "AccountName": "",
+    "AccountKey": "",
+    "ImageContainer": "Navnet på din image container"
+  }
+```
 
 Gå så til Program.cs og erstatt `CreateWebHostBuilder` med følgende:
 
@@ -71,11 +93,11 @@ Det du finner ut er mest sannsynlig at Web App'en din ikke har tilgang til å le
 vi å bruke Managed Service Identity (MSI), som gjør at man kan opprette en identitet (Service Principal/"bruker") for Web App'en din som man igjen kan gi de tilganger man vil til andre tjenester i Azure (her i Key Vault).
 
 1. Gå til Web Appen din i Azureportalen.
-2. Velg så "Managed Service Identity" under Settings, og trykk på "On" og trykk Save.
+2. Velg så "Identity" under Settings, og trykk på "On" og trykk Save. Kopier samtidig "Object ID" til din utklippstavle.
 3. Gå så til Key Vault'en din.
 4. Velg "Access policies" under settings.
-5. Trykk "Add new".
-6. På "Select principal", søker du opp navnet på Web App'en din.
+5. Trykk "Add Access Policies".
+6. På "Select principal", søker du opp navnet på Web App'en din eller limer inn Object ID om du husket å kopiere denne i steg 2.
 7. Velg så "Get" og "List" under "Secret Permissions"
 8. Trykk på OK.
 
