@@ -19,7 +19,7 @@ Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal o
     | --------------- | ------------------------------------------------------------- |
     | Resource name   | `Valgfritt`                                                   |
     | Subscription    | `Visual Studio Professional` &#124; `Den du har tilgjengelig` |
-    | Resource Group  | `Den du opprettet tidlig`                                     |
+    | Resource Group  | `Den du opprettet tidligere`                                  |
     | Location        | `Anbefalt Norway East` &#124; `Valgfritt`                     |
     | SKU             | `Standard`                                                    |
     
