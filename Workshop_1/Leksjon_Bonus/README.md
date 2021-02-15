@@ -15,13 +15,13 @@ Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal o
 3. Velg Azure Key Vault 
 4. Opprett Azure Key Vault ved å trykke på + tegnet og skriv inn følgende verdier:
 
-    | Azure Key Vault | Verdi                                                   |
-    | --------------- | ------------------------------------------------------- |
-    | Resource name   | `Valgfritt`                                             |
-    | Subscription    | `Visual Studio Professional || Den du har tilgjengelig` |
-    | Resource Group  | `Den du opprettet tidlig`                               |
-    | Location        | `Anbefalt Norway East || Valgfritt`                     |
-    | SKU             | `Standard`                                              |
+    | Azure Key Vault | Verdi                                                         |
+    | --------------- | ------------------------------------------------------------- |
+    | Resource name   | `Valgfritt`                                                   |
+    | Subscription    | `Visual Studio Professional` &#124; `Den du har tilgjengelig` |
+    | Resource Group  | `Den du opprettet tidlig`                                     |
+    | Location        | `Anbefalt Norway East` &#124; `Valgfritt`                     |
+    | SKU             | `Standard`                                                    |
     
 
 5. Klikk deg videre, sørg for at alle "Project changes" er huket på derretter klikk på "Finish"
