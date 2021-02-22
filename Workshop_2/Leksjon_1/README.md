@@ -58,29 +58,28 @@ Fremgangsmåte:
 >- Via build pipeline designeren
 >- Via YAML script
 >
->Microsoft anbefaler å sette opp et YAML script som definerer build pipelinen din. Dette er et forholdsvis nytt konsept hvor ikke alt er støttet enda. Fordelen med å definere build pipelinen din i et script er at man kan sjekke det inn i kildekoden. Azure DevOps vil lese YAML fila og sette opp pipelinen din som et steg før selve applikasjonen din kjøres gjennom den. På den måten kan man ikke bare endre selve applikasjonen ved en commit, men pipelinen også. Det blir i tillegg mulig å rulle tilbake selve pipelinen din om en feil skulle oppstå.
+>Microsoft anbefaler å sette opp et YAML script som definerer build pipelinen din. Fordelen med å definere build pipelinen din i et script er at man kan sjekke det inn i kildekoden. Azure DevOps vil lese YAML fila og sette opp pipelinen din som et steg før selve applikasjonen din kjøres gjennom den. På den måten kan man ikke bare endre selve applikasjonen ved en commit, men pipelinen også. Det blir i tillegg mulig å rulle tilbake selve pipelinen din om en feil skulle oppstå.
 >
 >Den andre måten å gjøre det på er gjennom designeren. Det negative med denne fremgangsmetoden er at definisjonen av pipelinen din ikke er lagret i kildekoden din, med alle implikasjoner det gir. Det fine med å bruke designeren er at man minimerer terskelen for å sette opp en pipeline for en uerfaren DevOps-er. Designeren er en fin måte å oppdage hvilke steg som finnes, og hvilke innstillinger som finnes til hvert av stegene. 
 >
 >Azure DevOps gjør det forholdsvis enkelt å traversere mellom å bruke designeren og YAML filer om det skulle ønskes. Så man kan starte med designeren for så å konvertere pipelinen YAML om man skulle ønske det.
 
-Trykk på portrettet ditt oppe i høyre hjørne i Azure DevOps og trykk på "*Preview features*". Slå av "*New YAML pipeline creation experience*". 
+I Azure DevOps, gå til "*Pipelines*" => "*Pipelines*" => "*Create pipeline*". 
+Velg deretter "Use the classic editor to create a pipeline without YAML." nederst på siden.
 
->Ettersom vi er (eller later som vi er) uerfarene DevOps-ere skal vi opt-out for YAML pipelines i dette leksjonen. 
+Velg så det repoet vi importerte til Azure DevOps prosjektet vårt i steg 1 (det er det som er valgt for oss som default om vi kun har et repo i prosjektet vårt).
 
-I Azure DevOps, gå til "*Pipelines*" => "*Builds*" => "*New pipeline*". Når du skal velge repo velger du det vi importerte til Azure DevOps prosjektet vårt i steg 1. Det er det som er valgt for oss som default om vi kun har et repo i prosjektet vårt.
+På neste steg kan vi velge å starte fra et template, en tom jobb, eller opprette en YAML fil. Vi velger templaten "*Azure Web App for ASP.NET*". Denne templaten gir oss alt vi trenger for å komme i gang.
 
-På neste steg kan vi velge å starte fra et template, en tom jobb, eller opprette en YAML fil. Vi velger "*Azure Web App for ASP.NET*". Denne templaten gir oss alt vi trenger for å komme i gang.
+>Nå har vi kommet til siden hvor vi kan sette opp bygg stegene våre via en YAML-fil. Her ser vi hva templaten vi valgte i forige steg inneholder. 
 
->Nå har vi kommet til siden hvor vi kan sette opp bygg stegene våre. Her ser vi hva templaten vi valgte i forige steg inneholder. 
-
-Under "*pipeline*", set solution til `AzureWorkshop/AzureWorkshop.sln`.
+Under "*pipeline*", sett solution til `AzureWorkshop/AzureWorkshop.sln`.
 
 >For vår del inneholder repoet vårt kun en solution og kunne strengt tatt hatt defaulten som henter alle solutions i repoet. Men det er alltid en god ide å være spesifikk på hva man vil bygge, i tilfelle man vil legge til flere solutions i fremtiden, hvilket vi kommer til å gjøre senere.
 
 Finn Azure subscriptionen din under dropdownen på samme side og autentiser deg. Etter du har autentisert deg, velg test miljøet vi satt opp i steg 2.
 
-Under "*VsTest - testAssemblies*" => "*Test files*" skriv inn følgende:
+Under "*VsTest - testAssemblies*" => "*Test files*" sjekk at det står følgende:
 ```
 **\$(BuildConfiguration)\**\*tests*.dll
 !**\obj\**
@@ -105,7 +104,7 @@ Når du har skrudd på testene igjen klikk "*Save & Queue*". Nå vil Azure DevOp
 >Jeg vet hva du tenker, og svaret er nei! Nei, du fikser det ikke med å skru av testene igjen din latsabb! 😆 Dette er steg 5 mat. 
 
 ## 4: Sett opp release pipelines
-Gå til "*Pipelines*" => "*Release*" => "*New pipeline*" => "*Add an artifact*". Her velger vi build pipelinen vi lagde i forige steg som source. Default version skal være "*Latest from the build pipeline default branch with tags*". Trykk "*Add*".
+Gå til "*Pipelines*" => "*Releases*" => "*New pipeline*" => "*Add an artifact*". Her velger vi build pipelinen vi lagde i forige steg som source. Default version skal være "*Latest from the build pipeline default branch with tags*". Trykk "*Add*".
 
 >En artifact er produktet av en build pipeline i form av en zip fil. Denne filen inneholder alt som trengs for å deploye applikasjonen til en host. I dette steget har vi valgt artifacten som ble produsert av bygget vi satt opp tidligere. 
 
