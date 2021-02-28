@@ -16,9 +16,9 @@ Parameter-filen i ARM-templates (kalt *azuredeploy.{environment}.parameters.json
 3. I azuredeploy.test.parameters.json, sett inn 3 unike navn i *value* feltene. Dette bestemmer navnet ressursene dine får - bruk samme navn på App service som før. Gi komponentene navn slik at man kan se hvilket miljø de tilhører.
 4. Valider templaten din ved å gjøre en test-deploy ved å høyre-klikke på prosjektet og velg Deploy. Velg riktige filer og rett ressursgruppe i Azure. Publish. (Dersom du får spørsmål om navn på ressursgruppe., kan det være noen problemer med Visual Studio-versjonen din, og da må du fylle ut dette manuelt).
 5. Hvis du får feil i steget over er sannsynligvis ett av ressursnavnene dine ulovlig.   
-6. Lag en commit og push den din til DevOps repoet ditt.
-7. Undersøk om ressursene dine ble opprettet i ressursgruppen din. Hvis ikke, gjør steg 4. på nytt eller spør om hjelp. 
-8. Slett ressursene som ble opprettet i ressurgruppen.
+6. Undersøk om ressursene dine ble opprettet i ressursgruppen din. Hvis ikke, gjør steg 4. på nytt eller spør om hjelp. 
+7. Slett ressursene som ble opprettet i ressurgruppen.
+8. Lag en commit og push den til ditt DevOps-repo.
 ​
 ## Bygge-pipeline 
 Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din til neste steg i kjeden (release-pipeline).
