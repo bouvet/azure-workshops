@@ -53,6 +53,12 @@ Fremgangsmåte:
 2. Lag en resource group for hvert av miljøene, med hver sin service plan 
 4. Lag en app service for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
 
+    * <b>Name:</b> Dette navnet må være unikt i hele Azure, da den vil kunne   nås fra &lt;appservicenavn&gt;.azurewebsites.net. 
+    * <b>Publish:</b> Code
+    * <b>Runtime Stack:</b> .NET core 3.1 (LTS)
+    * <b>OS:</b> Windows
+    * <b>Region:</b> Valgfritt
+
 ## 3: Sett opp build pipeline
 >Nå som du har opprettet et prosjekt i Azure DevOps og importert et Git repo kan vi sette opp en build pipeline for å automatisere bygging og testing av applikasjonen. Azure DevOps har to måter å sette opp en build pipeline på:
 >- Via build pipeline designeren
@@ -90,6 +96,8 @@ Under "*VsTest - testAssemblies*" => "*Test files*" sjekk at det står følgende
 Under "*VsTest - testAssemblies*" => "*Control Options*" slå av "*Enabled*".
 
 >Dette vil skru av testing steget, men slapp av, vi skal skru det på igjen om ikke så lenge. 😊
+
+Under "*Azure Web App Deploy*" => "*App Type*" velg Web App on Windows
 
 Nå kan du trykke "*Save & Queue*", lene deg tilbake og se at du har en pipeline som bygger koden din, og stapper den ut på en App Service i Azure. Når bygg agenten er ferdig å kjøre kan du gå browse App Servicen din og se at applikasjonen ligger der, klar til bruk. 
 
