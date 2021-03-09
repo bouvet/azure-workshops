@@ -12,8 +12,8 @@ I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen d
 Parameter-filen i ARM-templates (kalt *azuredeploy.{environment}.parameters.json* i dette prosjektet), gjør det mulig å spinne opp et sett med Azure ressurser med ulik konfigurasjon til forskjellige miljøer. For hvert miljø kan du legge inn parameters, eksempel hvis du vil oppskalere produksjonsmiljøet i forhold til test. Det er også vanlig å definere navn på ressurser her. 
 ​
 1. Gjenbruk ressursgruppen du brukte for test-miljøet. Slett Web App'en og App Service Plan du opprettet i den gruppen. Merk deg navnet på Web App'en din, da du skal gjenbruke denne i steg 3. 
-2. Kopier azuredeploy.parameters.json til azuredeploy.test.parameters.json. Dette vil være parameter-filen din for test.
-3. I azuredeploy.test.parameters.json, sett inn 3 unike navn i *value* feltene. Dette bestemmer navnet ressursene dine får - bruk samme navn på App service som før. Gi komponentene navn slik at man kan se hvilket miljø de tilhører.
+2. Kopier `azuredeploy.parameters.json` til `azuredeploy.test.parameters.json`. Dette vil være parameter-filen din for test.
+3. I `azuredeploy.test.parameters.json`, sett inn 3 unike navn i *value* feltene. Dette bestemmer navnet ressursene dine får - bruk samme navn på App service som før. Gi komponentene navn slik at man kan se hvilket miljø de tilhører.
 4. Valider templaten din ved å gjøre en test-deploy ved å høyre-klikke på prosjektet og velg Deploy. Velg riktige filer og rett ressursgruppe i Azure. Publish. (Dersom du får spørsmål om navn på ressursgruppe., kan det være noen problemer med Visual Studio-versjonen din, og da må du fylle ut dette manuelt).
 5. Hvis du får feil i steget over er sannsynligvis ett av ressursnavnene dine ulovlig.   
 6. Undersøk om ressursene dine ble opprettet i ressursgruppen din. Hvis ikke, gjør steg 4. på nytt eller spør om hjelp. 
@@ -48,8 +48,8 @@ For å deploye infrastrukturen trenger å opprette en Release-pipeline som tar e
 7. Åpne så Stage-Task (menyen øverst står på pipeline, bytt til Tasks) og legg til tasken "ARM template Deployment". 
 8. Velge Azure subscription, ressursgruppen du har laget og sett location til samme sted som ressursgruppen.
 9. Åpne opp "Template" settings
-10. I template feltet, finn stien til *azuredeploy.json*. Hva skjer egentlig i denne filen mon tro?
-11. I template parameters feltet, finn stien til *azuredeploy.test.parameters.json*
+10. I template feltet, finn stien til `azuredeploy.json`. Hva skjer egentlig i denne filen mon tro?
+11. I template parameters feltet, finn stien til `azuredeploy.test.parameters.json`
 12. Trykk så på "Save" og "Ok".
 13. Trykk så på "+Release". Dersom du har valgt manuell deploy, så må du starte denne.
 ​
@@ -65,7 +65,7 @@ For å teste at ting faktisk blir opprettet på konsistent vis, skal du nå slet
 Du ønsker å gjøre det mulig å sette størrelsen på App Service Plan'en til forskjellige størrelse basert på om det er et test-miljø eller
 et produksjonsmiljø. For å gjøre dette må du legge inn et 
 ​
-1. Editer så azuredeploy.parameters.test.json og legg inn parameter for _appServiceSku_. Sett denne verdien til en f.eks. F1, slik at den overskriver parameteren D1 som er satt som default verdi.
+1. Editer så `azuredeploy.parameters.test.json` og legg inn parameter for `appServiceSku`. Sett denne verdien til en f.eks. F1, slik at den overskriver parameteren D1 som er satt som default verdi.
 2. Sjekk så inn koden, lag et nytt bygg og kjør en release.
 ​
 Se så at SKU har oppdatert seg på App Service Planen din.
@@ -74,7 +74,7 @@ Se så at SKU har oppdatert seg på App Service Planen din.
 ​
 I neste leksjon skal du bruke Application Insights for å overvåke løsning. For å gjøre dette må du legge til selve ressursen i miljøet ditt.
 ​
-1. Editer azuredeploy.json. Se https://docs.microsoft.com/en-us/azure/templates/microsoft.insights/2015-05-01/components for strukturen på denne komponenten. Legg også til en parameter til scriptet for navnet på komponenten. Vår forslag er: 
+1. Editer `azuredeploy.json`. Se https://docs.microsoft.com/en-us/azure/templates/microsoft.insights/2015-05-01/components for strukturen på denne komponenten. Legg også til en parameter til scriptet for navnet på komponenten. Vår forslag er: 
 ```
     {
       "name": "[parameters('appInsightsName')]",
@@ -90,9 +90,10 @@ I neste leksjon skal du bruke Application Insights for å overvåke løsning. Fo
       }
     }
 ```
-2. Du må også legge til noen appSettings på website-ressursen din (i tillegg til de som allerede finnes), som peker til Application Insights-ressursen din.
+2. Fortsett i `azuredeploy.json`: her må du også legge til noen appSettings på website-ressursen din (i tillegg til de som allerede finnes), som peker til Application Insights-ressursen din.
 ```
           "appSettings": [
+            ...eksisterende innstillinger her
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('Microsoft.Insights/components', parameters('appInsightsName')), '2014-04-01').InstrumentationKey]"
@@ -118,8 +119,26 @@ Vår dependsOn på Web App ser slik ut:
         "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]"
       ]
 ```
-4. Editer azuredeploy.parameters.test.json, og legg til parameter som setter navnet på Application Insights-instansen din.
-5. Sjekk inn endringene dine, og vent til at bygget ditt har gått igjennom.
-6. Lag en ny release og valider at komponenten blir opprettet. 
+​
+4. I `azuredeploy.json` må vi sørge for at det ny parameteret appInsightsName blir en del av templaten. Legg til objektet under nederst i parameters-seksjonen
+​
+```
+    ,"appInsightsName": {
+      "type": "string",
+      "metadata": {
+        "description": "The app insights name."
+      }
+    }
+```
+​
+5. Legg til parameteret under i `azuredeploy.parameters.test.json` for å sette navnet på Application Insights-instansen din.
+```
+    "appInsightsName": {
+      "value":  "my-great-insights" 
+    } 
+```
+​
+6. Sjekk inn endringene dine, og vent til at bygget ditt har gått igjennom.
+7. Lag en ny release og valider at komponenten blir opprettet. 
 ​
 Du er nå klar for å begi deg ut på neste leksjon.
