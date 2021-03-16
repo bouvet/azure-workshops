@@ -30,7 +30,7 @@ Disse variablene må ha navn som er globalt unike, så hvis du velger et navn so
 
 For å deploye applikasjonen
 
-1. Høyreklikk på prosjektet, og velg "Publish".
+1. Høyreklikk på prosjektet, og velg "Deploy".
 2. Velg "New..."
 3. Velg "Add an account.." og logg inn med brukeren din (trial).
 4. Velg "Create New..." under Resource Group og gi ressursgruppen din et passende navn, samt velg f.eks. "West Europe" under Resource Group Location.
@@ -68,7 +68,7 @@ For å kunne gi de brukerne som skal se bilder tilgang til bilder, skal vi bruke
 
 1. Editer filen `Services/StorageService.cs` filen i AzureWorkshopApp-filen. Vi har laget TODO-kommentarer som beskriver endringene
    som skal gjøres.
-2. Publiser prosjektet på nytt (høyreklikk på prosjektet og trykk "Deploy")
+2. Publiser prosjektet på nytt (høyreklikk på prosjektet og trykk "Publish")
 
 Nå skal du igjen se bildene, og hvis du høyreklikker på bildet og ser URL'en, så ser du at SAS-tokenet er lagt til på slutten. Du tenker
 kanskje at alle har fortsatt tilgang, men det skal vi gjøre noe med i leksjon 2.
