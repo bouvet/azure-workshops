@@ -68,7 +68,7 @@ For å kunne gi de brukerne som skal se bilder tilgang til bilder, skal vi bruke
 
 1. Editer filen `Services/StorageService.cs` filen i AzureWorkshopApp-filen. Vi har laget TODO-kommentarer som beskriver endringene
    som skal gjøres.
-2. Publiser prosjektet på nytt (høyreklikk på prosjektet og trykk "Publish")
+2. Publiser prosjektet på nytt (høyreklikk på prosjektet og trykk "Deploy")
 
 Nå skal du igjen se bildene, og hvis du høyreklikker på bildet og ser URL'en, så ser du at SAS-tokenet er lagt til på slutten. Du tenker
 kanskje at alle har fortsatt tilgang, men det skal vi gjøre noe med i leksjon 2.
