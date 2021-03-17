@@ -53,23 +53,23 @@ For å opprette en storage account og en blob-container:
 
 I solution ligger en klasse som heter StorageService hvor det meste av funksjonalitet mangler. Jobben din er å skrive kode som bruker API-ene til Azure Storage for å laste opp bilder til blob storage, og deretter hente ut url-ene til de samme bildene.
 
-1. Legg til NuGet-pakke for Azure Storage: WindowsAzure.Storage.
+1. Legg til NuGet-pakker for Azure Storage: Azure.Storage.Blobs og Azure.Storage.Sas
 
-2. Hent ut StorageAccountName og AccountKey fra Access keys i menyen til Storage Account. Hent også ut navnet på blob-kontaineren du opprettet tidligere. Legg de inn i appsettings.json filen i webapplikasjonen.
+2. Hent ut ConnectionString fra Access keys i menyen til Storage Account. Hent også ut navnet på blob-kontaineren du opprettet tidligere. Legg de inn i appsettings.json filen i webapplikasjonen.
 
 3. Implementer metoden for å laste opp fil:
 
    **UploadFileToStorage (Stream fileStream, string fileName)**
 
-   Følgende klasser og metoder fra Microsoft.WindowsAzure.Storage ble brukt i løsningsforslaget.
+   Følgende klasser og metoder fra Azure.Storage.Blobs ble brukt i løsningsforslaget.
 
    | Klasse              | Metoder               |
    | ------------------- | --------------------- |
-   | StorageCredentials  |                       |
-   | CloudStorageAccount | CreateCloudBlobClient |
-   | CloudBlobClient     | GetContainerReference |
-   | CloudBlobContainer  | GetBlockBlobReference |
-   | CloudBlockBlob      | UploadFromStreamAsync |
+   | BlobServiceClient   | GetBlobContainerClient|
+   | BlobContainerClient | CreateIfNotExists     |
+   |                     | GetBlobClient         |
+   | BlobClient          | UploadAsync           |
+
 
    Dersom du står fast eller ønsker å se et ferdig eksempel så kan du se [her](https://github.com/bouvet/azure-workshops/blob/master/Workshop_1/Komplett/AzureWorkshop/AzureWorkshopApp/Services/StorageService.cs).
 
@@ -81,10 +81,20 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
 
    | Klasse                | Metoder                                                                                                                                                                                                                                                                                                         |
    | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | StorageCredentials    |                                                                                                                                                                                                                                                                                                                 |
-   | CloudStorageAccount   | CreateCloudBlobClient                                                                                                                                                                                                                                                                                           |
-   | CloudBlobClient       | GetContainerReference                                                                                                                                                                                                                                                                                           |
-   | CloudBlobContainer    | GetBlockBlobReference, ListBlobsSegmentedAsync                                                                                                                                                                                                                                                                  |
-   | BlobContinuationToken | Lag for eksempel en do-while. Start med å kalle ListBlobsSegmentedAsync og enumerer resultat-segmentet som returneres. Fortsett å gjøre dette så lenge continuation token i resultat-segmentet ikke er null. Når continuation tokenet er null, så har det siste segmentet blitt returnert og loopen kan brytes. |
+   | BlobServiceClient     | GetBlobContainerClient                                                                                                                                                                                                                                                                                          |
+   | BlobContainerClient   | GetBlobsAsync/GetBlobClient                                                                                                                                                                                                                                                                                                   |
+   | BlobSasBuilder        | SetPermissions                                                                                                                                                                                                                                                                                                  |
+   | BlobClient            | GenerateSasUri                                                                                                                                                                                                                                                                                                  |
+   | BlobItem              |
+   Name
+                                            |
+  
+  Lag for eksempel en foreach. Start med å kalle GetBlobsAsync og enumerer resultat-segmentet som returneres. Lag så en BlobClient ved å bruke navnet i BlobItem. 
+  Sett så opp BlobSasBuilder med riktige permissions. Det som må settes er:
+   * BlobContainerName
+   * BlobName
+   * Resource ("b" er type resource så bare sett det)
+   * ExpiresOn
+   * Permissions
 
    Dersom du står fast eller ønsker å se et ferdig eksempel så kan du se [her](https://github.com/bouvet/azure-workshops/blob/master/Workshop_1/Komplett/AzureWorkshop/AzureWorkshopApp/Services/StorageService.cs).

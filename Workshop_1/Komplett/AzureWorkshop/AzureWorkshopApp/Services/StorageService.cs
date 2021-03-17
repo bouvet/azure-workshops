@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
 using AzureWorkshopApp.Helpers;
 using AzureWorkshopApp.Models;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace AzureWorkshopApp.Services
 {
@@ -27,69 +26,57 @@ namespace AzureWorkshopApp.Services
 
         public async Task<bool> UploadFileToStorage(Stream fileStream, string fileName)
         {
-            // Create storagecredentials object by reading the values from the configuration (appsettings.json)
-            StorageCredentials storageCredentials = new StorageCredentials(_storageConfig.AccountName, _storageConfig.AccountKey);
+            // Create a BlobServiceClient object which will be used to create a container client
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConfig.ConnectionString);
 
-            // Create cloudstorage account by passing the storagecredentials
-            CloudStorageAccount storageAccount = new CloudStorageAccount(storageCredentials, true);
+            //Create a BlobContainerClient
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient(_storageConfig.ImageContainer);
 
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            //Create the container if it does not exist (can be removed)
+            blobContainerClient.CreateIfNotExists();
 
-            // Get reference to the blob container by passing the name by reading the value from the configuration (appsettings.json)
-            CloudBlobContainer container = blobClient.GetContainerReference(_storageConfig.ImageContainer);
+            //Create BlobClient that points to a blob with the given filename
+            var blobClient = blobContainerClient.GetBlobClient(fileName);
 
-            // Get the reference to the block blob from the container
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(fileName);
+            //Upload the content
+            await blobClient.UploadAsync(fileStream);
 
-            // Upload the file
-            await blockBlob.UploadFromStreamAsync(fileStream);
-
-            return await Task.FromResult(true);
+             return true;
         }
 
         public async Task<List<string>> GetImageUrls()
         {
             List<string> imageUrls = new List<string>();
 
-            // Create storagecredentials object by reading the values from the configuration (appsettings.json)
-            StorageCredentials storageCredentials = new StorageCredentials(_storageConfig.AccountName, _storageConfig.AccountKey);
+            // Create a BlobServiceClient object which will be used to create a container client
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConfig.ConnectionString);
 
-            // Create cloudstorage account by passing the storagecredentials
-            CloudStorageAccount storageAccount = new CloudStorageAccount(storageCredentials, true);
+            //Create a BlobContainerClient
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient(_storageConfig.ImageContainer);
 
-            // Create blob client
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
-            // Get reference to the container
-            CloudBlobContainer container = blobClient.GetContainerReference(_storageConfig.ImageContainer);
-
-            BlobContinuationToken continuationToken = null;
-            var sasToken = container.GetSharedAccessSignature(new SharedAccessBlobPolicy()
+            BlobSasBuilder builder;
+            await foreach(var blobItem in blobContainerClient.GetBlobsAsync())
             {
-                Permissions = SharedAccessBlobPermissions.Read,
-                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(3)
-            });
-            //Call ListBlobsSegmentedAsync and enumerate the result segment returned, while the continuation token is non-null.
-            //When the continuation token is null, the last page has been returned and execution can exit the loop.
-            do
-            {
-                //This overload allows control of the page size. You can return all remaining results by passing null for the maxResults parameter,
-                //or by calling a different overload.
-                BlobResultSegment resultSegment = await container.ListBlobsSegmentedAsync("", true, BlobListingDetails.All, 10, continuationToken, null, null);
+                //Create a blobclient from the blobItem.Name
+                var blobClient = blobContainerClient.GetBlobClient(blobItem.Name);
 
-                foreach (var blobItem in resultSegment.Results)
+                //Create a shared access signature builder with name of the container, the blob, type of resource and expiration
+                builder = new BlobSasBuilder()
                 {
-                    imageUrls.Add(blobItem.StorageUri.PrimaryUri.ToString() + sasToken);
-                }
+                    BlobContainerName = blobContainerClient.Name,
+                    BlobName = blobClient.Name,
+                    Resource = "b",
+                    ExpiresOn = DateTime.UtcNow.AddMinutes(3),
+                };
 
-                //Get the continuation token.
-                continuationToken = resultSegment.ContinuationToken;
+                //Set type of access, we only need read so we set that 
+                builder.SetPermissions(BlobAccountSasPermissions.Read);
+
+                //Create the sasUri and add it to the list
+                imageUrls.Add(blobClient.GenerateSasUri(builder).AbsoluteUri);
             }
 
-            while (continuationToken != null);
-
-            return await Task.FromResult(imageUrls);
+            return imageUrls;
         }
     }
 }
