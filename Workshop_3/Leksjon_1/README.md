@@ -30,7 +30,7 @@ Disse variablene må ha navn som er globalt unike, så hvis du velger et navn so
 
 For å deploye applikasjonen
 
-1. Høyreklikk på prosjektet, og velg "Publish".
+1. Høyreklikk på prosjektet, og velg "Deploy".
 2. Velg "New..."
 3. Velg "Add an account.." og logg inn med brukeren din (trial).
 4. Velg "Create New..." under Resource Group og gi ressursgruppen din et passende navn, samt velg f.eks. "West Europe" under Resource Group Location.
