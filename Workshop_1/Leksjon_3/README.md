@@ -85,8 +85,7 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
    | BlobContainerClient   | GetBlobsAsync/GetBlobClient                                                                                                                                                                                                                                                                                                   |
    | BlobSasBuilder        | SetPermissions                                                                                                                                                                                                                                                                                                  |
    | BlobClient            | GenerateSasUri                                                                                                                                                                                                                                                                                                  |
-   | BlobItem              |
-   Name
+   | BlobItem              | Name
                                             |
   
   Lag for eksempel en foreach. Start med å kalle GetBlobsAsync og enumerer resultat-segmentet som returneres. Lag så en BlobClient ved å bruke navnet i BlobItem. 
