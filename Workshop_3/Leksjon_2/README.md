@@ -132,7 +132,7 @@ For å nå kunne gi brukeren din rollen Uploader.
 
 1. Gå til _Azure Active Directory_ ressursen i Azure portalen, trykk til `Enterprise Applications`.
 2. Finn applikasjonen du lagde (bruk søkefeltet) og trykk på denne.
-3. Gå til `Group`. Trykk på `+ Add user`
+3. Gå til `Users & Groups`. Trykk på `+ Add user`
 4. Legg til deg selv, og se at rollen er `Uploader` (det er eneste rollen vi har).
 5. Trykk `Assign`
    ​
