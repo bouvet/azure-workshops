@@ -19,12 +19,12 @@ kun tillatter https uansett.
 
 (Dersom du har tid til overs, kan du gjøre samme øvelse for Storage Account'en din, og se om du får noen anbefalinger der).
 
-## Advanced Threat Protection
+## Azure Defender for Storage
 
-Advanced Threat Protection er en tilleggstjeneste på storage account, slik at storage accounten din blir overvåket for angrep og unormal oppførsel. Dersom Security Center oppdager noe unormalt som den mener du bør se på, så vil du motta en epost med varsling om hva som har
+Azure Defender for Storage er en tilleggstjeneste på storage account, slik at storage accounten din blir overvåket for angrep og unormal oppførsel. Dersom Security Center oppdager noe unormalt som den mener du bør se på, så vil du motta en epost med varsling om hva som har
 skjedd.
 
-Gå til din Storage Account som ble opprettet, og trykk på `Advanced Security`. Siden dette koster ekstra penger, og vi har vurdert til at dette ikke er noe som er nødvendig velger vi å ikke skru på denne i dette tilfelle.
+Gå til din Storage Account som ble opprettet, og trykk på `Security`. Siden dette koster ekstra penger, og vi har vurdert til at dette ikke er noe som er nødvendig velger vi å ikke skru på denne i dette tilfelle.
 
 Du kan lese mer om dette ved en senere anledning her:
-[Storage advanced threat protection](https://docs.microsoft.com/en-us/azure/storage/common/storage-advanced-threat-protection?tabs=azure-portal)
+[Azure Defender for Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-advanced-threat-protection?tabs=azure-portal)
