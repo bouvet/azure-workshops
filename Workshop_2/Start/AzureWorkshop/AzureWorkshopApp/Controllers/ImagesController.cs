@@ -29,27 +29,21 @@ namespace AzureWorkshopApp.Controllers
                 return BadRequest("No files received from the upload");
 
             foreach (var formFile in files)
-            {
-                if (!FileFormatHelper.IsImage(formFile))
+                if (FileFormatHelper.IsImage(formFile))
+                {
+                    if (formFile.Length > 0)
+                        using (var stream = formFile.OpenReadStream())
+                        {
+                            if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
+                            {
+                                return new AcceptedResult();
+                            }
+                        }
+                }
+                else
                 {
                     return new UnsupportedMediaTypeResult();
                 }
-
-                if (formFile.Length <= 0)
-                {
-                    continue;
-                }
-
-                // telemetry client goes here 
-
-                using (var stream = formFile.OpenReadStream())
-                {
-                    if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
-                    {
-                        return new AcceptedResult();
-                    }
-                }
-            }
 
             return BadRequest("Look like the image couldnt upload to the storage");
         }

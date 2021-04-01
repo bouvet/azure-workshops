@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureWorkshopApp.Helpers;
 using AzureWorkshopApp.Services;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,12 +12,10 @@ namespace AzureWorkshopApp.Controllers
     public class ImagesController : Controller
     {
         private readonly IStorageService _storageService;
-        private readonly TelemetryClient _telemetryClient;
 
-        public ImagesController(IStorageService storageService, TelemetryClient telemetryClient)
+        public ImagesController(IStorageService storageService)
         {
             _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
-            _telemetryClient = telemetryClient;
         }
 
         // POST /api/images/upload
@@ -32,30 +29,21 @@ namespace AzureWorkshopApp.Controllers
                 return BadRequest("No files received from the upload");
 
             foreach (var formFile in files)
-            {
-                if (!FileFormatHelper.IsImage(formFile))
+                if (FileFormatHelper.IsImage(formFile))
+                {
+                    if (formFile.Length > 0)
+                        using (var stream = formFile.OpenReadStream())
+                        {
+                            if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
+                            {
+                                return new AcceptedResult();
+                            }
+                        }
+                }
+                else
                 {
                     return new UnsupportedMediaTypeResult();
                 }
-                if (formFile.Length <= 0)
-                {
-                    continue;
-                }
-
-                _telemetryClient.TrackEvent("UPLOADED_FILE", new Dictionary<string, string>
-                {
-                    { "FILE_NAME", formFile.FileName},
-                    { "CONTENT_LENGTH", formFile.Length.ToString()}
-                });
-
-                using (var stream = formFile.OpenReadStream())
-                {
-                    if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
-                    {
-                        return new AcceptedResult();
-                    }
-                }
-            }
 
             return BadRequest("Look like the image couldnt upload to the storage");
         }

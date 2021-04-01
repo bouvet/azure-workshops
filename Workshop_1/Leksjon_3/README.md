@@ -86,7 +86,6 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
    | BlobSasBuilder        | SetPermissions                                                                                                                                                                                                                                                                                                  |
    | BlobClient            | GenerateSasUri                                                                                                                                                                                                                                                                                                  |
    | BlobItem              | Name
-                                            |
   
   Lag for eksempel en foreach. Start med å kalle GetBlobsAsync og enumerer resultat-segmentet som returneres. Lag så en BlobClient ved å bruke navnet i BlobItem. 
   Sett så opp BlobSasBuilder med riktige permissions. Det som må settes er:

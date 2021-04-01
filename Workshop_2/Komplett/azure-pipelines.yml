@@ -1,0 +1,78 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+  - stage: buildAndTest
+    jobs:
+    - job: buildAndTest
+      steps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          projects: 'AzureWorkshop/AzureWorkshop.sln'
+          arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        displayName: 'dotnet publish $(buildConfiguration)'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: 'AzureWorkshop/AzureWorkshopAppTests/AzureWorkshopAppTests.csproj'
+          testRunTitle: 'dotnet core run test'
+        displayName: 'Run tests'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+  
+  - stage: deployTest
+    jobs:
+      - job: deploy
+        steps:
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'drop'
+            downloadPath: '$(System.DefaultWorkingDirectory)'
+        - task: AzureRmWebAppDeployment@4
+          inputs:
+            ConnectionType: 'AzureRM'
+            azureSubscription: 'Azureskolen(de38b236-48ae-4401-9036-15c13016de7a)'
+            appType: 'webApp'
+            WebAppName: 'workshop2petter'
+            packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+          displayName: 'Deploy web app to azure'
+  
+  - stage: deployProd
+    jobs:
+      - deployment: deploy
+        environment: Prod
+        strategy: 
+         runOnce:
+           deploy:
+            steps:
+            - task: DownloadBuildArtifacts@0
+              inputs:
+                buildType: 'current'
+                downloadType: 'single'
+                artifactName: 'drop'
+                downloadPath: '$(System.DefaultWorkingDirectory)'
+            - task: AzureRmWebAppDeployment@4
+              inputs:
+                ConnectionType: 'AzureRM'
+                azureSubscription: 'Azureskolen(de38b236-48ae-4401-9036-15c13016de7a)'
+                appType: 'webApp'
+                WebAppName: 'workshop2petter'
+                packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+              displayName: 'Deploy web app to azure'
