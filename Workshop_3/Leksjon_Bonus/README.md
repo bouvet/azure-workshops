@@ -10,7 +10,9 @@ For å sikre Storage Accounten så må vi gå i portalen og sjekke/endre litt
 
 - Pass på at container er private access. Dette finner du under Container sin Access level. - Finn Storage Accounten i portalen. - Trykk Containers, finn containeren du vil endre på og trykk på den. - Ovenfor alle filene vil det være et par valg, sjekk her at containeren har access level "Private (no anonymous access)". Trykk OK,
 
-- Gå tilbake til Storage Accounten - På venstre side så skal det finnes et valg som heter Firewalls and Virtual Networks. - Her inne legger du til et virtuelt nettverk. - Hvis du ikke har et fra før så kan du lage det gjennom å velge "Selected Networks" og "Add new virtual network" valget. Gi nettet et navn, og la bare de anbefalte verdiene stå. Trykk på "Create".
+- Gå tilbake til Storage Accounten - På venstre side så skal det finnes et valg som heter Networking. - Her inne legger du til et virtuelt nettverk. - Hvis du ikke har et fra før så kan du lage det gjennom å velge "Selected Networks" og "Add new virtual network" valget. Gi nettet et navn, og la bare de anbefalte verdiene stå. 
+- Det kan hende du må fylle ut en Address range for ditt subnet. Du fyller da ut den samme adressen som du har for Address space, men erstatter tallet etter "/" med 29.
+- Trykk på "Create".
 
 ---
 
@@ -27,7 +29,11 @@ har du ikke tilgang til Storage Account fra din adresse.
 
 Hvis du fulgte litt godt med så så du kanskje valget med Firewall og legg til din IP-addresse (under "Firewalls and networks settings" på Storage Account)? Huk av for den og trykk lagre på nytt. Nå skal applikasjonen din fungere igjen. Valget med IP-addressen finnes i Storage Account under Firewalls and Virtual Networks. Gå til vnet og se litt rundt på valg. Her kan man parre med andre nettverk, legge til devices, opprette/endre subnets osv.
 
-- Lag så en Network Security Group, som du så legger på VNettet du opprettet ovenfor. - Dette kan gjøres ved å søke etter Network Security Group i søkefeltet eller via + tegnet på venstre side i menyen. - Opprett så en Network Security Group, pass på at du oppretter i samme ressursgruppe og region som det virituelle nettverket du lagde. - Etter at NSG er opprettet, gå til ressursen. - Gå til subnets (på venstre side i ressursbildet) og trykk Associate. - Her velger du det virtuelle nettverke du valgte og subnettet som Storage Accounten ligger på.
+- Lag så en Network Security Group, som du så legger på VNettet du opprettet ovenfor. 
+- Dette kan gjøres ved å søke etter Network Security Group i søkefeltet eller via + tegnet på venstre side i menyen. 
+- Opprett så en Network Security Group, pass på at du oppretter i samme ressursgruppe og region som det virituelle nettverket du lagde. 
+- Etter at NSG er opprettet, gå til ressursen. 
+- Gå til subnets (på venstre side i ressursbildet) og trykk Associate. - Her velger du det virtuelle nettverke du valgte og subnettet som Storage Accounten ligger på.
 
 Nå har du muligheten til å velge hvem som har tilgang til alle ressursene som ligger i det subnettet.
 Man kan gjøre det mulig å kontakte Storage Accounten fra spesifikke tjenester som ligger i vnettet, f.eks. virtuelle maskiner.
