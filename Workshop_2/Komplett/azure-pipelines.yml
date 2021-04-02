@@ -4,7 +4,12 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- main
+  branches: 
+    include:
+      - main
+  paths:
+    exclude:
+      - AzureWorkshopInfrastruktur
 
 pool:
   vmImage: ubuntu-latest
@@ -13,9 +18,9 @@ variables:
   buildConfiguration: 'Release'
 
 stages:
-  - stage: buildAndTest
+  - stage: build
     jobs:
-    - job: buildAndTest
+    - job: build
       steps:
       - task: DotNetCoreCLI@2
         inputs:
