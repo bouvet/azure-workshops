@@ -40,7 +40,7 @@ Vi må sette noen konfigurasjonsverdier i applikasjonen vår.
 Fyll også inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave.:
 ​
 
-```
+```json
             {
               "name": "AzureAd:Instance",
               "value": "https://login.microsoftonline.com/"
@@ -76,7 +76,7 @@ Editer filen AzureWorkshop/AzureWorkshopApp/appsettings.json legg inn konfiguras
 ​
 Nå når er det på tide å legge til funksjonaliteten til AzureWorkshop prosjektet.
 ​
-Først må du legge til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1) som har funksjonalitet for autentisering mot Azure AD.
+Først må du legge til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 3.1.15, siden vi bruker .NET Core 3.1) som har funksjonalitet for autentisering mot Azure AD.
 ​
 I denne workshoppen har vi valgt å legge inn kodeendringer som kommentarer som må kommenteres inn/ut for å få den funksjonaliten. Alle endringer har TODO: foran, slik at man lett kan finne dem. Alle filer som må endres:
 ​

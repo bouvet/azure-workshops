@@ -85,11 +85,11 @@ Nå skal du deploye selve applikasjonen fra Visual Studio. Åpne `AzureWorkshop/
 Nå skal du deploye selve applikasjonen fra Visual Studio Code. 
 
 1. Åpne mappen `Start/AzureWorkshop` i VS Code
-2. Installer Azure App Service extension i VS Code
+2. Installer Azure App Service extension i VS Code hvis du ikke har denne extensionen fra før
 1. Klikk på View > Terminal (øverst i VS Code)
 1. Naviger til `Start/AzureWorkshop/AzureWorkshopApp` i terminalen
 1. Kjør kommandoen `dotnet publish --configuration Release`
-1. På venstre side så skal du nå ha et Azure ikon, trykk på ikonet
+1. På venstre side så skal du ha et Azure ikon, trykk på ikonet
 1. Logg inn `Sign in to Azure...`
 1. Høyreklikk på App Servicen du lagde når du deployet infrastrukturen (navnet står i `azuredeploy.parameters.json` filen)
 1. Velg Deploy to Web App
