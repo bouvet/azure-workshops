@@ -142,16 +142,18 @@
 
                 _.forEach(fetchedImageLinks, x => {
 
-                    var imageWrapper = document.createElement("span");
-                    imageWrapper.className = "image-wrapper";
+                    if (gallery.length == 0 || !gallery.map(s => s.split("?")[0]).includes(x.split("?")[0])) {
+                        var imageWrapper = document.createElement("span");
+                        imageWrapper.className = "image-wrapper";
 
-                    var imageElement = document.createElement("img");
-                    imageElement.src = x;
-                    imageElement.className = "image";
+                        var imageElement = document.createElement("img");
+                        imageElement.src = x;
+                        imageElement.className = "image";
 
-                    imageWrapper.appendChild(imageElement);
+                        imageWrapper.appendChild(imageElement);
 
-                    divContainer.appendChild(imageWrapper);
+                        divContainer.appendChild(imageWrapper);
+                    }
                 });
 
                 gallery = fetchedImageLinks;
