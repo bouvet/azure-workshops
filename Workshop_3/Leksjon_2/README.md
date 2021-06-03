@@ -26,10 +26,9 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 8. På venstre side trykker du på "Authentication". I feltet for "Front-Channel Logout URL", legg inn "https://\<webappname>.azurewebsites.net/signout-oidc".
 9. Du må også krysse av for "ID token" under authentication.
 10. Trykk "Save" på toppen av skjermen.
-11. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere.
-    ​
-    (Dersom du ønsker å debugge lokalt, må du også legge inn "https://localhost:44327/signin-oidc" som "Redirect URI "og "https://localhost:44327/signout-oidc" som "Logout URL".
-    Ideelt bør man opprette en egen App Registration for lokal debugging, men for dette test-formålet, og for å spare tid gjør vi ikke det her)
+11. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere. 
+   (Dersom du ønsker å debugge lokalt, må du også legge inn "https://localhost:44327/signin-oidc" som "Redirect URI "og "https://localhost:44327/signout-oidc" som "Logout URL". 
+   Ideelt bør man opprette en egen App Registration for lokal debugging, men for dette test-formålet, og for å spare tid gjør vi ikke det her)
     ​
 
 ### Konfigurasjon
