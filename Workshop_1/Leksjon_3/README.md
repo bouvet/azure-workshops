@@ -12,8 +12,8 @@ I denne leksjonen skal vi jobbe med blobs for å lagre bildene til app'en i.
 Det er flere måter å manipulere data på i Azure Storage:
 
 - Portalen: Ved å velge Data Explorer.
-- Visual Studio: I Cloud Explorer i Visual Studio kan man gjøre.
-- Azure Storage Explorer: Azure Storage Explorer er en klient fra Microsoft for å administrere og bruke Storage Accounts: https://azure.microsoft.com/en-us/features/storage-explorer/
+- Visual Studio: I Cloud Explorer i Visual Studio.
+- Azure Storage Explorer: Azure Storage Explorer er en klient fra Microsoft for å administrere og bruke Storage Accounts: <a href="https://azure.microsoft.com/en-us/features/storage-explorer/">https://azure.microsoft.com/en-us/features/storage-explorer/</a>
 
 Du velger selv hvilken metode du ønsker å prøve ut.
 
@@ -26,15 +26,16 @@ Det er flere metoder for å opprette ressurser i Azure. De mest vanlige er her:
 - Azure CLI. Kryss-plattform shell som blant annet finnes både på Windows, Mac og Linux.
 - ARM-templates - deklarativ beskrivelse av Azure-komponenter og infrastruktur i JSON-format.
 
-I denne leksjonen skal du bruke Powershell eller Azure CLI for å opprette en Storage Account og en Blob-Container. Hovedregelen er at alt du kan gjøre i portalen kan du også gjøre via Powershell/Azure CLI, og det er også mye mer du kan gjøre via kommandolinje.
+I denne leksjonen skal du bruke Powershell eller Azure CLI for å opprette en Storage Account og en Blob-Container. Hovedregelen er at alt du kan gjøre i portalen kan du også gjøre via Powershell/Azure CLI og mye mer.
 
 Powershell er fint å bruk i Windows miljøer, mens Azure CLI er kryssplatform og kan brukes både på Linux, Mac og Windows. Begge er tilgjengelige i Azure Shell.
 
-For å opprette en storage account og en blob-container:
+For å opprette en storage account og en blob-container skal vi nå bruke Azure Shell i portalen:
 
-1. Start et Azure Shell kommando ved å klikke på ">\_" på toppen i portalen.
-2. Trykk ja når du får spørsmål om å opprette en storage account. Dette er en storage account som bruker Azure Shellet og som lever bak kulissene for at man skal kunne lagre filer og lignende, mens man er i shellet. Det er ikke mulig å bruke denne storage accounten i applikasjonen.
-3. Gå til denne siden for å lære hvordan du oppretter en egen Storage Account, som du ønsker å bruke i applikasjonen din.
+1. Gå til <a href="https://portal.azure.com">portalen</a> og logg inn. Bytte av directory gjøres ved å trykke på profil (øverst i høyre hjørnet) og på "switch directory" (hvis det er nødvendig).
+2. Start et Azure Shell kommando ved å klikke på ">\_" på toppen i portalen.
+3. Trykk ja når du får spørsmål om å opprette en storage account. Dette er en storage account som bruker Azure Shellet og som lever bak kulissene for at man skal kunne lagre filer og lignende, mens man er i shellet. Det er ikke mulig å bruke denne storage accounten i applikasjonen.
+4. Gå til denne siden for å lære hvordan du oppretter en egen Storage Account, som du ønsker å bruke i applikasjonen din. Her kan du velge om du vil bruke Powershell eller Azure CLI commands, siden begge støttes i Azure Shell som vi bruker. Følg oppskriften for å opprette en Storage Account.
    
    * Powershell:
    https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-powershell
@@ -42,11 +43,11 @@ For å opprette en storage account og en blob-container:
    * Azure CLI:
    https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-cli
 
-4. Opprett en container i Blob Servicen som Storage Accounten tilbyr. Denne skal ha Public Access Level satt til:  
+5. Opprett en container i Blob Servicen som Storage Accounten tilbyr. Denne skal ha Public Access Level satt til:  
    >Blob (anonymous read access for blobs only).
 
    
-5. Test containeren ved å laste opp en fil ved enten å bruke <a href="https://azure.microsoft.com/en-us/features/storage-explorer/">Storage Explorer</a> eller i <a href="https://portal.azure.com">Azure Portalen</a>.
+6. Test containeren ved å laste opp en fil ved enten å bruke <a href="https://azure.microsoft.com/en-us/features/storage-explorer/">Storage Explorer</a> eller i <a href="https://portal.azure.com">Azure Portalen</a>.
 
 
 ## Implementer servicen StorageService
@@ -55,7 +56,7 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
 
 1. Legg til NuGet-pakker for Azure Storage: Azure.Storage.Blobs og Azure.Storage.Sas
 
-2. Hent ut ConnectionString fra Access keys i menyen til Storage Account. Hent også ut navnet på blob-kontaineren du opprettet tidligere. Legg de inn i appsettings.json filen i webapplikasjonen.
+2. Hent ut ConnectionString fra Access keys i menyen til Storage Account. Hent også ut navnet på blob-container du opprettet tidligere. Legg de inn i appsettings.json filen i webapplikasjonen.
 
 3. Implementer metoden for å laste opp fil:
 

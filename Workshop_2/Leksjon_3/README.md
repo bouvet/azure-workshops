@@ -1,12 +1,21 @@
 # Monitorering og telemetri
 Vi har nå lagt til en Application Insights instans i ARM templaten. I forrige leksjon sørget vi for at ApplicationInsightsKey ble lagt inn som appSettings i web applikasjonen. Dette kan du verifisere i portalen ved å gå til app service --> configuration --> application settings. 
 ​
-## Legge til Application Insights i Visual Studio
+## Legg til Application Insights
+For Visual Studio
 1. Åpne `AzureWorkshopApp.sln`
 2. Åpne Package Manager Console og skriv `Install-Package Microsoft.ApplicationInsights.AspNetCore -Version 2.5.1` (det kan hende at du må bruke GUI til å legge til NuGet-Pakken `Microsoft.ApplicationInsights.AspNetCore`)
 ​
+
+For Visual Studio Code
+1. Åpne Terminal vindu
+2. Naviger til riktig mappe (Start/AzureWorkshop/AzureWorkshopApp)
+3. Kjør kommandoen `dotnet add .\AzureWorkshopApp.csproj package --version 2.5.1 Microsoft.ApplicationInsights.AspNetCore`
+
 Åpne filen `Program.cs` og modifiser koden slik at det nå står
-```c#
+<font size="4">
+
+```C#
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Run();
@@ -17,26 +26,28 @@ Vi har nå lagt til en Application Insights instans i ARM templaten. I forrige l
                 .UseStartup<Startup>()
                 .UseApplicationInsights().Build();
 ```
+</font>
 ​
 Åpne `_ViewImports.cshtml` og legg til følgende injection:
-```
+
+```html
     @inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
 ```
 ​
 Åpne deretter `_Layout.cshtml` og legg til følgende helt i toppen av filen 
-```
-@using Microsoft.ApplicationInsights.AspNetCore
+```html
+    @using Microsoft.ApplicationInsights.AspNetCore
 ```
 og følgende nederst i `<head>`
 ```html
     @Html.Raw(JavaScriptSnippet.FullScript)
 ```
 ​
-Commit (skrive en bra commit-melding, f.eks `add ApplicationInsights telemetry`) og push slik at den nye koden blir deployet. 
+Commit (skrive en bra commit-melding, f.eks. `add ApplicationInsights telemetry`) og push slik at den nye koden blir deployet. 
 ​
 Når release er ferdig, naviger til azure-websiten og generer litt trafikk. Bonuspoeng for alle som klarer å lage en exception 
 ​
-_hint: last opp en `.txt-fil`, burde kræsje_
+_hint: last opp en `.txt-fil`, det burde kræsje_
 ​
 ## Se på telemetri
 - Gå til portal.azure.com
@@ -51,8 +62,8 @@ _hint: last opp en `.txt-fil`, burde kræsje_
 ​
 Prøv å hent ut exceptions ved å skrive inn følgende og trykke _Run_:
 Det skal ikke være noen her helt ennå.
-```
-exceptions | search "error"
+```html
+    exceptions | search "error"
 ```
 Se https://docs.microsoft.com/en-us/azure/azure-monitor/log-query/get-started-portal for mer info om hvordan LogAnalytics kan brukes
 ​
@@ -64,12 +75,17 @@ Først må vi gå til Visual Studio og legge til TelemetryClient som dependency 
 Gå til `Startup.cs` og metoden `public void ConfigureServices(IServiceCollection services)`
 ​
 Legg til følgende linje:
+<font size="4">
+
 ```c#
    services.AddApplicationInsightsTelemetry(Configuration);
 ```
+</font>
 Deretter skal vi konfigurere `ImagesController.cs` til å lage egendefinert telemetri
 - Åpne filen `ImagesController.cs`
 - Endre konstruktør og lokale variabler til følgende:
+<font size="4">
+
 ```c#
         private readonly IStorageService _storageService;
         private readonly TelemetryClient _telemetryClient;
@@ -80,7 +96,11 @@ Deretter skal vi konfigurere `ImagesController.cs` til å lage egendefinert tele
             _telemetryClient = telemetryClient;
         }
 ```
+</font>
+
 - Gå til metoden "Upload" og endre `foreach`-løkken til gjøre et TrackEvent-kall med `_telemetryClient`:
+<font size="4">
+
 ```c#
         foreach (var formFile in files)
         {
@@ -108,12 +128,14 @@ Deretter skal vi konfigurere `ImagesController.cs` til å lage egendefinert tele
             }
         }
 ```
+</font>
+
 - Sjekk inn endringene dine, og vent til pipelinene har kjørt.
 - Last opp et bilde
 - Gå til portal.azure.com og ApplicationInsights
 - Velg _Usage -> Events_ for å se eventen som ble laget
 - Gå til `Logs` og kjør query på _customEvents_ for å se all info om eventen
-```
+```html
 customEvents | where name  == "UPLOADED_FILE"
 ```
 - Trykk "Chart" for å se resultatet som en graf

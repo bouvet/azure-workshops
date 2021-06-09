@@ -10,34 +10,26 @@ Les mer her: https://docs.microsoft.com/en-in/azure/key-vault/key-vault-whatis
 
 Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal opprette et key vault og kode om applikasjonen til å benytte dette.
 
-1. I Visual Studio, klikk på `Project` øverst til venstre, derretter velg `Add Connected Service`.
-2. Klikk på + tegnet ved siden av `Service Dependencies`
-3. Velg Azure Key Vault 
-4. Opprett Azure Key Vault ved å trykke på + tegnet og skriv inn følgende verdier:
-
-    | Azure Key Vault | Verdi                                                         |
-    | --------------- | ------------------------------------------------------------- |
-    | Resource name   | `Valgfritt`                                                   |
-    | Subscription    | `Visual Studio Professional` &#124; `Den du har tilgjengelig` |
-    | Resource Group  | `Den du opprettet tidligere`                                  |
-    | Location        | `Anbefalt Norway East` &#124; `Valgfritt`                     |
-    | SKU             | `Standard`                                                    |
-    
-
-5. Klikk deg videre, sørg for at alle "Project changes" er huket på derretter klikk på "Finish"
-6. Gå til <a href="https://portal.azure.com/">Azure Portalen</a>, og finn din nylige opprettede Azure Key Vault.
-7. Gå til Settings -> Secrets og klikk Generate/Import
-8. Lag en nøkkel for Storage account name opprettet i forrige leksjon. Den skal ha følgende verdier:
+1. Last ned <a href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli">Azure CLI</a> (hvis du ikke har gjort dette steget tidligere)
+2. Åpne en terminal (cmd, powershell, terminal e.l. for ditt OS)
+3. Kjør kommandoen az login (hvis du ikke har Azure CLI vil dette feile)
+4. Etter å ha logget inn så vil det bli listet alle subscriptions du har tilgang til og en av disse vil ha isDefault: true
+5. Hvis du må bytte subscription så gjøres det med kommandoen >az account set --subscription "{subscription name or id}"
+6. For å lage en key vault så kjøres kommandoen >az keyvault create --resource-group "{resource group name}" --location norwayeast --name "{keyvaultname}"
+7. Gå til <a href="https://portal.azure.com/">Azure Portalen</a>, og finn din nylige opprettede Azure Key Vault.
+8. Gå til Settings -> Secrets og klikk Generate/Import
+9. Lag en nøkkel for Storage account name opprettet i forrige leksjon. Den skal ha følgende verdier:
 
     | Name                              | Value (secret)                                        |
     | --------------------------------- | ----------------------------------------------------- |
     | `AzureStorageConfig--AccountName` | `Verdien som står i AccountName fra appsettings.json` |
     
-9.  Lag en nøkkel for Storage Account Key opprettet i forrige leksjon. Den skal ha følgende verdier:
+10.  Lag en nøkkel for Storage Account Key opprettet i forrige leksjon. Den skal ha følgende verdier:
 
     | Name                             | Value (secret)                                       |
     | -------------------------------- | ---------------------------------------------------- |
     | `AzureStorageConfig--AccountKey` | `Verdien som står i AccountKey fra appsettings.json` |
+
 
 ### Bruk key vault
 
@@ -99,6 +91,7 @@ vi å bruke Managed Service Identity (MSI), som gjør at man kan opprette en ide
 5. Trykk `Add Access Policies`.
 6. På `Select principal`, søker du opp navnet på Web App'en din eller limer inn `Object ID` om du husket å kopiere denne i steg 2.
 7. Velg så `Get` og `List` under `Secret Permissions`
-8. Trykk på OK.
+8. Trykk på Add
+9. Husk å trykke Save for å lagre endringene til Key Vaultet
 
 Nå skal applikasjonen din ha tilgang til å lese secrets fra denne Key Vaulten.

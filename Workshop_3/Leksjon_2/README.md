@@ -26,10 +26,9 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 8. På venstre side trykker du på "Authentication". I feltet for "Front-Channel Logout URL", legg inn "https://\<webappname>.azurewebsites.net/signout-oidc".
 9. Du må også krysse av for "ID token" under authentication.
 10. Trykk "Save" på toppen av skjermen.
-11. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere.
-    ​
-    (Dersom du ønsker å debugge lokalt, må du også legge inn "https://localhost:44327/signin-oidc" som "Redirect URI "og "https://localhost:44327/signout-oidc" som "Logout URL".
-    Ideelt bør man opprette en egen App Registration for lokal debugging, men for dette test-formålet, og for å spare tid gjør vi ikke det her)
+11. Ta vare på "Application (client) ID" og "Directory (tenant) ID" som står på oversiktssiden "Overview". Du trenger denne senere. 
+   (Dersom du ønsker å debugge lokalt, må du også legge inn "https://localhost:44327/signin-oidc" som "Redirect URI "og "https://localhost:44327/signout-oidc" som "Logout URL". 
+   Ideelt bør man opprette en egen App Registration for lokal debugging, men for dette test-formålet, og for å spare tid gjør vi ikke det her)
     ​
 
 ### Konfigurasjon
@@ -40,7 +39,7 @@ Vi må sette noen konfigurasjonsverdier i applikasjonen vår.
 Fyll også inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave.:
 ​
 
-```
+```json
             {
               "name": "AzureAd:Instance",
               "value": "https://login.microsoftonline.com/"
@@ -76,7 +75,7 @@ Editer filen AzureWorkshop/AzureWorkshopApp/appsettings.json legg inn konfiguras
 ​
 Nå når er det på tide å legge til funksjonaliteten til AzureWorkshop prosjektet.
 ​
-Først må du legge til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 2.1.1, siden vi bruker .NET Core 2.1) som har funksjonalitet for autentisering mot Azure AD.
+Først må du legge til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget-pakke (Viktig: velg versjon 3.1.15, siden vi bruker .NET Core 3.1) som har funksjonalitet for autentisering mot Azure AD.
 ​
 I denne workshoppen har vi valgt å legge inn kodeendringer som kommentarer som må kommenteres inn/ut for å få den funksjonaliten. Alle endringer har TODO: foran, slik at man lett kan finne dem. Alle filer som må endres:
 ​

@@ -9,13 +9,25 @@ Parameter-filen i ARM-templates (kalt *azuredeploy.{environment}.parameters.json
 1. Gjenbruk ressursgruppen du brukte for test-miljøet. Slett Web App'en og App Service Plan du opprettet i den gruppen. Merk deg navnet på Web App'en din, da du skal gjenbruke denne i steg 3. 
 2. Kopier `azuredeploy.parameters.json` til `azuredeploy.test.parameters.json`. Dette vil være parameter-filen din for test.
 3. I `azuredeploy.test.parameters.json`, sett inn 3 unike navn i *value* feltene. Dette bestemmer navnet ressursene dine får - bruk samme navn på App service som før. Gi komponentene navn slik at man kan se hvilket miljø de tilhører.
-4. Valider templaten din ved å gjøre en test-deploy ved å høyre-klikke på prosjektet og velg Deploy. 
-a. Velg riktige filer og rett ressursgruppe i Azure. 
-b. Publish. (Dersom du får spørsmål om navn på ressursgruppe., kan det være noen problemer med Visual Studio-versjonen din, og da må du fylle ut dette manuelt). Hvis du ikke har visual studio eller av en annen grunn ikke kan publishe direkte kan du gå rett på å sette opp build-pipeline.
-5. Hvis du får feil i steget over er sannsynligvis ett av ressursnavnene dine ulovlig.   
-6. Undersøk om ressursene dine ble opprettet i ressursgruppen din. Hvis ikke, gjør steg 4. på nytt eller spør om hjelp. 
-7. Slett ressursene som ble opprettet i ressurgruppen.
-8. Lag en commit og push den til ditt DevOps-repo.
+4. Valider templaten din ved å gjøre en test-deploy via Visual Studio (gå til steg 5 hvis du ikke har Visual Studio)
+  a. Deploy via Visual Studio ved å høyre-klikke på prosjektet (AzureWorkshopInfrastruktur.sln)
+  b. Velg riktige filer og rett ressursgruppe i Azure
+  c. Publish. (Dersom du får spørsmål om navn på ressursgruppe., kan det være noen problemer med Visual Studio-versjonen din, og da må du fylle ut dette manuelt). Hvis du ikke har visual studio eller av en annen grunn ikke kan publishe direkte kan du prøve via Azure CLI (se steg 5)
+5. Valider templaten din ved å gjøre en test-deploy via Azure CLI (har du gjort steg 4 kan du hoppe over denne)  
+  a. Åpne Powershell eller en terminal
+  b. Log inn via ``az login``
+  c. Sjekk at du har riktig subscription valgt eller endre subscription ved å kjøre ```az account set --subscription "{subscription name or id}" ```
+  d. Naviger til riktig mappe (for eksempelet under så bør man være i samme mappe som AzureWorkshopInfrastruktur.sln filen)
+  e. Kjør kommandoen ```az deployment group create
+  --name {ExampleDeployment}
+  --resource-group {dinRessursGruppe} 
+  --template-file .\AzureWorkshopInfrastruktur\azuredeploy.json 
+  --parameters '@AzureWorkshopInfrastruktur\azuredeploy.test.parameters.json' ```
+  f. Deploymenten bør da liste opp både en storage og en web app og ha "provisionState": "Succeeded"
+6. Hvis du får feil i steget over er sannsynligvis ett av ressursnavnene dine brukt. Se på output og prøv på nytt   
+7. Undersøk om ressursene dine ble opprettet i ressursgruppen din. Hvis ikke, gjør steg 4. eller 5. på nytt eller spør om hjelp. 
+8. Slett ressursene som ble opprettet i ressurgruppen.
+9. Lag en commit og push den til ditt DevOps-repo.
 ​
 ## Build-pipeline 
 Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din til neste steg i kjeden (release-pipeline).
@@ -57,7 +69,7 @@ Verifiser at ressursene dine blir deployet ut til ressursgruppen din.
 For å teste at ting faktisk blir opprettet på konsistent vis, skal du nå slette og redeploye.
 ​
 1. Slett en ressurs i ressursgruppen din (f.eks. Storage Accounten).
-2. Kjør Redploy av releasen og se at det blir opprettet igjen (gå inn på selve releasen og trykk på miljøet, og velg Redeploy)
+2. Kjør Redeploy av releasen og se at det blir opprettet igjen (gå inn på selve releasen og trykk på miljøet, og velg Redeploy)
 ​
 ### Endring av miljø
 Du ønsker å gjøre det mulig å sette størrelsen på App Service Planen til forskjellige størrelse basert på om det er et test-miljø eller et produksjonsmiljø. For å gjøre dette må du legge inn et nytt steg i release pipelinen. Dette kan du gjøre ved å legge til en ny stage. Trykk "+ Add" og "New Stage" og velg "Empty Job" øverst. Repeter så det du gjorde for Test stagen for Prod (endre navn, gå til tasks->prod og legg til "Arm Template Deployment" og velg riktige filer, subscription, resource group og location). Hvis du ikke har en template fil for prod. Så kan du lage en ny ved å kopiere `azuredeploy.test.parameters.json` og kalle den `azuredeploy.prod.parameters.json`, bytt ut navn på 'webSiteName' og 'storageAccountName' og commit og push endringene dine. Gå tilbake til å editere på release-pipelinen og legg til riktige verdier i "Arm Template Deployment" tasken for Prod stagen (bygg må bli ferdig før du kan velge `azuredeploy.prod.parameters.json` som parameter fil). Nå har du to stages i release pipelinen og disse kan nå ha forskjellige verdier via `azuredeploy.test.parameters.json` og `azuredeploy.prod.parameters.json`. 

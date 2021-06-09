@@ -8,14 +8,9 @@ namespace AzureWorkshopApp.Helpers
         {
             AzureStorageConfigValidationResult validation = new AzureStorageConfigValidationResult();
 
-            if (storageConfig.AccountKey == string.Empty)
+            if (storageConfig.ConnectionString == string.Empty)
             {
-                validation.AddError("AccountKey", "Account key is empty. Check configuration.");
-            }
-
-            if (storageConfig.AccountName == string.Empty)
-            {
-                validation.AddError("AccountName", "Account name is empty. Check configuration.");
+                validation.AddError("ConnectionString", "ConnectionString key is empty. Check configuration.");
             }
 
             if (storageConfig.ImageContainer == string.Empty)
