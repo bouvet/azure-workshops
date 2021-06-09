@@ -27,7 +27,7 @@ namespace AzureWorkshopApp.Controllers
 
         // TODO: Legg til attributt for at bruker må være innlogget og ha rollen Uploader for å laste oppe bilde.
         // [Authorize(Roles = "Uploader")]
-        // POST /api/images
+        // POST /api/images/upload
         [HttpPost("[action]")]
         public async Task<IActionResult> Upload(ICollection<IFormFile> files)
         {
