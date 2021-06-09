@@ -29,6 +29,7 @@ For Visual Studio Code
 </font>
 ​
 Åpne `_ViewImports.cshtml` og legg til følgende injection:
+
 ```html
     @inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
 ```
