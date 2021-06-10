@@ -1,7 +1,9 @@
 ﻿using Azure.Storage.Blobs;
 using AzureWorkshopFunctionApp.Interfaces;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +21,7 @@ namespace AzureWorkshopFunctionApp.Services
 
         public async Task<Stream> GetBlobAsStream(string container, string blobName)
         {
+            Console.WriteLine("ConnectionString: " + _connectionString);
             // Create a BlobServiceClient object which will be used to create a container client
             BlobServiceClient blobServiceClient = new BlobServiceClient(_connectionString);
 
@@ -43,6 +46,7 @@ namespace AzureWorkshopFunctionApp.Services
 
             //Create a BlobContainerClient
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(container);
+            await blobContainerClient.CreateIfNotExistsAsync();
 
             var blobClient = blobContainerClient.GetBlobClient(blobName);
 

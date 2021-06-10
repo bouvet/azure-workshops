@@ -21,9 +21,9 @@ I tillegg må du gi Web App'en din mulighet til å snakke med Storage Accounten 
 - Gå til Web App'en din i portalen.
 - VNET integrasjon er en Standard-tier feature i App Service Plan. Skifte App Service Plan: Trykk på "Scale Up". Velg så "S1" under "Production".
 - Gå så til Networking i menyen til venstre. Trykk "VNET integration".
-- Trykk "+ Add VNET (preview)" og velg det virtuelle nettverket du opprettet i forrige. Det har bare et subnet, så velg dette. Trykk OK. Nå har Web App'en din lov til å
+- Trykk "+ Add VNET (preview)" og velg det virtuelle nettverket du opprettet i forrige. Det har bare et subnet, så velg dette. Trykk OK. Nå har Web App'en din lov til å snakke med Storage Accounten gjennom VNET
 
-Test så at applikasjonen din ikke fungerer lengre, og bildene vises. Hvorfor ikke? Du har jo SAS-token?
+Test så at applikasjonen din ikke fungerer lengre, og bildene vises ikke. Hvorfor ikke? Du har jo SAS-token?
 Grunnen til dette er at nå er det kun Web App'en (backend) som har lov til å snakke direkte med Storage Account i VNET, mens Web App'en kun returnerer linker (med SAS-token) direkte til Storage Account. Per nå
 har du ikke tilgang til Storage Account fra din adresse.
 
