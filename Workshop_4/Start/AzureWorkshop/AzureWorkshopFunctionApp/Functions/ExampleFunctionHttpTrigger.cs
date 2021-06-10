@@ -1,16 +1,11 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using AzureWorkshopFunctionApp.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using AzureWorkshopFunctionApp.Interfaces;
 using System.Drawing.Imaging;
-using AzureWorkshopFunctionApp.Services;
-using System.Configuration;
+using System.Threading.Tasks;
 
 namespace AzureWorkshopFunctionApp.Functions
 {
@@ -21,7 +16,7 @@ namespace AzureWorkshopFunctionApp.Functions
 
         public ExampleFunctionHttpTrigger(IImageService imageService, IBlobStorageService blobStorageService)
         {
-            BlobStorageService = blobStorageService; // new BlobStorageService(ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ConnectionString);
+            BlobStorageService = blobStorageService;
             ImageService = imageService;
         }
 
@@ -31,48 +26,12 @@ namespace AzureWorkshopFunctionApp.Functions
             ILogger log)
         {
             var blobName = req.Query["blobName"];
-            var func = req.Query["func"];
-            Stream stream;
-            Stream mirror;
+            
+            var stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
+            var mirror = ImageService.FlipHorizontal(stream, ImageFormat.Jpeg);
 
-            if (func.Count != 0)
-            {
-                switch (func[0])
-                {
-                    case "mirror":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.FlipHorizontal(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-mirror", blobName, mirror);
-                        break;
-                    case "flip":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.FlipVertical(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-flipped", blobName, mirror);
-                        break;
-                    case "rotate":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.RotateClockwise(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-clockwise", blobName, mirror);
-                        break;
-                    case "antirotate":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.RotateClockwise(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-anticlockwise", blobName, mirror);
-                        break;
-                    case "greyscale":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.GreyScale(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-grey", blobName, mirror);
-                        break;
-                }
-            }
-            else
-            {
-                stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                mirror = ImageService.FlipHorizontal(stream, ImageFormat.Jpeg);
-
-                await BlobStorageService.UploadStreamToBlob("imagecontainer-mirror", blobName, mirror);
-            }
+            await BlobStorageService.UploadStreamToBlob("imagecontainer-mirror", blobName, mirror);
+            
             return new OkResult();
         }
 
