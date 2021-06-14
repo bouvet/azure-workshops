@@ -44,15 +44,16 @@ namespace AzureWorkshopApp.Services
              return true;
         }
 
-        public async Task<List<string>> GetImageUrls()
+        public async Task<List<string>> GetImageUrls(string container)
         {
+            container ??= _storageConfig.ImageContainer;
             List<string> imageUrls = new List<string>();
 
             // Create a BlobServiceClient object which will be used to create a container client
             BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConfig.ConnectionString);
 
             //Create a BlobContainerClient
-            var blobContainerClient = blobServiceClient.GetBlobContainerClient(_storageConfig.ImageContainer);
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient(container);
 
             BlobSasBuilder builder;
             await foreach(var blobItem in blobContainerClient.GetBlobsAsync())

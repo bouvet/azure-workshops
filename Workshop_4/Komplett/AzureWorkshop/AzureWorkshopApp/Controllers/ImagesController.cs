@@ -12,10 +12,12 @@ namespace AzureWorkshopApp.Controllers
     public class ImagesController : Controller
     {
         private readonly IStorageService _storageService;
+        private readonly IQueueService _queueService;
 
-        public ImagesController(IStorageService storageService)
+        public ImagesController(IStorageService storageService, IQueueService queueService)
         {
             _storageService = storageService ?? throw new ArgumentNullException(nameof(storageService));
+            _queueService = queueService ?? throw new ArgumentNullException(nameof(queueService));
         }
 
         // POST /api/images/upload
@@ -36,6 +38,10 @@ namespace AzureWorkshopApp.Controllers
                         {
                             if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
                             {
+                                //Send message on queue
+                                //Make sure to match up the queueName with a trigger and the message body with how
+                                //your function reads the message. E.g.:
+                                await _queueService.SendQueueMessage("imagequeue", formFile.FileName);
                                 return new AcceptedResult();
                             }
                         }
@@ -52,10 +58,11 @@ namespace AzureWorkshopApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetImages()
         {
+            var container = Request.Query["container"].Count > 0 ? Request.Query["container"][0] : null;
             var configValidation = _storageService.ValidateConfiguration();
             if (!configValidation.IsValid()) return BadRequest(configValidation.GetErrors());
 
-            var imageUrls = await _storageService.GetImageUrls();
+            var imageUrls = await _storageService.GetImageUrls(container);
 
             return new ObjectResult(imageUrls);
         }

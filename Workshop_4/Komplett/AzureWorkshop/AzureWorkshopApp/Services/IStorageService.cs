@@ -9,6 +9,6 @@ namespace AzureWorkshopApp.Services
     {
         AzureStorageConfigValidationResult ValidateConfiguration();
         Task<bool> UploadFileToStorage(Stream fileStream, string fileName);
-        Task<List<string>> GetImageUrls();
+        Task<List<string>> GetImageUrls(string container);
     }
 }

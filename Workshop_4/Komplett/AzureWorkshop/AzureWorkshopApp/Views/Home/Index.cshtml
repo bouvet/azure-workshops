@@ -74,6 +74,10 @@
         padding-right: 16px;
     }
 
+    button {
+        color: black;
+    }
+
     .dropzone {
         border: 3px dashed #D5C383;
         background: #8E7931;
@@ -107,6 +111,13 @@
 
     <div class="box content">
         <hr>
+        <button onclick="changeContainer('imagecontainer');">Normal</button>
+        <button onclick="changeContainer('imagecontainer-grey');">GreyScale</button>
+        <button onclick="changeContainer('imagecontainer-mirror');">Mirror</button>
+        <button onclick="changeContainer('imagecontainer-flipped');">Flipped</button>
+        <button onclick="changeContainer('imagecontainer-clockwise');">Clockwise</button>
+        <button onclick="changeContainer('imagecontainer-anticlockwise');">Anti clockwise</button>
+
         <div class="form-wrapper">
             <form action="/api/images/upload"
                   class="dropzone needsclick dz-clickable"
@@ -129,8 +140,22 @@
 <script>
     var gallery = [];
 
+    var containers = ["imagecontainer", "imagecontainer-anticlockwise", "imagecontainer-clockwise",
+        "imagecontainer-flipped", "imagecontainer-grey", "imagecontainer-mirror"];
+    var currentContainer = containers[0];
+
+    function changeContainer(container) {
+        if (containers.includes(container)) {
+            currentContainer = container;
+            gallery = [];
+            var divContainer = document.getElementById("stored-images");
+            divContainer.innerHTML = "";
+            fetchImageLinks();
+        }
+    }
+
     function fetchImageLinks() {
-        $.get("api/Images", function (fetchedImageLinks) {
+        $.get("api/Images?container=" + currentContainer, function (fetchedImageLinks) {
             if (_.isEmpty(fetchedImageLinks)) {
                 return;
             }
