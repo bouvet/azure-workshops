@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace AzureWorkshopFunctionApp.Functions
 {
-    public class BlobTriggerMirror
+    public class MirrorBlobTrigger
     {
         private IImageService ImageService { get; set; }
 
-        public BlobTriggerMirror(IImageService imageService)
+        public MirrorBlobTrigger(IImageService imageService)
         {
             ImageService = imageService;
         }

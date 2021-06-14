@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 using AzureWorkshopApp.Models;
 using Microsoft.Extensions.Options;
 using System;
@@ -17,7 +18,10 @@ namespace AzureWorkshopApp.Services
 
         public async Task SendQueueMessage(string queueName, string message)
         {
-            QueueServiceClient queueServiceClient = new QueueServiceClient(_storageConfig.ConnectionString);
+            QueueServiceClient queueServiceClient = new QueueServiceClient(_storageConfig.ConnectionString, new QueueClientOptions
+            {
+                MessageEncoding = QueueMessageEncoding.Base64
+            });
 
             var queueClient = queueServiceClient.GetQueueClient(queueName);
 

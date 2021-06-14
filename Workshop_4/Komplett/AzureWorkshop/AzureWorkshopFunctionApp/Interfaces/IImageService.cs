@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
+﻿using System.Drawing.Imaging;
 using System.IO;
-using System.Text;
 
 namespace AzureWorkshopFunctionApp.Interfaces
 {
@@ -17,5 +14,7 @@ namespace AzureWorkshopFunctionApp.Interfaces
         Stream RotateAntiClockwise(Stream image, ImageFormat format);
 
         Stream GreyScale(Stream image, ImageFormat format);
+
+        Stream SquareImage(Stream image, ImageFormat format);
     }
 }
