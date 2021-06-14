@@ -24,6 +24,7 @@ namespace AzureWorkshopApp
             services.AddOptions();
 
             services.AddScoped<IStorageService, StorageService>();
+            services.AddScoped<IQueueService, QueueService>();
             services.Configure<AzureStorageConfig>(Configuration.GetSection("AzureStorageConfig"));
         }
 
