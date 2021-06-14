@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using AzureWorkshopFunctionApp.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -50,7 +51,7 @@ namespace AzureWorkshopFunctionApp.Services
 
             var blobClient = blobContainerClient.GetBlobClient(blobName);
 
-            await blobClient.UploadAsync(stream);
+            await blobClient.UploadAsync(stream, overwrite: true);
         }
     }
 }

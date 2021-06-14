@@ -1,23 +1,23 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using AzureWorkshopFunctionApp.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using AzureWorkshopFunctionApp.Interfaces;
+using System.Drawing.Imaging;
+using System.Threading.Tasks;
 
 namespace AzureWorkshopFunctionApp.Functions
 {
     public class ExampleFunctionHttpTrigger
     {
         private IBlobStorageService BlobStorageService { get; set; }
+        private IImageService ImageService { get; set; }
 
-        public ExampleFunctionHttpTrigger(IBlobStorageService blobStorageService)
+        public ExampleFunctionHttpTrigger(IImageService imageService, IBlobStorageService blobStorageService)
         {
             BlobStorageService = blobStorageService;
+            ImageService = imageService;
         }
 
         [FunctionName("ExampleFunctionHttpTrigger")]
@@ -26,10 +26,14 @@ namespace AzureWorkshopFunctionApp.Functions
             ILogger log)
         {
             var blobName = req.Query["blobName"];
+            
+            var stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
+            var mirror = ImageService.FlipHorizontal(stream, ImageFormat.Jpeg);
 
-            var stream = BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-
+            await BlobStorageService.UploadStreamToBlob("imagecontainer-mirror", blobName, mirror);
+            
             return new OkResult();
         }
+
     }
 }

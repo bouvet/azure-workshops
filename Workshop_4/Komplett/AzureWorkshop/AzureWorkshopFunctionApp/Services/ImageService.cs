@@ -17,6 +17,7 @@ namespace AzureWorkshopFunctionApp.Services
             bitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
             var ms = new MemoryStream();
             bitmap.Save(ms, format);
+            ms.Position = 0;
             return ms;
         }
 
@@ -26,6 +27,7 @@ namespace AzureWorkshopFunctionApp.Services
             bitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
             var ms = new MemoryStream();
             bitmap.Save(ms, format);
+            ms.Position = 0;
             return ms;
         }
 
@@ -35,6 +37,7 @@ namespace AzureWorkshopFunctionApp.Services
             bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
             var ms = new MemoryStream();
             bitmap.Save(ms, format);
+            ms.Position = 0;
             return ms;
         }
 
@@ -44,6 +47,7 @@ namespace AzureWorkshopFunctionApp.Services
             bitmap.RotateFlip(RotateFlipType.Rotate270FlipNone);
             var ms = new MemoryStream();
             bitmap.Save(ms, format);
+            ms.Position = 0;
             return ms;
         }
 
@@ -69,23 +73,9 @@ namespace AzureWorkshopFunctionApp.Services
 
             var ms = new MemoryStream();
             greyBitmap.Save(ms, format);
+            ms.Position = 0;
             return ms;
         }
 
-        public void Something()
-        {
-            var bitmap = new Bitmap(2, 2);
-            var greyBitmap = new Bitmap(2, 2);
-            for (int i = 0; i < bitmap.Width; i++)
-            {
-                for (int x = 0; x < bitmap.Height; x++)
-                {
-                    Color oc = bitmap.GetPixel(i, x);
-                    int grayScale = (int)((oc.R * 0.3) + (oc.G * 0.59) + (oc.B * 0.11));
-                    Color nc = Color.FromArgb(oc.A, grayScale, grayScale, grayScale);
-                    greyBitmap.SetPixel(i, x, nc);
-                }
-            }
-        }
     }
 }

@@ -13,9 +13,6 @@ namespace AzureWorkshopFunctionApp
 
     public class Startup : FunctionsStartup
     {
-        public Startup()
-        {
-        }
 
         public IConfiguration Configuration { get; set; }
         public override void Configure(IFunctionsHostBuilder builder)

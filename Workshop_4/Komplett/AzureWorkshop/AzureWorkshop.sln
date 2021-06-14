@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureWorkshopApp", "AzureWo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureWorkshopAppTests", "AzureWorkshopAppTests\AzureWorkshopAppTests.csproj", "{F33830EE-0BF3-4554-A452-CC4CB6496A0D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureWorkshopFunctionApp", "AzureWorkshopFunctionApp\AzureWorkshopFunctionApp.csproj", "{012C688E-9759-4887-80BD-B01B89546052}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F33830EE-0BF3-4554-A452-CC4CB6496A0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F33830EE-0BF3-4554-A452-CC4CB6496A0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F33830EE-0BF3-4554-A452-CC4CB6496A0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{012C688E-9759-4887-80BD-B01B89546052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{012C688E-9759-4887-80BD-B01B89546052}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{012C688E-9759-4887-80BD-B01B89546052}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{012C688E-9759-4887-80BD-B01B89546052}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
