@@ -1,12 +1,7 @@
 ﻿using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using AzureWorkshopFunctionApp.Interfaces;
-using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AzureWorkshopFunctionApp.Services

@@ -16,6 +16,9 @@
     },
     "appInsightsName": {
       "value": ""
-    } 
+    },
+    "functionAppName":{
+      "value": "" 
+   }
   }
 }

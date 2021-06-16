@@ -22,11 +22,11 @@ namespace AzureWorkshopFunctionApp.Functions
         {
             log.LogInformation($"C# Queue trigger function processed: {imageName}");
 
-            var blobStream = await BlobStorageService.GetBlobAsStream("imagecontainer", imageName);
+            var blobStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, imageName);
 
-            var squareStream = ImageService.SquareImage(blobStream, ImageFormat.Jpeg);
+            var squareImageStream = ImageService.SquareImage(blobStream, ImageFormat.Jpeg);
 
-            await BlobStorageService.UploadStreamToBlob("imagecontainer-square", imageName, squareStream);
+            await BlobStorageService.UploadStreamToBlob(Constants.SquareImageContainer, imageName, squareImageStream);
         }
     }
 }

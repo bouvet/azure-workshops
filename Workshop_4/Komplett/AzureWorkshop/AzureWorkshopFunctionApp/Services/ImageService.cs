@@ -8,7 +8,7 @@ namespace AzureWorkshopFunctionApp.Services
 {
     public class ImageService : IImageService
     {
-
+        //Mirror on left or right side
         public Stream FlipHorizontal(Stream image, ImageFormat format)
         {
             var bitmap = new Bitmap(image);
@@ -19,6 +19,7 @@ namespace AzureWorkshopFunctionApp.Services
             return ms;
         }
 
+        //Mirror on top/bottom
         public Stream FlipVertical(Stream image, ImageFormat format)
         {
             var bitmap = new Bitmap(image);
@@ -74,6 +75,7 @@ namespace AzureWorkshopFunctionApp.Services
             return ms;
         }
 
+        //Makes the image square, loses some information in the process
         public Stream SquareImage(Stream image, ImageFormat format)
         {
             var bitmap = new Bitmap(image);
@@ -94,7 +96,5 @@ namespace AzureWorkshopFunctionApp.Services
             ms.Position = 0;
             return ms;
         }
-
-
     }
 }

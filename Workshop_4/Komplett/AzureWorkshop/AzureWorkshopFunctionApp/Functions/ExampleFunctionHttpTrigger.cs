@@ -28,46 +28,46 @@ namespace AzureWorkshopFunctionApp.Functions
         {
             var blobName = req.Query["blobName"];
             var func = req.Query["func"];
-            Stream stream;
-            Stream mirror;
+            Stream imageStream;
+            Stream changedImageStream;
 
             if (func.Count != 0)
             {
                 switch (func[0])
                 {
                     case "mirror":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.FlipHorizontal(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-mirror", blobName, mirror);
+                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = ImageService.FlipHorizontal(imageStream, ImageFormat.Jpeg);
+                        await BlobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, changedImageStream);
                         break;
                     case "flip":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.FlipVertical(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-flipped", blobName, mirror);
+                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = ImageService.FlipVertical(imageStream, ImageFormat.Jpeg);
+                        await BlobStorageService.UploadStreamToBlob(Constants.FlippedImageContainer, blobName, changedImageStream);
                         break;
                     case "rotate":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.RotateClockwise(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-clockwise", blobName, mirror);
+                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = ImageService.RotateClockwise(imageStream, ImageFormat.Jpeg);
+                        await BlobStorageService.UploadStreamToBlob(Constants.ClockwiseImageContainer, blobName, changedImageStream);
                         break;
                     case "antirotate":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.RotateClockwise(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-anticlockwise", blobName, mirror);
+                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = ImageService.RotateClockwise(imageStream, ImageFormat.Jpeg);
+                        await BlobStorageService.UploadStreamToBlob(Constants.AntiClockwiseImageContainer, blobName, changedImageStream);
                         break;
                     case "greyscale":
-                        stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                        mirror = ImageService.GreyScale(stream, ImageFormat.Jpeg);
-                        await BlobStorageService.UploadStreamToBlob("imagecontainer-grey", blobName, mirror);
+                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = ImageService.GreyScale(imageStream, ImageFormat.Jpeg);
+                        await BlobStorageService.UploadStreamToBlob(Constants.GreyImageContainer, blobName, changedImageStream);
                         break;
                 }
             }
             else
             {
-                stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
-                mirror = ImageService.FlipHorizontal(stream, ImageFormat.Jpeg);
+                imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                changedImageStream = ImageService.FlipHorizontal(imageStream, ImageFormat.Jpeg);
 
-                await BlobStorageService.UploadStreamToBlob("imagecontainer-mirror", blobName, mirror);
+                await BlobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, changedImageStream);
             }
             return new OkResult();
         }
