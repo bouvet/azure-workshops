@@ -17,7 +17,7 @@ namespace AzureWorkshopFunctionApp.Functions
 
         public ExampleFunctionHttpTrigger(IImageService imageService, IBlobStorageService blobStorageService)
         {
-            BlobStorageService = blobStorageService; 
+            BlobStorageService = blobStorageService;
             ImageService = imageService;
         }
 

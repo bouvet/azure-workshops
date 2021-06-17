@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AzureWorkshopApp.Helpers;
+﻿using AzureWorkshopApp.Helpers;
 using AzureWorkshopApp.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AzureWorkshopApp.Controllers
 {

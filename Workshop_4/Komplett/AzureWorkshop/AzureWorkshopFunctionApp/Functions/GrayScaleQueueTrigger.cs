@@ -14,7 +14,7 @@ namespace AzureWorkshopFunctionApp.Functions
 
         public GrayScaleQueueTrigger(IImageService imageService, IBlobStorageService blobStorageService)
         {
-            BlobStorageService = blobStorageService; 
+            BlobStorageService = blobStorageService;
             ImageService = imageService;
         }
 

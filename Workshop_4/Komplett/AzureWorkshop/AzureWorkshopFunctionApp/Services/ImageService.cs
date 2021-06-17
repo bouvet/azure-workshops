@@ -55,7 +55,7 @@ namespace AzureWorkshopFunctionApp.Services
             var bitmap = new Bitmap(image);
             var greyBitmap = new Bitmap(bitmap.Width, bitmap.Height);
 
-            ColorMatrix colorMatrix = new ColorMatrix( new float[][]
+            ColorMatrix colorMatrix = new ColorMatrix(new float[][]
             {
                 new float[] {.3f, .3f, .3f, 0, 0},
                 new float[] {.59f, .59f, .59f, 0, 0},
@@ -89,7 +89,7 @@ namespace AzureWorkshopFunctionApp.Services
             graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
             graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
-            graphics.DrawImage(bitmap,(minSize / 2) - (bitmap.Width / 2) , (minSize / 2)-(bitmap.Height / 2), bitmap.Width, bitmap.Height);
+            graphics.DrawImage(bitmap, (minSize / 2) - (bitmap.Width / 2), (minSize / 2) - (bitmap.Height / 2), bitmap.Width, bitmap.Height);
 
             var ms = new MemoryStream();
             squareBmp.Save(ms, format);

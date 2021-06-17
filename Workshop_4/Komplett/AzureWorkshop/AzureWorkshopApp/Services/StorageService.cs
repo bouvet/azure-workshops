@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 using AzureWorkshopApp.Helpers;
 using AzureWorkshopApp.Models;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace AzureWorkshopApp.Services
 {
@@ -41,7 +41,7 @@ namespace AzureWorkshopApp.Services
             //Upload the content
             await blobClient.UploadAsync(fileStream);
 
-             return true;
+            return true;
         }
 
         public async Task<List<string>> GetImageUrls(string container)
@@ -56,7 +56,7 @@ namespace AzureWorkshopApp.Services
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(container);
 
             BlobSasBuilder builder;
-            await foreach(var blobItem in blobContainerClient.GetBlobsAsync())
+            await foreach (var blobItem in blobContainerClient.GetBlobsAsync())
             {
                 //Create a blobclient from the blobItem.Name
                 var blobClient = blobContainerClient.GetBlobClient(blobItem.Name);

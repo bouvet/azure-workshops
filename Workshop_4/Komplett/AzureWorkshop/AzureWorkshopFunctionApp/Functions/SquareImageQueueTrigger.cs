@@ -18,7 +18,7 @@ namespace AzureWorkshopFunctionApp.Functions
         }
 
         [FunctionName("SquareImageQueueTrigger")]
-        public async Task Run([QueueTrigger(Constants.SquareImageQueue, Connection = Constants.ConnectionString)]string imageName, ILogger log)
+        public async Task Run([QueueTrigger(Constants.SquareImageQueue, Connection = Constants.ConnectionString)] string imageName, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {imageName}");
 

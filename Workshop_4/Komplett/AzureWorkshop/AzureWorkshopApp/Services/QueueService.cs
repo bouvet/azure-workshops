@@ -1,5 +1,4 @@
 ﻿using Azure.Storage.Queues;
-using Azure.Storage.Queues.Models;
 using AzureWorkshopApp.Models;
 using Microsoft.Extensions.Options;
 using System;

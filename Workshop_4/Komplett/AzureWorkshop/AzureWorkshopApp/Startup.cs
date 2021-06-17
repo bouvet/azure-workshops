@@ -45,7 +45,8 @@ namespace AzureWorkshopApp
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseEndpoints(configure => {
+            app.UseEndpoints(configure =>
+            {
                 configure.MapControllers();
                 configure.MapDefaultControllerRoute();
             });
