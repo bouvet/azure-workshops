@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AzureWorkshopApp.Helpers;
+﻿using AzureWorkshopApp.Helpers;
 using AzureWorkshopApp.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AzureWorkshopApp.Controllers
 {
@@ -58,7 +58,7 @@ namespace AzureWorkshopApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetImages()
         {
-            var container = Request.Query["container"].Count>0 ? Request.Query["container"][0] : null;
+            var container = Request.Query["container"].Count > 0 ? Request.Query["container"][0] : null;
             var configValidation = _storageService.ValidateConfiguration();
             if (!configValidation.IsValid()) return BadRequest(configValidation.GetErrors());
 

@@ -18,15 +18,17 @@ namespace AzureWorkshopFunctionApp.Functions
         }
 
         [FunctionName("SquareImageQueueTrigger")]
-        public async Task Run([QueueTrigger("squareimage", Connection = "AzureWebJobsStorage")]string imageName, ILogger log)
+        public async Task Run([QueueTrigger(Constants.SquareImageQueue, Connection = Constants.ConnectionString)]string imageName, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {imageName}");
 
             var blobStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, imageName);
 
+            log.LogInformation($"BlobService has connectionString");
             var squareImageStream = ImageService.SquareImage(blobStream, ImageFormat.Jpeg);
 
             await BlobStorageService.UploadStreamToBlob(Constants.SquareImageContainer, imageName, squareImageStream);
+            log.LogInformation($"Finished processing");
         }
     }
 }

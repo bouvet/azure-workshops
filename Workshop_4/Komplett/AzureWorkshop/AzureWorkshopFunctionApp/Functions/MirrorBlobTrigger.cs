@@ -18,8 +18,8 @@ namespace AzureWorkshopFunctionApp.Functions
 
         [FunctionName("BlobTriggerMirror")]
         public async Task Run(
-            [BlobTrigger("imagecontainer/{name}", Connection = "AzureWebJobsStorage")]Stream myBlob,
-            [Blob("imagecontainer-mirror/{name}", FileAccess.Write, Connection = "AzureWebJobsStorage")] Stream mirror, ILogger log)
+            [BlobTrigger("imagecontainer/{name}", Connection = Constants.ConnectionString)]Stream myBlob,
+            [Blob("imagecontainer-mirror/{name}", FileAccess.Write, Connection = Constants.ConnectionString)] Stream mirror, ILogger log)
         {
             myBlob.Position = 0;
             var flipHorizontal = ImageService.FlipHorizontal(myBlob, ImageFormat.Jpeg);

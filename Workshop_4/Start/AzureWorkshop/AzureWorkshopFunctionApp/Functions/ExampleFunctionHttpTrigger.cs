@@ -27,10 +27,10 @@ namespace AzureWorkshopFunctionApp.Functions
         {
             var blobName = req.Query["blobName"];
             
-            var stream = await BlobStorageService.GetBlobAsStream("imagecontainer", blobName);
+            var stream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
             var mirror = ImageService.FlipHorizontal(stream, ImageFormat.Jpeg);
 
-            await BlobStorageService.UploadStreamToBlob("imagecontainer-mirror", blobName, mirror);
+            await BlobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, mirror);
             
             return new OkResult();
         }

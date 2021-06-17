@@ -19,16 +19,22 @@ namespace AzureWorkshopFunctionApp.Functions
         }
 
         [FunctionName("GrayScaleQueueTrigger")]
-        public async Task Run([QueueTrigger("greyimage", Connection = "AzureWebJobsStorage")]string imageName, ILogger log)
+        [return: Queue(Constants.SquareImageQueue, Connection = Constants.ConnectionString)]
+        public async Task<string> Run([QueueTrigger(Constants.GreyImageQueue, Connection = Constants.ConnectionString)] string imageName,
+            ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {imageName}");
 
-            var blobStream = await BlobStorageService.GetBlobAsStream("imagecontainer", imageName);
+            var blobStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, imageName);
 
+            log.LogInformation($"BlobService has connectionString");
             var greyStream = ImageService.GreyScale(blobStream, ImageFormat.Jpeg);
             greyStream.Position = 0;
 
-            await BlobStorageService.UploadStreamToBlob("imagecontainer-grey", imageName, greyStream);
+            await BlobStorageService.UploadStreamToBlob(Constants.GreyImageContainer, imageName, greyStream);
+
+            log.LogInformation($"Finished processing");
+            return imageName;
         }
     }
 }

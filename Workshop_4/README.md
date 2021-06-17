@@ -1,5 +1,5 @@
 # Workshop: Serverless 
-------------------------------
+
 ## Function App
 
 I Start folderen finner du en påbegynt Function App (under AzureWorkshopApp). Denne Function Appen er ufullstendig og det blir din oppgave å utvide den. 
@@ -15,7 +15,7 @@ Videre steg for å deploye infrastruktur til Azure:
    - Hvis du ikke har Azureskolen subscription tilgjengelig, be om tilgang eller bruk et annet subscription du har tilgjengelig
 1. Lag så en Resource Group ved å kjøre kommandoen `az group create --location westeurope --name {YourResourceGroup}`
    - Bytt ut YourResourceGroup med et navn på din ressursgruppe
-1. Naviger til Start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur mappen
+1. Naviger til `Start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur` mappen
    - Her skal azuredeploy.json og azuredeploy.parameters.json ligge
 1. Åpne azuredeploy.parameters.json i en tekst editor
 1. Legg inn verdier for parameterne som ikke er satt (husk å lagre)
@@ -39,9 +39,11 @@ Endringene som må gjøres i AzureWorkshopApp er å kommentere inn muligheten ti
 
 Tilleggsfunksjonalitet man kan prøve seg på:
 * En timer trigger function
+* Logic App som trigger en eller flere functions basert på input
 * Ha queue trigger med queue binding output som trigger en ny function
 * Service Bus trigger (dette må settes opp selv)
 * Eller en annen trigger
+* Output Blob binding 
 
 ### Litt om Function App koden
 Constants.cs har konstanter som representerer containere i Storage Accounten. Her er det bare å legge til nye hvis man har lyst til å ha andre containere
@@ -52,8 +54,8 @@ ImageService har en del forskjellige metoder for å gjøre ting med bilder. Denn
 Anbefaler å bruke Azure Functions extension i VS Code, i Visual Studio så vil du kunne høyreklikke på Functions mappen og klikke på Add > New Azure Function...
 For å kunne legge til functions så må man åpne folderen AzureWorkshopFunctionApp i VS Code. Når det er gjort legger du inn nye functions ved å gå til Azure Extensionen på venstre side. Hvis du har Azure Functions extension installert så skal du ha en tab som heter Functions. Det vil da under tabben finnes en mappe som heter Local Project, trykk på denne og evt initialiser hvis den trenger det. Hvis det listes Functions og ExampleFunctionHttpTrigger vises så kan du legge til nye functions ved å trykke på et lyn med et pluss på (finnes til høyre for Functions). Velg så trigger type, navn og gjør endringene får å få Dependency Injection til å fungere på samme måte som i eksempel funksjonen. 
 
-Man kan legge til en local.settings.json fil og legge settings inn i den for å teste functions lokalt. Hvis du vil kjøre det lokalt så må AzureWebJobsStorage være satt (helst til en reell Storage Account ConnectionString)
-Eksempel med lokal Development Storage Account (en virituall Storage Account)
+Man kan legge til en local.settings.json fil og legge settings inn i den for å teste functions lokalt. Hvis du vil kjøre det lokalt så må AzureWebJobsStorage være satt (helst til en reell Storage Account ConnectionString).
+Eksempel med lokal Development Storage Account (en virituall Storage Account). 
 ```json
 {
   "IsEncrypted": false,
@@ -71,10 +73,9 @@ Hvis du vil deploye gjennom Visual Studio eller VS Code så kan det enkelt gjør
 1. Gå til AzureWorkshopApp eller AzureWorkshopFunctionApp (ettersom hva du vil deploye)
 1. Kjør kommandoen `dotnet publish -c Release`
    - Dette lager en release av koden
-1. Naviger til ./bin/Release/netcoreapp3.1/publish/
 1. Zip filene i denne mappen 
-   - Powershell `Compress-Archive -Path .\* -DestinationPath .\functionapp.zip `
-   - Terminal (Linux/Mac) `zip -r functionapp.zip ./*`
+   - Powershell `Compress-Archive -Path .\bin\Release\netcoreapp3.1\publish\* -DestinationPath .\functionapp.zip `
+   - Terminal (Linux/Mac) `zip -r functionapp.zip ./bin/Release/netcoreapp3.1/publish/*`
 1. Deploy ved å kjøre `az functionapp deployment source config-zip -g {YourResourceGroup} -n {YourAppServiceName} --src functionapp.zip` 
    - Denne kommandoen fungerer for både Function App og App Service
 1. Hvis du får tilbake `Deployment endpoint responded with status code 202` så er applikasjonen lastet opp og klar til å testes
