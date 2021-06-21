@@ -19,7 +19,7 @@ Videre steg for å deploye infrastruktur til Azure:
    - Her skal azuredeploy.json og azuredeploy.parameters.json ligge
 1. Åpne azuredeploy.parameters.json i en tekst editor
 1. Legg inn verdier for parameterne som ikke er satt (husk å lagre)
-1. Kjør så kommandoen `az deployment group create --name {ExampleDeployment} --resource-group {YourResourceGroup} --template-file .\azuredeploy.json --parameters '@azuredeploy.parameters.json'  `
+1. Kjør så kommandoen `az deployment group create --name {ExampleDeployment} --resource-group {YourResourceGroup} --template-file ./azuredeploy.json --parameters '@azuredeploy.parameters.json'  `
    - Bytt ut ExampleDeployment og YourResourceGroup med et navn på deploymenten (f.eks. infrastrukturDeployment) og resource groupen du lagde ovenfor 
 1. Hvis alt gikk gjennom så skal du få en json output med ressursene som ble laget
 1. Gå gjerne til portalen og sjekk at ressursene ligger i ressurs gruppen din
@@ -73,8 +73,9 @@ Hvis du vil deploye gjennom Visual Studio eller VS Code så kan det enkelt gjør
 1. Gå til AzureWorkshopApp eller AzureWorkshopFunctionApp (ettersom hva du vil deploye)
 1. Kjør kommandoen `dotnet publish -c Release`
    - Dette lager en release av koden
+1. Naviger til `./bin/Release/netcoreapp3.1/publish`
 1. Zip filene i denne mappen 
-   - Powershell `Compress-Archive -Path .\bin\Release\netcoreapp3.1\publish\* -DestinationPath .\functionapp.zip `
+   - Powershell `Compress-Archive -Path ./* -DestinationPath ./functionapp.zip `
    - Terminal (Linux/Mac) `zip -r functionapp.zip ./bin/Release/netcoreapp3.1/publish/*`
 1. Deploy ved å kjøre `az functionapp deployment source config-zip -g {YourResourceGroup} -n {YourAppServiceName} --src functionapp.zip` 
    - Denne kommandoen fungerer for både Function App og App Service

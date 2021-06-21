@@ -118,6 +118,7 @@
         <button onclick="changeContainer('imagecontainer-clockwise');">Clockwise</button>
         <button onclick="changeContainer('imagecontainer-anticlockwise');">Anti clockwise</button>
         <button onclick="changeContainer('imagecontainer-square');">Square</button>
+        <button onclick="changeContainer('imagecontainer-blur');">Blur</button>
         <div class="form-wrapper">
             <form action="/api/images/upload"
                   class="dropzone needsclick dz-clickable"
@@ -141,7 +142,7 @@
     var gallery = [];
 
     var containers = ["imagecontainer", "imagecontainer-anticlockwise", "imagecontainer-clockwise",
-        "imagecontainer-flipped", "imagecontainer-grey", "imagecontainer-mirror", "imagecontainer-square"];
+        "imagecontainer-flipped", "imagecontainer-grey", "imagecontainer-mirror", "imagecontainer-square", "imagecontainer-blur"];
     var currentContainer = containers[0];
 
     function changeContainer(container) {

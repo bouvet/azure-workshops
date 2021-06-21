@@ -1,7 +1,6 @@
 using AzureWorkshopFunctionApp.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -9,7 +8,7 @@ namespace AzureWorkshopFunctionApp.Functions
 {
     public class MirrorBlobTrigger
     {
-        private IImageService ImageService { get; set; }
+        private IImageService ImageService { get; }
 
         public MirrorBlobTrigger(IImageService imageService)
         {
@@ -18,11 +17,11 @@ namespace AzureWorkshopFunctionApp.Functions
 
         [FunctionName("BlobTriggerMirror")]
         public async Task Run(
-            [BlobTrigger(Constants.ImageContainer + "/{name}", Connection = Constants.ConnectionString)] Stream myBlob,
-            [Blob(Constants.MirrorImageContainer + "/{name}", FileAccess.Write, Connection = Constants.ConnectionString)] Stream mirror, ILogger log)
+            [BlobTrigger(Constants.ImageContainer + "/{name}")] Stream myBlob,
+            [Blob(Constants.MirrorImageContainer + "/{name}", FileAccess.Write)] Stream mirror, ILogger log)
         {
             myBlob.Position = 0;
-            var flipHorizontal = ImageService.FlipHorizontal(myBlob, ImageFormat.Jpeg);
+            var flipHorizontal = ImageService.FlipHorizontal(myBlob);
             await flipHorizontal.CopyToAsync(mirror);
         }
     }

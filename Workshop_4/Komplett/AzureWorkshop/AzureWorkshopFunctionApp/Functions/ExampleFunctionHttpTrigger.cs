@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -12,8 +11,8 @@ namespace AzureWorkshopFunctionApp.Functions
 {
     public class ExampleFunctionHttpTrigger
     {
-        private IBlobStorageService BlobStorageService { get; set; }
-        private IImageService ImageService { get; set; }
+        private IBlobStorageService BlobStorageService { get; }
+        private IImageService ImageService { get; }
 
         public ExampleFunctionHttpTrigger(IImageService imageService, IBlobStorageService blobStorageService)
         {
@@ -37,27 +36,27 @@ namespace AzureWorkshopFunctionApp.Functions
                 {
                     case "mirror":
                         imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.FlipHorizontal(imageStream, ImageFormat.Jpeg);
+                        changedImageStream = ImageService.FlipHorizontal(imageStream);
                         await BlobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, changedImageStream);
                         break;
                     case "flip":
                         imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.FlipVertical(imageStream, ImageFormat.Jpeg);
+                        changedImageStream = ImageService.FlipVertical(imageStream);
                         await BlobStorageService.UploadStreamToBlob(Constants.FlippedImageContainer, blobName, changedImageStream);
                         break;
                     case "rotate":
                         imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.RotateClockwise(imageStream, ImageFormat.Jpeg);
+                        changedImageStream = ImageService.RotateClockwise(imageStream);
                         await BlobStorageService.UploadStreamToBlob(Constants.ClockwiseImageContainer, blobName, changedImageStream);
                         break;
                     case "antirotate":
                         imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.RotateClockwise(imageStream, ImageFormat.Jpeg);
+                        changedImageStream = ImageService.RotateClockwise(imageStream);
                         await BlobStorageService.UploadStreamToBlob(Constants.AntiClockwiseImageContainer, blobName, changedImageStream);
                         break;
                     case "greyscale":
                         imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.GreyScale(imageStream, ImageFormat.Jpeg);
+                        changedImageStream = ImageService.GreyScale(imageStream);
                         await BlobStorageService.UploadStreamToBlob(Constants.GreyImageContainer, blobName, changedImageStream);
                         break;
                 }
@@ -65,7 +64,7 @@ namespace AzureWorkshopFunctionApp.Functions
             else
             {
                 imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                changedImageStream = ImageService.FlipHorizontal(imageStream, ImageFormat.Jpeg);
+                changedImageStream = ImageService.FlipHorizontal(imageStream);
 
                 await BlobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, changedImageStream);
             }
