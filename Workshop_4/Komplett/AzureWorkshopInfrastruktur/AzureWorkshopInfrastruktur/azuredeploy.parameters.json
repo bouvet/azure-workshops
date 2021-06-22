@@ -19,6 +19,12 @@
     },
     "functionAppName":{
       "value": "" 
-   }
+    },
+    "serviceBusName":{
+      "value": "" 
+    },
+    "serviceBusQueueName":{
+      "value": "imagequeue" 
+    }
   }
 }
