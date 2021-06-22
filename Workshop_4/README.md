@@ -69,11 +69,14 @@ Andre ting man kan gjøre er å kalle en HttpTrigger Function via en HttpClient,
 * `BlobService` inneholder logikk for å hente blobs som Stream og lagre en Stream i en blob. Opplasting av blobs er satt til å overskrive eksisterende blobs by default
 * `ImageService` har en del forskjellige metoder for å manipulere bilder. Denne kan utvides enkelt om man ønsker å gjøre mer spennende ting, anbefaler da at man fortsetter å bruke bitmap
 
-**Legge til functions manuelt**
+> <b>Functions kan lages på flere forskjellige måter. Det er hovedsakelig bare vanlige C# filer (.cs) som får autogenerert litt JSON filer når man bygger og deployer koden. Du kan velge å lage Functions manuelt eller via VS Code / Visual Studio. Bruk `TemplateQueueTrigger.cs` til å verifisere at det er satt opp riktig, det er lett at man får noen feil når man autogenerer kode og det autogenereres uten Dependency Injection.</b>
+
+**Legge til functions manuelt** 
+
 I koden finnes det en Function template som heter `TemplateQueueTrigger.cs`. Den kan man bruke til å lage andre functions som BlobTrigger, TimerTrigger og lignende. 
-Det går også å genere spesifikke Triggers ved hjelp av VS code og Visual Studio, men de må endres på. Bruk templaten til å verifisere at det er satt opp riktig.
 
 **Legge til functions med Visual Studio**
+
 * Høyreklikk på Functions mappen
 * Trykk `Add > New Azure Function`
 
