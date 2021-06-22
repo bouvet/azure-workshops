@@ -54,6 +54,8 @@ namespace AzureWorkshopApp.Services
 
             //Create a BlobContainerClient
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(container);
+            if (!await blobContainerClient.ExistsAsync())
+                return imageUrls;
 
             BlobSasBuilder builder;
             await foreach (var blobItem in blobContainerClient.GetBlobsAsync())

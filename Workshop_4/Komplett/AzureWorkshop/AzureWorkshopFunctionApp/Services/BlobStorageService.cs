@@ -19,7 +19,6 @@ namespace AzureWorkshopFunctionApp.Services
 
         public async Task<Stream> GetBlobAsStream(string container, string blobName)
         {
-            Console.WriteLine("ConnectionString: " + _connectionString);
             // Create a BlobServiceClient object which will be used to create a container client
             BlobServiceClient blobServiceClient = new BlobServiceClient(_connectionString);
 

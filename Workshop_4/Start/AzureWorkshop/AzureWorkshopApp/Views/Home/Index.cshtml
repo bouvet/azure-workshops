@@ -111,13 +111,15 @@
 
     <div class="box content">
         <hr>
-       <!-- <button onclick="changeContainer('imagecontainer');">Normal</button>
-        <button onclick="changeContainer('imagecontainer-grey');">GreyScale</button>
-        <button onclick="changeContainer('imagecontainer-mirror');">Mirror</button>
-        <button onclick="changeContainer('imagecontainer-flipped');">Flipped</button>
-        <button onclick="changeContainer('imagecontainer-clockwise');">Clockwise</button>
-        <button onclick="changeContainer('imagecontainer-anticlockwise');">Anti clockwise</button>
-           -->
+        <!-- <button onclick="changeContainer('imagecontainer');">Normal</button>
+     <button onclick="changeContainer('imagecontainer-grey');">GreyScale</button>
+     <button onclick="changeContainer('imagecontainer-mirror');">Mirror</button>
+     <button onclick="changeContainer('imagecontainer-flipped');">Flipped</button>
+     <button onclick="changeContainer('imagecontainer-clockwise');">Clockwise</button>
+     <button onclick="changeContainer('imagecontainer-anticlockwise');">Anti clockwise</button>
+     <button onclick="changeContainer('imagecontainer-square');">Square</button>
+     <button onclick="changeContainer('imagecontainer-blur');">Blur</button>
+        -->
         <div class="form-wrapper">
             <form action="/api/images/upload"
                   class="dropzone needsclick dz-clickable"
@@ -140,7 +142,7 @@
 <script>
     var gallery = [];
     var containers = ["imagecontainer", "imagecontainer-anticlockwise", "imagecontainer-clockwise",
-        "imagecontainer-flipped", "imagecontainer-grey", "imagecontainer-mirror"];
+        "imagecontainer-flipped", "imagecontainer-grey", "imagecontainer-mirror", "imagecontainer-square", "imagecontainer-blur"];
     var currentContainer = containers[0];
 
     function changeContainer(container) {
