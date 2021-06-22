@@ -9,7 +9,7 @@ Det er lurt å Lese hele README før du går i gang med å kode. Det kommer en d
 
 ### Anbefalte verktøy
 
-* Azure CLI
+* [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 * Visual studio eller VS code
 * [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
 
