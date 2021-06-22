@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "webSiteName": {
@@ -39,6 +39,18 @@
         "description": "The name of the Function App instance"
       }
     },
+    "serviceBusName":{
+      "type": "string",
+      "metadata": {
+        "description": "The name of the service Bus instance"
+      }
+    },
+    "serviceBusQueueName":{
+      "type": "string",
+      "metadata": {
+        "description": "The name of the service Bus instance"
+      }
+    },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -52,7 +64,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2017-08-01",
+      "apiVersion": "2018-02-01",
       "type": "Microsoft.Web/serverfarms",
       "kind": "app",
       "name": "[variables('servicePlanName')]",
@@ -72,7 +84,8 @@
       "kind": "functionapp",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+        "[resourceId('Microsoft.ServiceBus/Namespaces', parameters('serviceBusName'))]"
       ],
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
@@ -90,6 +103,10 @@
               
             },
             {
+              "name":"AzureWebJobsServiceBus",
+              "value": "[listKeys(resourceId(concat('Microsoft.ServiceBus/namespaces/AuthorizationRules'),parameters('serviceBusName'),'RootManageSharedAccessKey'),'2015-08-01').primaryConnectionString]"
+            },
+            {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), 
               ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
@@ -100,7 +117,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "~2"
+              "value": "~3"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -197,6 +214,54 @@
         "Flow_Type": "Bluefield",
         "Request_Source": "rest"
       }
+    },
+    {
+      "apiVersion": "2017-04-01",
+      "name": "[parameters('serviceBusName')]",
+      "type": "Microsoft.ServiceBus/Namespaces",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {},
+      "resources": [
+        {
+          "apiVersion": "2017-04-01",
+          "name": "[parameters('serviceBusQueueName')]",
+          "type": "Queues",
+          "dependsOn": [
+            "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusName'))]"
+          ],
+          "properties": {
+            "lockDuration": "PT5M",
+            "requiresDuplicateDetection": false,
+            "requiresSession": false,
+            "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+            "deadLetteringOnMessageExpiration": false,
+            "duplicateDetectionHistoryTimeWindow": "PT10M",
+            "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+            "enablePartitioning": false,
+            "enableExpress": false
+          },
+            "resources":[
+        {
+              "apiVersion": "2017-04-01",
+              "name": "[concat(parameters('serviceBusQueueName'),'.listen')]",
+              "type": "AuthorizationRules",
+              "dependsOn": [
+                "[parameters('serviceBusQueueName')]"
+              ],
+              "properties": {
+                "keyName": "[concat(parameters('serviceBusQueueName'),'.listen')]",
+                "claimType": "SharedAccessKey",
+                "claimValue": "None",
+                "rights": [ "Listen" ],
+                "revision": -1
+              }
+            }
+      ]
+        }
+      ]
     }
   ]
 }

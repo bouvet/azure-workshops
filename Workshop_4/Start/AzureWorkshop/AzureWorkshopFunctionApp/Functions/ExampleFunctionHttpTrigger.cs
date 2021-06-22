@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using System.Drawing.Imaging;
 using System.Threading.Tasks;
 
 namespace AzureWorkshopFunctionApp.Functions
@@ -28,7 +27,7 @@ namespace AzureWorkshopFunctionApp.Functions
             var blobName = req.Query["blobName"];
             
             var stream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-            var mirror = ImageService.FlipHorizontal(stream, ImageFormat.Jpeg);
+            var mirror = ImageService.FlipHorizontal(stream);
 
             await BlobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, mirror);
             

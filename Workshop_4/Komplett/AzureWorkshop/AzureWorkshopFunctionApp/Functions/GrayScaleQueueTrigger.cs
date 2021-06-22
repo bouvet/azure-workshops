@@ -1,7 +1,6 @@
 using AzureWorkshopFunctionApp.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using System.Drawing.Imaging;
 using System.Threading.Tasks;
 
 namespace AzureWorkshopFunctionApp.Functions
@@ -9,8 +8,8 @@ namespace AzureWorkshopFunctionApp.Functions
     public class GrayScaleQueueTrigger
     {
 
-        private IBlobStorageService BlobStorageService { get; set; }
-        private IImageService ImageService { get; set; }
+        private IBlobStorageService BlobStorageService { get; }
+        private IImageService ImageService { get; }
 
         public GrayScaleQueueTrigger(IImageService imageService, IBlobStorageService blobStorageService)
         {
@@ -19,8 +18,8 @@ namespace AzureWorkshopFunctionApp.Functions
         }
 
         [FunctionName("GrayScaleQueueTrigger")]
-        [return: Queue(Constants.SquareImageQueue, Connection = Constants.ConnectionString)]
-        public async Task<string> Run([QueueTrigger(Constants.GreyImageQueue, Connection = Constants.ConnectionString)] string imageName,
+        [return: Queue(Constants.SquareImageQueue)]
+        public async Task<string> Run([QueueTrigger(Constants.GreyImageQueue)] string imageName,
             ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {imageName}");
@@ -28,7 +27,7 @@ namespace AzureWorkshopFunctionApp.Functions
             var blobStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, imageName);
 
             log.LogInformation($"BlobService has connectionString");
-            var greyStream = ImageService.GreyScale(blobStream, ImageFormat.Jpeg);
+            var greyStream = ImageService.GreyScale(blobStream);
             greyStream.Position = 0;
 
             await BlobStorageService.UploadStreamToBlob(Constants.GreyImageContainer, imageName, greyStream);

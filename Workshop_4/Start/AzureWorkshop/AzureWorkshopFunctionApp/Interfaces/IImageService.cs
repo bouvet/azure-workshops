@@ -5,14 +5,19 @@ namespace AzureWorkshopFunctionApp.Interfaces
 {
     public interface IImageService
     {
-        Stream FlipHorizontal(Stream image, ImageFormat format);
+        bool SoftBlurImage { get; set; }
+        Stream FlipHorizontal(Stream image);
 
-        Stream FlipVertical(Stream image, ImageFormat format);
+        Stream FlipVertical(Stream image);
 
-        Stream RotateClockwise(Stream image, ImageFormat format);
+        Stream RotateClockwise(Stream image);
 
-        Stream RotateAntiClockwise(Stream image, ImageFormat format);
+        Stream RotateAntiClockwise(Stream image);
 
-        Stream GreyScale(Stream image, ImageFormat format);
+        Stream GreyScale(Stream image);
+
+        Stream Square(Stream image);
+
+        Stream Blur(Stream image);
     }
 }
