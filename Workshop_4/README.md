@@ -33,25 +33,48 @@ Hvis alt har gått bra skal du ha fått en liste over subscriptions du har tilga
 1. Hvis alt gikk gjennom så skal du få en json output med ressursene som ble laget. Dersom det ikke er tilfellet legg til `--debug` flagget i kommandoen. Om du da finleser output fra kommandoen, så finner du trolig ut at et av ressursnavnene ikke er unikt
 1. Gå gjerne til portalen og sjekk at ressursene ligger i ressurs gruppen din
 
-### Oppgaven
 
-`AzureWorkshopApp` er en bildeapp som lar deg se bilder og laste opp bilder. Oppgaven din er å lage nye Functions som manipulerer bildene ved hjelp av ulike Function triggers. Eksempel når brukeren trykker på en knapp eller etter et nytt bilde er lastet opp. Her er målet å bli kjent med ulike Function triggers, og hvordan man faktisk implementer de.  
-
-Ønsket sluttresultat er:
-* En `http trigger` Function
-* En `blob trigger` Function
-* En `queue trigger` Function
-* En `output queue binding` (dette legges i en av de andre functionene)
-
-Tilleggsfunksjonalitet man kan prøve seg på:
-* En `timer trigger` Function
-* Ha `queue trigger` med queue binding output som trigger en ny Function
-* `Service Bus trigger` (dette må settes opp selv)
-* Andre triggers du vil eksperimentere med
-
-Det anbefales å deploye ofte til Azure for å teste at alt fungerer som det skal.
 
 ### Komme i gang
+
+For å komme i gang anbefaler vi at du deployer både Web Appen og Function Appen. Disse skal da fungere, men ikke gjøre noe mer enn de gjorde etter Workshop 1 (dvs du kan laste opp bilder og se de).
+
+
+#### Deploy av AzureWorkshopApp
+
+1. Åpne en terminal/powershell
+1. Naviger til `Start/AzureWorkshop/AzureWorkshopApp` mappen
+1. Kjør kommandoen `dotnet publish -c Release`
+   - Dette lager en release av koden
+1. Zip filene i mappen `./bin/Release/netcoreapp3.1/publish/` 
+   - Powershell `Compress-Archive -Path .\bin\Release\netcoreapp3.1\publish\* -DestinationPath .\code.zip` (legg til -Force for å overskrive)
+   - Terminal (Linux/Mac) `zip -r code.zip ./bin/Release/netcoreapp3.1/publish/*`
+1. Deploy ved å kjøre `az functionapp deployment source config-zip -g {YourResourceGroup} -n {YourAppServiceName} --src code.zip` 
+1. Hvis du får tilbake `Deployment endpoint responded with status code 202` så er applikasjonen lastet opp og klar til å testes
+
+#### Deploy av FunctionApp
+
+1. Åpne en terminal/powershell
+1. Naviger til `Start/AzureWorkshop/AzureWorkshopFunctionApp` mappen
+1. Kjør kommandoen `dotnet publish -c Release`
+   - Dette lager en release av koden
+1. Zip filene i mappen `./bin/Release/netcoreapp3.1/publish/` 
+   - Powershell `Compress-Archive -Path .\bin\Release\netcoreapp3.1\publish\* -DestinationPath .\code.zip` (legg til -Force for å overskrive)
+   - Terminal (Linux/Mac) `zip -r code.zip ./bin/Release/netcoreapp3.1/publish/*`
+1. Deploy ved å kjøre `az functionapp deployment source config-zip -g {YourResourceGroup} -n {YourAppServiceName} --src code.zip` 
+1. Hvis du får tilbake `Deployment endpoint responded with status code 202` så er applikasjonen lastet opp og klar til å testes
+
+`ExampleFunctionHttpTrigger` er satt opp for å kunne teste og validere at Function Appen din er oppe og går. Dette er et http endepunkt som krever en query parameter. Hvis du vil teste så gå til test siden i portalen:
+1. Åpne [portalen](portal.azure.com)
+1. Gå til Function Appen din
+1. Klikk på Functions på venstre side
+1. Velg ExampleFunctionHttpTrigger
+1. Klikk på Code + Test på venstre side
+1. Klikk på Test/Run over json filen
+1. Legg til en Query parameter med navn "blobName" og verdi lik navnet på et bildet du har lastet opp
+   - Hvis bloben ikke eksisterer så får du en feilmelding i loggen. Last opp et bilde gjennom Web Appen og prøv så på nytt
+
+#### Endre på koden
 
 1. Åpne `AzureWorkshopApp` i VS Code eller Visual Studio. De fleste endringene skal gjøres i `AzureWorkshopFunctionApp`, men et par småting må fikses i `AzureWorkshopApp`.
 1. Åpne `ExampleFunctionHttpTrigger.cs`, denne filen gir deg et eksempel på hvordan en Function ser ut og hvordan en trigger brukes. 
@@ -60,8 +83,6 @@ Oppgaven din er å lage nye functions som gjør endringer på bilder som sendes 
 Endringene som må gjøres i `AzureWorkshopApp` er å 
 1. Kommentere inn knappene i `Views/Home/Index.cshtml`. Bildene som vises i frontend hentes fra en Blob container i en Storage account. Knappene gjør at man kan bytte Blob container source. 
 1. I `ImagesController.cs` kan man kommentere inn en kodelinje som legger en melding med filnavn på en kø. Hvis man vil sende JSON objekter så er det også mulig. 
-
-Andre ting man kan gjøre er å kalle en HttpTrigger Function via en HttpClient, her er det egentlig bare å passe på at man har nok kall mot functions man lager.
 
 ### Litt om Function App koden
 * `Constants.cs` har konstanter som representerer containere i Storage Accounten. Her er det bare å legge til nye hvis man har lyst til å ha andre containere
@@ -105,8 +126,29 @@ Eksempel `local.settings.json` med lokal Development Storage Account (en virtuel
 }
 ```
 
+### Oppgaven
+
+
+`AzureWorkshopApp` er en bildeapp som lar deg se bilder og laste opp bilder. Oppgaven din er å lage nye Functions som manipulerer bildene ved hjelp av ulike Function triggers. Eksempel når brukeren trykker på en knapp eller etter et nytt bilde er lastet opp. Her er målet å bli kjent med ulike Function triggers, og hvordan man faktisk implementer de.  
+
+Ønsket sluttresultat er:
+* En `http trigger` Function (denne er laget for deg)
+* En `blob trigger` Function som kutter bildet til kvadrater (ImageService.Square)
+* En `output queue binding` i blob trigger Functionen 
+* En `queue trigger` Function som gjør bildet grått (ImageService.GreyScale) trigget via blob trigger output binding
+
+Tilleggsfunksjonalitet man kan prøve seg på:
+* En `timer trigger` Function
+* Ha to `queue trigger` Functions hvor en har output binding til neste queue trigger function
+* En `Service Bus trigger` Function
+* Andre triggers du vil eksperimentere med
+
+Det anbefales å deploye ofte til Azure for å teste at alt fungerer som det skal.
+
+![Architecture](./workshop4.png)
+
 ### Deploy kode til Azure
-Det er opp til deg hvordan du velger å deploye. Du kan godt bruke Visual Studio eller VS Code. For å gjøre det med Azure CLI kan du gjøre følgende
+Når du har oppdatert koden din og ønsker å deploye på nytt så kan du godt bruke Visual Studio eller VS Code, men hvis du vil gjøre det med Azure CLI, slik du gjorde det ved første deploy, så gjør du følgende:  
 1. Åpne en terminal/powershell
 1. Naviger til `Start/AzureWorkshop` mappen
 1. Gå til `AzureWorkshopApp` eller `AzureWorkshopFunctionApp` (ettersom hva du vil deploye)
