@@ -2,9 +2,9 @@
 
 ## Function App
 
-I `Start` mappen finner du en påbegynt Function App under `Start/AzureWorkshop/AzureWorkshopApp`, med tilhørende infrastruktur definert i `start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur`. Denne Function Appen er ufullstendig og oppgaven din er å utvide den. Før vi går i gang så må vi sette opp litt ressurser i Azure. Forklaringene kommer kun til å vise Azure CLI måten man deployer på. Om du heller vil bruke portalen og Visual Studio så er dette også greit.
+I `Start` mappen finner du en påbegynt Function App under `Start/AzureWorkshop/AzureWorkshopApp`, med tilhørende infrastruktur definert i `start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur`. Denne Function Appen er ufullstendig og oppgaven din er å utvide den. Før vi går i gang så må vi sette opp litt ressurser i Azure. Forklaringene kommer kun til å vise hvordan man deployer via Azure CLI. Om du heller vil bruke portalen og Visual Studio så er dette også greit.
 
-Det er lurt å Lese hele README før du går i gang med å kode. Det kommer en del viktige tips og workshoppen er ganske åpen. Etter du har lest kjapt i gjennom står du fritt til å lage din egen plan for å komme i mål!  
+Det er lurt å lese hele README før du går i gang med å kode. Det kommer en del viktige tips og workshoppen er ganske åpen. Etter du har lest kjapt i gjennom står du fritt til å lage din egen plan for å komme i mål!  
 
 
 ### Anbefalte verktøy
@@ -94,12 +94,13 @@ Endringene som må gjøres i `AzureWorkshopApp` er å
 
 **Legge til functions manuelt** 
 
-I koden finnes det en Function template som heter `TemplateQueueTrigger.cs`. Den kan man bruke til å lage andre functions som BlobTrigger, TimerTrigger og lignende. 
+I koden finnes det en Function template som heter `TemplateQueueTrigger.cs`. Den kan man bruke til å lage andre functions som BlobTrigger, TimerTrigger og lignende. Lag en ny cs fil og kopier over, endre så navnet på klassen og i FunctionName til å matche filnavn. 
 
 **Legge til functions med Visual Studio**
 
 * Høyreklikk på Functions mappen
 * Trykk `Add > New Azure Function`
+* Legg inn dependency injection selv (se `TemplateQueueTrigger.cs`)
 
 **Legge til functions med VS code**
 
@@ -111,11 +112,11 @@ I koden finnes det en Function template som heter `TemplateQueueTrigger.cs`. Den
 * Trykk på denne og initialiser den om det trengs, slik at `ExampleFunctionHttpTrigger` dukker opp under `Functions` mappen i tabben
 * Legg til nye functions ved å trykke på lynikonet som er til høyre i tabheaderen
 * Velg trigger type og navn
-* Husk å legge til `IImageService` og `IBlobStorageService` i Function konstruktøren om du trenger det 
+* Legg inn dependency injection selv (se `TemplateQueueTrigger.cs`)
 
 Man kan opprette en `local.settings.json` fil og legge settings inn i den for å teste functions lokalt. For å kjøre det lokalt må AzureWebJobsStorage være satt (helst til en reell Storage Account ConnectionString)
 
-Eksempel `local.settings.json` med lokal Development Storage Account (en virtuell Storage Account)
+Eksempel `local.settings.json` med lokal Development Storage Account (en virtuell Storage Account). Bytt ut AzureWebJobsStorage med en reell Storage Account ConnectionString for å bruke Azure Storage Account.
 ```json
 {
   "IsEncrypted": false,
@@ -129,7 +130,7 @@ Eksempel `local.settings.json` med lokal Development Storage Account (en virtuel
 ### Oppgaven
 
 
-`AzureWorkshopApp` er en bildeapp som lar deg se bilder og laste opp bilder. Oppgaven din er å lage nye Functions som manipulerer bildene ved hjelp av ulike Function triggers. Eksempel når brukeren trykker på en knapp eller etter et nytt bilde er lastet opp. Her er målet å bli kjent med ulike Function triggers, og hvordan man faktisk implementer de.  
+`AzureWorkshopApp` er en bildeapp som lar deg se bilder og laste opp bilder. Oppgaven din er å lage nye Functions som manipulerer bildene ved hjelp av ulike Function triggers. Eksempel når brukeren trykker på en knapp, eller etter et nytt bilde er lastet opp. Her er målet å bli kjent med ulike Function triggers, og hvordan man faktisk implementer de.  
 
 Ønsket sluttresultat er:
 * En `http trigger` Function (denne er laget for deg)
