@@ -6,7 +6,7 @@
 * [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 * [dotnet](https://dotnet.microsoft.com/download) (dotnet core 3.1 eller .NET 5)
 * Text editor (f.eks. VS Code eller Visual Studio)
-* Tilgang til Azureskolen subscription (sjekk [her](portal.azure.com))
+* Tilgang til Azureskolen subscription (sjekk [her](https://portal.azure.com))
 
 #### Kjekt å ha
 * [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
@@ -40,10 +40,14 @@
 1. Klikk på Test/Run over json filen
 1. Legg til en Query parameter med navn "blobName" og verdi lik navnet på et bildet du har lastet opp
    * Hvis bloben ikke eksisterer så får du en feilmelding i loggen. Last opp et bilde gjennom Web Appen og prøv så på nytt
+1. Gå til Storage Account
+1. Åpne container imagecontainer-mirror
+1. Se at bildet har blitt lagt til der
+
 
 ## Function App
 
-I `Start` mappen finner du en påbegynt Function App under `Start/AzureWorkshop/AzureWorkshopApp`, med tilhørende infrastruktur definert i `start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur`. Denne Function Appen er ufullstendig og oppgaven din er å utvide den. Hvis du ønsker å deploye manuelt gå til [ManuellDeploy.md](./Start/ManuellDeploy.md)
+I `Start` mappen finner du en påbegynt Function App under `Start/AzureWorkshop/AzureWorkshopApp`, med tilhørende infrastruktur definert i `start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur`. Denne Function Appen er ufullstendig og oppgaven din er å utvide den. Hvis du ønsker å deploye manuelt gå til [ManuellDeploy.md](Start/ManuellDeploy.md)
 
 Det er lurt å lese hele README før du går i gang med å kode. Det kommer en del viktige tips og workshoppen er ganske åpen. Etter du har lest kjapt i gjennom står du fritt til å lage din egen plan for å komme i mål!  
 
