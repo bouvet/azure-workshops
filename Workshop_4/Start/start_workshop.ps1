@@ -59,6 +59,7 @@ function Run_AzureInfra
 {
     param([String]$rg)
 
+    Write-Host "Sette opp infrastruktur"
     az login
 
     $basePath = "./AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur/"
@@ -83,43 +84,49 @@ function Run_AzureInfra
         return 
     }
     else{
-        Write-Host $output
+        Write-Host ($output | convertto-json -depth 10)
+        Write-Host "Sette opp infrastruktur: completed"
     }
+
 }
 
 function Deploy_WebApp{
     param([String]$wa, [String]$rg)
 
+    Write-Host "Deploy av WebApp"
     write-host $wa
     write-host $rg
 
     cd ./AzureWorkshop/AzureWorkshopApp
     dotnet publish -c Release 
-    Compress-Archive -Path .\bin\Release\netcoreapp3.1\publish\* -DestinationPath .\code.zip -Force
+    Compress-Archive -Path ./bin/Release/netcoreapp3.1/publish/* -DestinationPath ./code.zip -Force
 
     az functionapp deployment source config-zip -g $rg -n $wa --src code.zip
 
     cd ../..
+    Write-Host "Deploy av WebApp: completed"
 }
 
 function Deploy_FunctionApp{
     param([String]$fa, [String]$rg)
 
+    Write-Host "Deploy av FunctionApp"
     write-host $fa
     write-host $rg
 
     cd ./AzureWorkshop/AzureWorkshopFunctionApp
     dotnet publish -c Release 
-    Compress-Archive -Path .\bin\Release\netcoreapp3.1\publish\* -DestinationPath .\code.zip -Force
+    Compress-Archive -Path ./bin/Release/netcoreapp3.1/publish/* -DestinationPath ./code.zip -Force
 
     az functionapp deployment source config-zip -g $rg -n $fa --src code.zip
     
     cd ../..
+    Write-Host "Deploy av FunctionApp: completed"
 }
 
 function Start_Workshop{
-    #$name = Read-host "Vennligst oppgi ditt navn"
-    $name = "Petter Abrahamsen"
+    $name = Read-host "Vennligst oppgi ditt navn"
+
     $name = $name.Replace(' ','').ToLower()
     $maxLength = 20
 
