@@ -1,70 +1,37 @@
 # Workshop: Serverless 
 
-## Function App
-
-I `Start` mappen finner du en påbegynt Function App under `Start/AzureWorkshop/AzureWorkshopApp`, med tilhørende infrastruktur definert i `start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur`. Denne Function Appen er ufullstendig og oppgaven din er å utvide den. Før vi går i gang så må vi sette opp litt ressurser i Azure. Forklaringene kommer kun til å vise hvordan man deployer via Azure CLI. Om du heller vil bruke portalen og Visual Studio så er dette også greit.
-
-Det er lurt å lese hele README før du går i gang med å kode. Det kommer en del viktige tips og workshoppen er ganske åpen. Etter du har lest kjapt i gjennom står du fritt til å lage din egen plan for å komme i mål!  
-
-
-### Anbefalte verktøy
-
+## Verktøy
+#### Disse må du ha
+* [Powershell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.1) 
 * [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-* Visual studio eller VS code
+* [dotnet](https://dotnet.microsoft.com/download) (dotnet core 3.1 eller .NET 5)
+* Text editor (f.eks. VS Code eller Visual Studio)
+* Tilgang til Azureskolen subscription (sjekk [her](portal.azure.com))
+
+#### Kjekt å ha
 * [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
 
-### Deploy infrastruktur til Azure 
 
-1. Last ned [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) og installer. 
-1. Åpne en terminal/powershell og sjekk at Azure CLI fungerer ved å logge inn med kommandoen `az login` og følg stegene deretter (åpner som oftest en nettleser med Microsoft pålogging).
+## Kom i gang
+Åpne powershell og naviger til Workshop_4/Start. Her finner du et powershell script som heter start_workshop.ps1. Vi skal kjøre dette scriptet og det setter opp infrastruktur og deployer koden som ligger i Start folderen. I Powershell gjør du følgende
+* `cd azure-workshops/Workshop_4/Start` 
+* `./start_workshop.ps1`
+* Skriv inn navnet ditt og trykk enter
+* Logg inn på bouvet brukeren din når nettleseren åpner
+* Gå til portalen når scriptet er ferdig
+  * Sjekk at din ressursgruppe eksisterer
+  * Ved å skrive inn `$Env:Rg` vil ressursgruppen bli vist
 
-Hvis alt har gått bra skal du ha fått en liste over subscriptions du har tilgang til. Videre steg for å deploye infrastruktur til Azure
+## Test at koden er oppe og går
+#### Test App Servicen 
+1. Åpne [portalen](portal.azure.com)
+1. Gå til App Servicen din
+1. Klikk på urlen i oversikten
+1. Last opp et bilde til applikasjonen
+1. Vent litt og se at et bilde dukker opp
 
-1. Velg Azureskolen subscription `az account set --subscription "Azureskolen"`
-   - Hvis du ikke har Azureskolen subscription tilgjengelig, be om tilgang eller bruk et annet subscription du har tilgjengelig
-1. Lag så en Resource Group ved å kjøre kommandoen `az group create --location westeurope --name {YourResourceGroup}`
-   - Bytt ut `YourResourceGroup` med et navn på din ressursgruppe
-1. Naviger til `Start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur` mappen
-   - Her finner du `azuredeploy.json `og `azuredeploy.parameters.json`
-1. Åpne `azuredeploy.parameters.json` i en tekst editor
-1. Legg inn verdier for parameterne som ikke er satt (husk å lagre og at Azure ofte krever unike ressursnavn)
-1. Kjør så kommandoen `az deployment group create --name {ExampleDeployment} --resource-group {YourResourceGroup} --template-file .\azuredeploy.json --parameters '@azuredeploy.parameters.json'  `
-   - Bytt ut `ExampleDeployment` og `YourResourceGroup` med et navn på deploymenten (f.eks. infrastrukturDeployment) og resource groupen du lagde ovenfor 
-1. Hvis alt gikk gjennom så skal du få en json output med ressursene som ble laget. Dersom det ikke er tilfellet legg til `--debug` flagget i kommandoen. Om du da finleser output fra kommandoen, så finner du trolig ut at et av ressursnavnene ikke er unikt
-1. Gå gjerne til portalen og sjekk at ressursene ligger i ressurs gruppen din
-
-
-
-### Komme i gang
-
-For å komme i gang anbefaler vi at du deployer både Web Appen og Function Appen. Disse skal da fungere, men ikke gjøre noe mer enn de gjorde etter Workshop 1 (dvs du kan laste opp bilder og se de).
-
-
-#### Deploy av AzureWorkshopApp
-
-1. Åpne en terminal/powershell
-1. Naviger til `Start/AzureWorkshop/AzureWorkshopApp` mappen
-1. Kjør kommandoen `dotnet publish -c Release`
-   - Dette lager en release av koden
-1. Zip filene i mappen `./bin/Release/netcoreapp3.1/publish/` 
-   - Powershell `Compress-Archive -Path .\bin\Release\netcoreapp3.1\publish\* -DestinationPath .\code.zip` (legg til -Force for å overskrive)
-   - Terminal (Linux/Mac) `zip -r code.zip ./bin/Release/netcoreapp3.1/publish/*`
-1. Deploy ved å kjøre `az functionapp deployment source config-zip -g {YourResourceGroup} -n {YourAppServiceName} --src code.zip` 
-1. Hvis du får tilbake `Deployment endpoint responded with status code 202` så er applikasjonen lastet opp og klar til å testes
-
-#### Deploy av FunctionApp
-
-1. Åpne en terminal/powershell
-1. Naviger til `Start/AzureWorkshop/AzureWorkshopFunctionApp` mappen
-1. Kjør kommandoen `dotnet publish -c Release`
-   - Dette lager en release av koden
-1. Zip filene i mappen `./bin/Release/netcoreapp3.1/publish/` 
-   - Powershell `Compress-Archive -Path .\bin\Release\netcoreapp3.1\publish\* -DestinationPath .\code.zip` (legg til -Force for å overskrive)
-   - Terminal (Linux/Mac) `zip -r code.zip ./bin/Release/netcoreapp3.1/publish/*`
-1. Deploy ved å kjøre `az functionapp deployment source config-zip -g {YourResourceGroup} -n {YourAppServiceName} --src code.zip` 
-1. Hvis du får tilbake `Deployment endpoint responded with status code 202` så er applikasjonen lastet opp og klar til å testes
-
-`ExampleFunctionHttpTrigger` er satt opp for å kunne teste og validere at Function Appen din er oppe og går. Dette er et http endepunkt som krever en query parameter. Hvis du vil teste så gå til test siden i portalen:
+#### Test Function Appen
+`ExampleFunctionHttpTrigger` er satt opp for å kunne teste og validere at Function Appen din er oppe og går. Dette er et http endepunkt som krever en query parameter. For å teste denne:
 1. Åpne [portalen](portal.azure.com)
 1. Gå til Function Appen din
 1. Klikk på Functions på venstre side
@@ -72,7 +39,13 @@ For å komme i gang anbefaler vi at du deployer både Web Appen og Function Appe
 1. Klikk på Code + Test på venstre side
 1. Klikk på Test/Run over json filen
 1. Legg til en Query parameter med navn "blobName" og verdi lik navnet på et bildet du har lastet opp
-   - Hvis bloben ikke eksisterer så får du en feilmelding i loggen. Last opp et bilde gjennom Web Appen og prøv så på nytt
+   * Hvis bloben ikke eksisterer så får du en feilmelding i loggen. Last opp et bilde gjennom Web Appen og prøv så på nytt
+
+## Function App
+
+I `Start` mappen finner du en påbegynt Function App under `Start/AzureWorkshop/AzureWorkshopApp`, med tilhørende infrastruktur definert i `start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur`. Denne Function Appen er ufullstendig og oppgaven din er å utvide den. Hvis du ønsker å deploye manuelt gå til [ManuellDeploy.md](./Start/ManuellDeploy.md)
+
+Det er lurt å lese hele README før du går i gang med å kode. Det kommer en del viktige tips og workshoppen er ganske åpen. Etter du har lest kjapt i gjennom står du fritt til å lage din egen plan for å komme i mål!  
 
 #### Endre på koden
 
@@ -148,19 +121,17 @@ Det anbefales å deploye ofte til Azure for å teste at alt fungerer som det ska
 
 ![Architecture](./workshop4.png)
 
-### Deploy kode til Azure
-Når du har oppdatert koden din og ønsker å deploye på nytt så kan du godt bruke Visual Studio eller VS Code, men hvis du vil gjøre det med Azure CLI, slik du gjorde det ved første deploy, så gjør du følgende:  
+#### Deploy av AzureWorkshopApp
+
+1. Åpne en Powershell
+1. Naviger til `Start/AzureWorkshop/AzureWorkshopApp` mappen
+1. Kjør scriptet `./DeployApp.ps1`
+
+#### Deploy av FunctionApp
+
 1. Åpne en terminal/powershell
-1. Naviger til `Start/AzureWorkshop` mappen
-1. Gå til `AzureWorkshopApp` eller `AzureWorkshopFunctionApp` (ettersom hva du vil deploye)
-1. Kjør kommandoen `dotnet publish -c Release`
-   - Dette lager en release av koden
-1. Zip filene i mappen `./bin/Release/netcoreapp3.1/publish/` 
-   - Powershell `Compress-Archive -Path .\bin\Release\netcoreapp3.1\publish\* -DestinationPath .\code.zip` (legg til -Force for å overskrive)
-   - Terminal (Linux/Mac) `zip -r code.zip ./bin/Release/netcoreapp3.1/publish/*`
-1. Deploy ved å kjøre `az functionapp deployment source config-zip -g {YourResourceGroup} -n {YourAppServiceName} --src code.zip` 
-   - Denne kommandoen fungerer for både Function App og App Service
-1. Hvis du får tilbake `Deployment endpoint responded with status code 202` så er applikasjonen lastet opp og klar til å testes
+1. Naviger til `Start/AzureWorkshop/AzureWorkshopFunctionApp` mappen
+1. Kjør scriptet `./DeployFunction.ps1`
 
 
 ### Står du fast?
