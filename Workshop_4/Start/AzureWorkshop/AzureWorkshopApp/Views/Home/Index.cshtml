@@ -104,22 +104,24 @@
 
 <main>
     <div class="box header">
-        <h1><span class="fa fa-user-circle-o"></span> <span id="page-title">Blob storage</span></h1>
+        <h1><span class="fa fa-user-circle-o"></span> <span id="page-title">Bildebanken</span></h1>
     </div>
 
     <aside id="ip-address">IP: @ViewData["IpAddress"]</aside>
 
     <div class="box content">
         <hr>
-        <!-- <button onclick="changeContainer('imagecontainer');">Normal</button>
-     <button onclick="changeContainer('imagecontainer-grey');">GreyScale</button>
-     <button onclick="changeContainer('imagecontainer-mirror');">Mirror</button>
-     <button onclick="changeContainer('imagecontainer-flipped');">Flipped</button>
-     <button onclick="changeContainer('imagecontainer-clockwise');">Clockwise</button>
-     <button onclick="changeContainer('imagecontainer-anticlockwise');">Anti clockwise</button>
-     <button onclick="changeContainer('imagecontainer-square');">Square</button>
-     <button onclick="changeContainer('imagecontainer-blur');">Blur</button>
-        -->
+        <span>Bytt mellom bildevisning under</span><br>
+        <button onclick="changeContainer('imagecontainer');">Normal</button>
+        <button onclick="changeContainer('imagecontainer-grey');">GreyScale</button>
+        <button onclick="changeContainer('imagecontainer-mirror');">Mirror</button>
+        <button onclick="changeContainer('imagecontainer-flipped');">Flipped</button>
+        <button onclick="changeContainer('imagecontainer-clockwise');">Clockwise</button>
+        <button onclick="changeContainer('imagecontainer-anticlockwise');">Anti clockwise</button>
+        <button onclick="changeContainer('imagecontainer-square');">Square</button>
+        <button onclick="changeContainer('imagecontainer-blur');">Blur</button>
+        <br/><span id="currentContainer"></span>
+
         <div class="form-wrapper">
             <form action="/api/images/upload"
                   class="dropzone needsclick dz-clickable"
@@ -152,8 +154,10 @@
             var divContainer = document.getElementById("stored-images");
             divContainer.innerHTML = "";
             fetchImageLinks();
+            document.getElementById("currentContainer").innerText="Container: "+currentContainer
         }
     }
+
     function fetchImageLinks() {
         $.get("api/Images?container=" + currentContainer, function (fetchedImageLinks) {
             if (_.isEmpty(fetchedImageLinks)) {
@@ -214,4 +218,5 @@
             });
         }
     };
+    changeContainer('imagecontainer');
 </script>
