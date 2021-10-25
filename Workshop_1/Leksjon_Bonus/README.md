@@ -25,9 +25,10 @@ Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal o
     | `AzureStorageConfig--AccountName` | `Verdien som står i AccountName fra appsettings.json` |
     
 10.  Lag en nøkkel for Storage Account Key opprettet i forrige leksjon. Den skal ha følgende verdier:
-    | Name | Value (secret) |
-    |--------------------------------|----------------------------------------------------|
-    | `AzureStorageConfig--AccountKey` | `Verdien som står i AccountKey fra appsettings.json` |
+    
+| Name | Value (secret) |
+|-------------------------------- | ----------------------------------------------------|
+| `AzureStorageConfig--AccountKey` | `Verdien som står i AccountKey fra appsettings.json` |
 
 
 ### Bruk key vault
