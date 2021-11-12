@@ -22,4 +22,6 @@ Til nå er disse modulene planlagt.
   * SAS-tokens i Azure Storage
   * Introduksjon til infrastruktur-sikkerhet
 
-* Workshop #4: TBD
+* Workshop #4: Serverless
+  * Function App
+  * Logic App
