@@ -36,14 +36,14 @@ I denne øvelsen skal du deploye start-versjonen av web-applikasjonen. Dette er 
 2. Bygg prosjektet. 
 3. Høyreklikk på prosjektet og velg "Publish". Logg så inn med Microsoft-kontoen som er tilknyttet Azure-abonnementet ditt.
 4. Sett opp publishing profilen slik at den deployer til den web-applikasjonen du satte opp tidligere. Deploy.
-5. Se at <appservicenavn>.azurewebsites.net serverer applikasjonen.
+5. Se at &lt;appservicenavn&gt;.azurewebsites.net serverer applikasjonen.
 6. Legg merke til at IP-adressen oppe til høyre ikke endres, selv om du trykker F5 flere ganger i nettleseren.
 
 ## Test av skalering 
 
 I denne øvelsen skal du teste å skalere opp (kraftigere App Service Plan/"VM") og skalere ut (flere instanser av App Service Plan/"VM") Web-applikasjonen din for å kunne takle mer last, samt ha redundans med flere servere.
 
-1. Gå til <appservicenavn>.azurewebsites.net og merk deg IP-adressen i høyre hjørne.
+1. Gå til &lt;appservicenavn&gt;.azurewebsites.net og merk deg IP-adressen i høyre hjørne.
 2. Gå til din "App Service Plan" i portalen som du lagde i forrige oppgave.
 3. Gå til til valget "Scale up", endre denne til en plan i "Standard tier". Man kan kun skalere opp med flere instanser ved å bruke Standard eller Premium tier. Disse koster mer enn Free/Shared/Basic tier.
 4. Dersom du refresher applikasjonen, samtidig som du ser på IP-adressen i høyre hjørne, så vil du se at den endrer seg én gang. Dette fordi applikasjonen er flyttet til en større App Service Plan/"VM" og fått en ny IP-adresse.

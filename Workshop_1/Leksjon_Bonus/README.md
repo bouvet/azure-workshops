@@ -18,17 +18,17 @@ Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal o
 6. For å lage en key vault så kjøres kommandoen >az keyvault create --resource-group "{resource group name}" --location norwayeast --name "{keyvaultname}"
 7. Gå til <a href="https://portal.azure.com/">Azure Portalen</a>, og finn din nylige opprettede Azure Key Vault.
 8. Gå til Settings -> Secrets og klikk Generate/Import
-9. Lag en nøkkel for Storage account name opprettet i forrige leksjon. Den skal ha følgende verdier:
+9. Lag en nøkkel for Storage Account Name opprettet i forrige leksjon. Den skal ha følgende verdier:
 
-    | Name                              | Value (secret)                                        |
-    | --------------------------------- | ----------------------------------------------------- |
+    | Name | Value (secret) |
+    |---------------------------------|-----------------------------------------------------|
     | `AzureStorageConfig--AccountName` | `Verdien som står i AccountName fra appsettings.json` |
     
 10.  Lag en nøkkel for Storage Account Key opprettet i forrige leksjon. Den skal ha følgende verdier:
-
-    | Name                             | Value (secret)                                       |
-    | -------------------------------- | ---------------------------------------------------- |
-    | `AzureStorageConfig--AccountKey` | `Verdien som står i AccountKey fra appsettings.json` |
+    
+| Name | Value (secret) |
+|-------------------------------- | ----------------------------------------------------|
+| `AzureStorageConfig--AccountKey` | `Verdien som står i AccountKey fra appsettings.json` |
 
 
 ### Bruk key vault
@@ -40,7 +40,7 @@ Start med å gå til appsettings.json og slett verdien i AccountName og AccountK
   "AzureStorageConfig": {
     "AccountName": "",
     "AccountKey": "",
-    "ImageContainer": "Navnet på din image container"
+    "ImageContainer": "Navnet på din image container" (default er imagecontainer)
   }
 ```
 
