@@ -112,15 +112,15 @@
     <div class="box content">
         <hr>
         <span>Bytt mellom bildevisning under</span><br>
-        <button onclick="changeContainer('imagecontainer');">Normal</button>
-        <button onclick="changeContainer('imagecontainer-grey');">GreyScale</button>
-        <button onclick="changeContainer('imagecontainer-mirror');">Mirror</button>
-        <button onclick="changeContainer('imagecontainer-flipped');">Flipped</button>
-        <button onclick="changeContainer('imagecontainer-clockwise');">Clockwise</button>
-        <button onclick="changeContainer('imagecontainer-anticlockwise');">Anti clockwise</button>
-        <button onclick="changeContainer('imagecontainer-square');">Square</button>
-        <button onclick="changeContainer('imagecontainer-blur');">Blur</button>
-        <br/><span id="currentContainer"></span>
+        <button onclick="changeContainer('imagecontainer', 'Normal');">Normal</button>
+        <button onclick="changeContainer('imagecontainer-grey', 'GreyScale');">GreyScale</button>
+        <button onclick="changeContainer('imagecontainer-mirror', 'Mirror');">Mirror</button>
+        <button onclick="changeContainer('imagecontainer-flipped', 'Flipped');">Flipped</button>
+        <button onclick="changeContainer('imagecontainer-clockwise', 'Clockwise');">Clockwise</button>
+        <button onclick="changeContainer('imagecontainer-anticlockwise', 'Anit clockwise');">Anti clockwise</button>
+        <button onclick="changeContainer('imagecontainer-square', 'Square');">Square</button>
+        <button onclick="changeContainer('imagecontainer-blur', 'Blur');">Blur</button><br/>
+        <span id="currentContainer">Container: Normal</span><br/>
 
         <div class="form-wrapper">
             <form action="/api/images/upload"
@@ -147,14 +147,14 @@
         "imagecontainer-flipped", "imagecontainer-grey", "imagecontainer-mirror", "imagecontainer-square", "imagecontainer-blur"];
     var currentContainer = containers[0];
 
-    function changeContainer(container) {
+    function changeContainer(container, containername) {
         if (containers.includes(container)) {
             currentContainer = container;
             gallery = [];
             var divContainer = document.getElementById("stored-images");
             divContainer.innerHTML = "";
             fetchImageLinks();
-            document.getElementById("currentContainer").innerText="Container: "+currentContainer
+            document.getElementById("currentContainer").innerText="Container: "+containername
         }
     }
 

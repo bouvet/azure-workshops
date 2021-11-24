@@ -41,7 +41,7 @@ namespace AzureWorkshopApp.Controllers
                                 //Send message on queue
                                 //Make sure to match up the queueName with a trigger and the message body with how
                                 //your function reads the message. E.g.:
-                                //await _queueService.SendQueueMessage("imagequeue", formFile.FileName);
+                                await _queueService.SendQueueMessage("greyimage", formFile.FileName);
                                 return new AcceptedResult();
                             }
                         }

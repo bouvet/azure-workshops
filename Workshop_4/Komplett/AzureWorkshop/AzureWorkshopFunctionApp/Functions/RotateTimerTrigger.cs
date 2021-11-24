@@ -16,7 +16,7 @@ namespace AzureWorkshopFunctionApp.Functions
         }
 
         [FunctionName("RotateTimerTrigger")]
-        public async Task Run([TimerTrigger("0 */10 * * * *")]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 */2 * * * *")]TimerInfo myTimer, ILogger log)
         {
             var blobNames = await BlobStorageService.GetFileNamesInContainer(Constants.ImageContainer);
             foreach(var blobName in blobNames)
