@@ -305,3 +305,4 @@ __pycache__/
 
 # OpenCover UI analysis results
 OpenCover/
+/Workshop_1/Start/AzureWorkshop/AzureWorkshopApp/Properties/ServiceDependencies/pfp-as-w1-web - Web Deploy/profile.arm.json

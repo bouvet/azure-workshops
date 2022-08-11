@@ -23,13 +23,14 @@ namespace AzureWorkshopApp.Services
         }
 
         public async Task<bool> UploadFileToStorage(Stream fileStream, string fileName)
-        {
-            throw new NotImplementedException();
+        {                        
+            return await Task.FromException<bool>(new NotImplementedException());            
         }
 
         public async Task<List<string>> GetImageUrls()
         {
-            throw new NotImplementedException();
+            return await Task.FromException<List<string>>(new NotImplementedException());            
         }
+
     }
 }
