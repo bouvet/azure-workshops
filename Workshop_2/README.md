@@ -9,10 +9,10 @@ Forutsetninger for å gjennomføre workshop:
 * En Azure DevOps konto. 
   * Denne kan opprettes her: https://azure.microsoft.com/en-us/services/devops/
   * Er gratis opp til 5 brukere.
-* Installere Visual Studio 2017 for Windows, eller Visual Studio for Mac. 
+* Installere Visual Studio 202022 for Windows, eller Visual Studio for Mac. 
   * Hvis du ikke har lisens, velg Community.
   * Hvis du har lisens, velg Professional eller Enterprise.
-  * Hvis du allerede har Visual Studio 2017 installert, husk å oppdater til siste versjon.
+  * Hvis du allerede har Visual Studio 2022 installert, husk å oppdater til siste versjon.
 * En git-klient for å sjekke ut kode i github.
   * Windows: https://git-scm.com/download/win
   * Mac: https://git-scm.com/download/mac
