@@ -37,7 +37,7 @@ Lag et nytt privat prosjekt med Git som version controll og Agile som work item 
 >- **Repos:** Det er her versjonskontroll repoene dine befinner seg. Herfra kan du få en oversikt over slike ting som filer, brancher og pull requests. 
 >- **Pipelines:** Herfra kan du se, og konfigurere build og release pipelinene dine. Du kan lett få en oversikt over hvilke pipelines som gikk bra, hvilke som ikke gikk bra og hvorfor. 
 >- **Test Plans:** Herfra kan prosjektet ditt koordinere og planlegge testing av applikasjonen din. Om build pipelinen din har et test steg kan det konfigureres til å rapportere testens resultat hit. 
->- **Artifacts:** Om flere av prosjektene dine har avhengigheter til sentrale komponenter som du ikke vil dele med hele verden kan de publiseres til artifacts. Dette er Azure DevOps interne nuget package feed som resten av prosjektene ditt kan ha avhengigheter til. 
+>- **Artifacts:** Om flere av prosjektene dine har avhengigheter til sentrale komponenter som du ikke vil dele med hele verden kan de publiseres til artifacts. Her er det støtte for både nuget og npm pakker som resten av prosjektene ditt kan ha avhengigheter til. 
 
 Gå til Repos og initialisere med VisualStudio gitignore. Clone repoet ned til din egen maskin. For autentisering mot Azure DevOps kan du enten sette opp et access token eller en alternativ innlogging. Gå til [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops) og hent filene. Dette kan du enten gjøre ved å clone det ned til egen maskin via git, eller laste ned som zip. Gå til `Workshop_2/Start` og kopier innholdet til ditt lokale Azure DevOps repo. Commit det og push det opp til Azure DevOps. 
 
@@ -50,16 +50,32 @@ Det er som oftest lurt å lage separate ressursgrupper for forskjellige miljøer
 
 Fremgangsmåte:
 1. Gå til [Azure](https://portal.azure.com)
-2. Lag en resource group for hvert av miljøene, med hver sin service plan 
-4. Lag en app service for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
+2. Lag en resource group for hvert av miljøene, Valgfritt (anbefalt: west europe, north europe eller norway east/west)
+3. Lag en app service for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
 
-    * <b>Name:</b> Dette navnet må være unikt i hele Azure, da den vil kunne   nås fra &lt;appservicenavn&gt;.azurewebsites.net. 
+    * <b>Name:</b> Dette navnet må være unikt i hele Azure, da den vil kunne nås fra &lt;appservicenavn&gt;.azurewebsites.net. 
     * <b>Publish:</b> Code
-    * <b>Runtime Stack:</b> .NET core 3.1 (LTS)
+    * <b>Runtime Stack:</b> .NET 6 (LTS)
     * <b>OS:</b> Windows
-    * <b>Region:</b> Valgfritt (anbefalt: west europe, north europe eller norway east/west)
+    * <b>Region:</b> Benytt samme region som ressursgruppen.
+    * <b>App service plan:</b> Endre sku and size til Free F1 under dev/test.
 
-## 3: Sett opp build pipeline
+4. Klikk på review and create. 
+
+## 3: Opprett storage accounts i [Azure](https://portal.azure.com)
+For at web applikasjonen skal fungere i begge miljøer, behøver vi en storage account for test, og en for prod. 
+Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
+
+1. Gå til [Azure](https://portal.azure.com) 
+2. Lag en storage account for hvert miljø, velg samme ressursgruppe som web applikasjonen. 
+   * <b>Storage account name</b> Navnet må være unikt i hele azure, lengde fra 3-24 tegn og kan kun innholde små bokstaver og tall.
+   * <b>Region</b> Velg samme region som ressursgruppen.
+   * <b>Performance</b> Standard
+   * <b>Redundancy</b> LRS
+
+3. Klikk på Review og create.
+
+## 4: Sett opp build pipeline
 Nå som du har opprettet et prosjekt i Azure DevOps og importert et Git repo kan vi sette opp en build pipeline for å automatisere bygging og testing av applikasjonen. Azure DevOps har to måter å sette opp en build pipeline på:
 >- Via build pipeline designeren
 >- Via YAML script
@@ -73,8 +89,8 @@ Den andre måten å gjøre det på er gjennom designeren. Det negative med denne
 I Azure DevOps, gå til "*Pipelines*" => "*Pipelines*" => "*Create pipeline*". 
 * Velg deretter "Azure Repos Git (YAML)". 
 * Velg så det repoet vi importerte til Azure DevOps prosjektet vårt i steg 1 (det er det som er valgt for oss som default om vi kun har et repo i prosjektet vårt). 
-* På neste steg kan vi velge å starte fra et template, denne setter opp en YAML-fil basert på hva slags kode vi har. 
-* Velg templaten "ASP.NET CORE". Denne templaten gir oss alt vi trenger for å komme i gang. 
+* På neste steg kan vi velge å enten benytte en YAML fil som allerede finnes i repoet, starte med en minimalistisk YAML fil, eller starte fra en template.
+* Velg templaten "ASP.NET CORE". Denne templaten gir oss alt vi trenger for å komme i gang. Må muligens klikke på Show more for å få opp alle templates. 
 * Trykk så på "Save and Run", DevOps vil så gi deg muligheten til å commite yaml filen til repoet. 
 * Trykk "Save and Run".
 
@@ -140,7 +156,7 @@ stages:
 
 Pipelinen burde nå ha to stages, en build og en deploy og begge disse har hver sin job. Det vi nå kan gjøre er å bruke forskjellige stages og bruke environments til å styre publisering til dev og prod. Hvis noe har gått galt i bygg og deploy stegene så kan du se på azure-pipeline.yaml i komplett folderen for inspirasjon, men prøv å løse problemet selv først.
 
-## 4: Environments 
+## 5: Environments 
 Vi har nå en pipeline som har flere stages og flere kan legges inn. Det kan f.eks. legges inn en til for produksjon ved å bare kopiere deploy stagen og ha en som heter deployTest og en som heter deployProd. For å bruke environments med forskjellige regler som vi skal sette opp under så må vi derfor gjøre nettopp det. Gå til pipelines og editer pipelinen din slik at du nå får 3 stages: build, deployTest og deployProd (husk å endre på web appen du peker på for prod). Det går an å ha flere pipelines i samme YAML-fil eller som forskjellige YAML-filer, men dette går vi ikke gjennom nå.
 
 La oss lage vårt første Environment. 
@@ -182,7 +198,7 @@ Eksempel
 Nå skal Prod kreve at du godkjenner deploy før den kjører gjennom. Via environment kan vi nå styre Prod og Test deployment. Gå til environments og velg Test eller Prod og se litt på mulighetene som finnes.
 
 
-## 5: Legg til testing
+## 6: Legg til testing
 Siste steget vi skal gjøre er å få lagt til en task for å kjøre gjennom tester. Testen som finnes i prosjektet skal feile og du kan rette på koden etter at pipelinen stopper opp på grunn av testen, for så å laste opp endringen og se at alt går gjennom. Som vanlig må vi til pipelinen og editere denne.
 
 * Legg til en ny .NET Core task før PublishBuildArtifact
@@ -196,7 +212,7 @@ Gå tilbake til pipelinen og se at testen nå stopper første stagen fra å kjø
 
 >En artifact er produktet av en build pipeline i form av en zip fil. Denne filen inneholder alt som ble lagt i mappen man publisher artifacten fra. Zip filen vil beholde mappestruktur og alle filer som default. Artifakten lastes opp på en server og blir tilgjengelig for nedlasting og andre stager kan da bruke current build og vil resolve hvor den henter artifakten fra selv. 
 
-## 6: Endre trigger
+## 7: Endre trigger
 For å forberede til Leksjon 2 så ønsker vi å legge inn en sjekk på triggeren i YAML-filen vår. Vi er kun interessert i endringer som ikke skjer i AzureWorkshopInfrastruktur. Alle endringer i den mappen hører til infrastruktur og trenger ikke å starte en bygg og deploy prosess. Dette er fordi vi skal gjøre en del endringer i neste leksjon og ønsker ikke å binde opp unødvendig byggetid. Åpne YAML-filen, enten lokalt eller gjennom Azure DevOps slik du har gjort i de tidligere oppgavene og erstatt 
 ```
 trigger: 
