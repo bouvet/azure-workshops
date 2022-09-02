@@ -135,11 +135,15 @@
                 return;
             }
 
-            var imageLinksEqual = _.isEqual(_.sortBy(gallery.map(s => s.split("?")[0])),
+            var imageLinksEqual = _.isEqual(_.sortBy(gallery.map(s => s.cleanLink)),
                 _.sortBy(fetchedImageLinks.map(s => s.split("?")[0])));
             if (!imageLinksEqual) {
-                var newImageLinks = _.difference(fetchedImageLinks.map(s => s.split("?")[0]),
-                    gallery.map(s => s.split("?")[0]));
+                var cleanedImageLinks = fetchedImageLinks.map(s => ({
+                    cleanLink: s.split("?")[0],
+                    actualLink: s
+                }));
+                
+                var newImageLinks = cleanedImageLinks.filter(i => gallery.map(s => s.cleanLink.split("?")[0]).indexOf(i.cleanLink) === -1);
 
                 var divContainer = document.getElementById("stored-images");
 
@@ -149,7 +153,7 @@
                         imageWrapper.className = "image-wrapper";
 
                         var imageElement = document.createElement("img");
-                        imageElement.src = x;
+                        imageElement.src = x.actualLink;
                         imageElement.className = "image";
 
                         imageWrapper.appendChild(imageElement);
@@ -158,7 +162,7 @@
                     }
                 });
 
-                gallery = fetchedImageLinks;
+                gallery = cleanedImageLinks;
             }
 
         }).fail(error => {
