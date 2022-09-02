@@ -27,7 +27,7 @@ For å opprette ressurser med portalen i Azure, så går du til https://portal.a
 
     Velg samme ressursgruppe som du opprettet i steg 1. Når du skal velge App Service Plan kan du opprette en i Free tier (merket F under Dev/Test fanen), men dersom du har Trial-abonnement så må du velge en App Service Plan som koster penger (f.eks. i B-serien). Du bør også velge samme datasenter som du valgte i 1).
 
-    Alle andre alternativer skal ha stadardverdier, så fortsett til "Review + Create".
+    Alle andre alternativer skal ha standardverdier, så fortsett til "Review + Create".
  
 
 ##  Deploy 
@@ -39,7 +39,7 @@ I denne øvelsen skal du deploye start-versjonen av web-applikasjonen. Dette er 
 1. Høyreklikk på prosjektet og velg "Publish". Velg Target "Azure" og Specific target "Azure App Service (Windows)". Logg så inn med Microsoft-kontoen som er tilknyttet Azure-abonnementet ditt.
 1. Velg samme "Web app" som du opprettet tidligere. Pass på at riktig  Subscription er valgt, hvis du har tilgang til flere.
 1. Velg Publish som Deployment type.
-1. Det generers nåe en "Publish Profile"-fil som lagres i prosjektet.
+1. Det generers når en "Publish Profile"-fil som lagres i prosjektet.
 1. Trykk publish for å publisere prosjektet til Azure.
 1. Se at &lt;appservicenavn&gt;.azurewebsites.net serverer applikasjonen.
 1. Legg merke til at IP-adressen oppe til høyre ikke endres, selv om du trykker F5 flere ganger i nettleseren.
