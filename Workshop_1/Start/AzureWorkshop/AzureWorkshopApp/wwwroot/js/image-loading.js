@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 var gallery = [];
-var fetchImageLinksTS = function () {
+var fetchImageLinks = function () {
     fetch("api/Images").then(function (response) { return __awaiter(_this, void 0, void 0, function () {
         var errorContainer, error, paragraph, fetchedImageLinks, cleanedImageLinks, newImages, divContainer, _i, newImages_1, image, imageWrapper;
         return __generator(this, function (_a) {
@@ -97,12 +97,12 @@ Dropzone.options.imageUpload = {
         var myDropzone = this;
         myDropzone.on("success", function (file, response) {
             myDropzone.removeFile(file);
-            fetchImageLinksTS();
+            fetchImageLinks();
         });
     }
 };
-fetchImageLinksTS();
+fetchImageLinks();
 setInterval(function () {
-    fetchImageLinksTS();
+    fetchImageLinks();
 }, 5000);
 //# sourceMappingURL=image-loading.js.map

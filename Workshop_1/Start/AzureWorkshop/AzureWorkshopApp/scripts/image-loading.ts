@@ -5,7 +5,7 @@
 
 var gallery: ImageInfo[] = [];
 
-const fetchImageLinksTS = () => {
+const fetchImageLinks = () => {
     fetch("api/Images").then(async (response) => {
         if (!response.ok) {
             var errorContainer = document.getElementById("errors");
@@ -66,13 +66,13 @@ Dropzone.options.imageUpload = {
         var myDropzone = this;
         myDropzone.on("success", function (file, response) {
             myDropzone.removeFile(file);
-            fetchImageLinksTS();
+            fetchImageLinks();
         });
     }
 };
 
-fetchImageLinksTS();
+fetchImageLinks();
 
 setInterval(function () {
-    fetchImageLinksTS();
+    fetchImageLinks();
 }, 5000);
