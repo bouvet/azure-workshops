@@ -7,9 +7,7 @@
 
 <!-- Client side libs required  -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.css" crossorigin="anonymous">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 
 <style>
     html {
@@ -125,70 +123,3 @@
         <div id="errors"></div>
     </div>
 </main>
-
-<script>
-    var gallery = [];
-
-    function fetchImageLinks() {
-        $.get("api/Images", function (fetchedImageLinks) {
-            if (_.isEmpty(fetchedImageLinks)) {
-                return;
-            }
-
-            var imageLinksEqual = _.isEqual(_.sortBy(gallery.map(s => s.split("?")[0])),
-                _.sortBy(fetchedImageLinks.map(s => s.split("?")[0])));
-            if (!imageLinksEqual) {
-                var newImageLinks = _.difference(fetchedImageLinks.map(s => s.split("?")[0]),
-                    gallery.map(s => s.split("?")[0]));
-
-                var divContainer = document.getElementById("stored-images");
-
-                _.forEach(newImageLinks, x => {
-                    if (gallery.length == 0 || !gallery.map(s => s.split("?")[0]).includes(x.split("?")[0])) {
-                        var imageWrapper = document.createElement("span");
-                        imageWrapper.className = "image-wrapper";
-
-                        var imageElement = document.createElement("img");
-                        imageElement.src = x;
-                        imageElement.className = "image";
-
-                        imageWrapper.appendChild(imageElement);
-
-                        divContainer.appendChild(imageWrapper);
-                    }
-                });
-
-                gallery = fetchedImageLinks;
-            }
-
-        }).fail(error => {
-            var errorContainer = document.getElementById("errors");
-            var paragraph = document.createElement("p");
-            paragraph.appendChild(document.createTextNode(error.responseText ? error.responseText : error.statusCode));
-            errorContainer.appendChild(paragraph);
-        });
-    }
-
-    fetchImageLinks();
-
-    // Poll for changes
-    setInterval(function () {
-        fetchImageLinks();
-    },
-        5000);
-
-    /* Dropzone */
-    // "imageUpload" is the camelized version of the HTML element's ID
-    Dropzone.options.imageUpload = {
-        paramName: "files", // The name that will be used to transfer the file
-        dictDefaultMessage: "Drop files here or Click to Upload",
-        addRemoveLinks: true, // Allows for cancellation of file upload and remove thumbnail
-        init: function () {
-            myDropzone = this;
-            myDropzone.on("success", function (file, response) {
-                console.log("Success");
-                myDropzone.removeFile(file);
-            });
-        }
-    };
-</script>
