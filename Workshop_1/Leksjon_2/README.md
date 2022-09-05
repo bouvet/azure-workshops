@@ -35,14 +35,15 @@ For å opprette ressurser med portalen i Azure, så går du til https://portal.a
 I denne øvelsen skal du deploye start-versjonen av web-applikasjonen. Dette er en "fungerende" applikasjon, men har ikke funksjonaliteten for å laste opp bilder.
 
 1. Åpne solution som ligger i mappen Workshop_1/Start.
-1. Bygg prosjektet. 
-1. Høyreklikk på prosjektet og velg "Publish". Velg Target "Azure" og Specific target "Azure App Service (Windows)". Logg så inn med Microsoft-kontoen som er tilknyttet Azure-abonnementet ditt.
-1. Velg samme "Web app" som du opprettet tidligere. Pass på at riktig  Subscription er valgt, hvis du har tilgang til flere.
-1. Velg Publish som Deployment type.
-1. Det generers når en "Publish Profile"-fil som lagres i prosjektet.
-1. Trykk publish for å publisere prosjektet til Azure.
-1. Se at &lt;appservicenavn&gt;.azurewebsites.net serverer applikasjonen.
-1. Legg merke til at IP-adressen oppe til høyre ikke endres, selv om du trykker F5 flere ganger i nettleseren.
+2. Bygg prosjektet.
+   1. Dersom prosjektet ikke vil bygge, høyreklikk på `package.json` og velg "Restore Packages"
+3. Høyreklikk på prosjektet og velg "Publish". Velg Target "Azure" og Specific target "Azure App Service (Windows)". Logg så inn med Microsoft-kontoen som er tilknyttet Azure-abonnementet ditt.
+4. Velg samme "Web app" som du opprettet tidligere. Pass på at riktig  Subscription er valgt, hvis du har tilgang til flere.
+5. Velg Publish som Deployment type.
+6. Det generers når en "Publish Profile"-fil som lagres i prosjektet.
+7. Trykk publish for å publisere prosjektet til Azure.
+8. Se at &lt;appservicenavn&gt;.azurewebsites.net serverer applikasjonen.
+9.  Legg merke til at IP-adressen oppe til høyre ikke endres, selv om du trykker F5 flere ganger i nettleseren.
 
 ## Test av skalering 
 
