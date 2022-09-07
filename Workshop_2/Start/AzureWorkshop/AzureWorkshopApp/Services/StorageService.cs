@@ -53,6 +53,7 @@ namespace AzureWorkshopApp.Services
 
             //Create a BlobContainerClient
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(_storageConfig.ImageContainer);
+            
             BlobSasBuilder builder;
             await foreach(var blobItem in blobContainerClient.GetBlobsAsync())
             {
@@ -62,13 +63,13 @@ namespace AzureWorkshopApp.Services
                 //Create a shared access signature builder with name of the container, the blob, type of resource and expiration
                 builder = new BlobSasBuilder()
                 {
-                   BlobContainerName = blobContainerClient.Name,
-                   BlobName = blobClient.Name,
-                   Resource = "b",
-                   ExpiresOn = DateTime.UtcNow.AddMinutes(3),
+                    BlobContainerName = blobContainerClient.Name,
+                    BlobName = blobClient.Name,
+                    Resource = "b",
+                    ExpiresOn = DateTime.UtcNow.AddMinutes(3),
                 };
 
-                ////Set type of access, we only need read so we set that 
+                //Set type of access, we only need read so we set that 
                 builder.SetPermissions(BlobAccountSasPermissions.Read);
 
                 //Create the sasUri and add it to the list
