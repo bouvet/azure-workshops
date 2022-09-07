@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "webSiteName": {
@@ -46,7 +46,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2017-08-01",
+      "apiVersion": "2021-03-01",
       "type": "Microsoft.Web/serverfarms",
       "kind": "app",
       "name": "[variables('servicePlanName')]",
@@ -59,7 +59,7 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2021-03-01",
       "type": "Microsoft.Web/sites",
       "kind": "app",
       "name": "[parameters('webSiteName')]",
