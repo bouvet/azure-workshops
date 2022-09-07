@@ -74,6 +74,8 @@ Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
    * <b>Redundancy</b> LRS
 
 3. Klikk på Review og create.
+4. Gå til Opprettet storage account, og navigerer inn i Containers.
+5. Opprett en ny Container som du kaller for: imagecontainer med private access level. 
 
 ## 4: Sett opp build pipeline
 Nå som du har opprettet et prosjekt i Azure DevOps og importert et Git repo kan vi sette opp en build pipeline for å automatisere bygging og testing av applikasjonen. Azure DevOps har to måter å sette opp en build pipeline på:
