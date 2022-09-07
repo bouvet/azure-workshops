@@ -11,7 +11,7 @@ const fetchImageLinks = () => {
             var errorContainer = document.getElementById("errors");
             var error = await response.json();
             var paragraph = document.createElement("p");
-            paragraph.appendChild(document.createTextNode(error ? error : response.status));
+            paragraph.appendChild(document.createTextNode(error ? JSON.stringify(error) : response.status.toString()));
             errorContainer.appendChild(paragraph);
             return;
         } else {
