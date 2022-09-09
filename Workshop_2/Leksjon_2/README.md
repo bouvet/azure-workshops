@@ -2,12 +2,12 @@
 ​
 Infrastructure as Code (IaC) er at man oppretter og vedlikeholder IT-infrastruktur i form av maskinlesbare definisjons-filer, i stedet for manuell oppsett eller at man bruker programmer for å provisjonere infratrukturen sin. ARM-templates er Microsofts løsning for IaC i Azure. Det aller fleste tjenester i Azure kan provisjoneres via ARM-templates. I denne leksjonen skal du lage build- og release-pipelines for infrastrukturen din. I tillegg skal du gjøre endringer på infrastrukturen ved å editere ARM-templates og så redeploye disse.
 ​
-## Klargjør parameter-filer for test-miljøet
+## Klargjør parameter-filer for test-miljøet og prod
 ​
 Parameter-filen i ARM-templates (kalt *azuredeploy.{environment}.parameters.json* i dette prosjektet), gjør det mulig å spinne opp et sett med Azure ressurser med ulik konfigurasjon til forskjellige miljøer. For hvert miljø kan du legge inn parameters, eksempel hvis du vil oppskalere produksjonsmiljøet i forhold til test. Det er også vanlig å definere navn på ressurser her. 
 ​
 1. Gjenbruk ressursgruppen du brukte for test-miljøet. Slett Web App'en og App Service Plan du opprettet i den gruppen. Merk deg navnet på Web App'en din, da du skal gjenbruke denne i steg 3. 
-2. Kopier `azuredeploy.parameters.json` til `azuredeploy.test.parameters.json`. Dette vil være parameter-filen din for test.
+2. Kopier `azuredeploy.test.parameters.json` og opprett `azuredeploy.prod.parameters.json` , Dette vil være parameter-filene dine for test og prod.
 3. I `azuredeploy.test.parameters.json`, sett inn 3 unike navn i *value* feltene. Dette bestemmer navnet ressursene dine får - bruk samme navn på App service som før. Gi komponentene navn slik at man kan se hvilket miljø de tilhører.
 4. Valider templaten din ved å gjøre en test-deploy via Visual Studio (gå til steg 5 hvis du ikke har Visual Studio)
   a. Deploy via Visual Studio ved å høyre-klikke på prosjektet (AzureWorkshopInfrastruktur.sln)
