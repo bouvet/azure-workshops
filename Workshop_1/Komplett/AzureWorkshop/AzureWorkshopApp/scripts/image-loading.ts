@@ -8,12 +8,7 @@ var gallery: ImageInfo[] = [];
 const fetchImageLinks = () => {
     fetch("api/Images").then(async (response) => {
         if (!response.ok) {
-            var errorContainer = document.getElementById("errors");
-            var error = await response.json();
-            var paragraph = document.createElement("p");
-            console.error(error);
-            paragraph.appendChild(document.createTextNode(error ? JSON.stringify(error) : response.status.toString()));
-            errorContainer.replaceChildren(paragraph);
+            await handleError(response);
             return;
         } else {
             var fetchedImageLinks: string[] = await response.json();
@@ -38,6 +33,15 @@ const fetchImageLinks = () => {
             gallery = cleanedImageLinks;
         }
     });
+}
+
+const handleError = async (response: Response) => {
+    console.error(response);
+    var errorContainer = document.getElementById("errors");
+    var error = response.status !== 500 ? await response.json() : null;
+    var paragraph = document.createElement("p");
+    paragraph.appendChild(document.createTextNode(error ? JSON.stringify(error) : response.statusText.toString()));
+    errorContainer.appendChild(paragraph);;
 }
 
 const findNewImages = (recentList: ImageInfo[]) => {

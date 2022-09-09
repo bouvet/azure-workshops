@@ -38,19 +38,14 @@ var _this = this;
 var gallery = [];
 var fetchImageLinks = function () {
     fetch("api/Images").then(function (response) { return __awaiter(_this, void 0, void 0, function () {
-        var errorContainer, error, paragraph, fetchedImageLinks, cleanedImageLinks, newImages, divContainer, _i, newImages_1, image, imageWrapper;
+        var fetchedImageLinks, cleanedImageLinks, newImages, divContainer, _i, newImages_1, image, imageWrapper;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     if (!!response.ok) return [3 /*break*/, 2];
-                    errorContainer = document.getElementById("errors");
-                    return [4 /*yield*/, response.json()];
+                    return [4 /*yield*/, handleError(response)];
                 case 1:
-                    error = _a.sent();
-                    paragraph = document.createElement("p");
-                    console.error(error);
-                    paragraph.appendChild(document.createTextNode(error ? JSON.stringify(error) : response.status.toString()));
-                    errorContainer.replaceChildren(paragraph);
+                    _a.sent();
                     return [2 /*return*/];
                 case 2: return [4 /*yield*/, response.json()];
                 case 3:
@@ -76,6 +71,31 @@ var fetchImageLinks = function () {
         });
     }); });
 };
+var handleError = function (response) { return __awaiter(_this, void 0, void 0, function () {
+    var errorContainer, error, _a, paragraph;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                console.error(response);
+                errorContainer = document.getElementById("errors");
+                if (!(response.status !== 500)) return [3 /*break*/, 2];
+                return [4 /*yield*/, response.json()];
+            case 1:
+                _a = _b.sent();
+                return [3 /*break*/, 3];
+            case 2:
+                _a = null;
+                _b.label = 3;
+            case 3:
+                error = _a;
+                paragraph = document.createElement("p");
+                paragraph.appendChild(document.createTextNode(error ? JSON.stringify(error) : response.statusText.toString()));
+                errorContainer.appendChild(paragraph);
+                ;
+                return [2 /*return*/];
+        }
+    });
+}); };
 var findNewImages = function (recentList) {
     return recentList.filter(function (i) { return !gallery.map(function (g) { return g.cleanLink; }).includes(i.cleanLink); });
 };
