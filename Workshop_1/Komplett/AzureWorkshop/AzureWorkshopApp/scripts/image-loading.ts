@@ -41,7 +41,7 @@ const handleError = async (response: Response) => {
     var error = response.status !== 500 ? await response.json() : null;
     var paragraph = document.createElement("p");
     paragraph.appendChild(document.createTextNode(error ? JSON.stringify(error) : response.statusText.toString()));
-    errorContainer.appendChild(paragraph);;
+    errorContainer.replaceChildren(paragraph);;
 }
 
 const findNewImages = (recentList: ImageInfo[]) => {
