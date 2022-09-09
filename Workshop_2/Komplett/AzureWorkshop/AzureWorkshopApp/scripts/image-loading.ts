@@ -36,7 +36,7 @@ const fetchImageLinks = () => {
 }
 
 const handleError = async (response: Response) => {
-    console.log("Error", response);
+    console.error(response);
     var errorContainer = document.getElementById("errors");
     var error = response.status !== 500 ? await response.json() : null;
     var paragraph = document.createElement("p");

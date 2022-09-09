@@ -1,0 +1,15 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es5",
+    "outDir": "wwwroot/js",
+    "lib": [ "es2015.promise", "ES2016.Array.Include", "es5", "dom", "es2015" ]
+  },
+  "include": [
+    "scripts/**/*"
+  ]
+}

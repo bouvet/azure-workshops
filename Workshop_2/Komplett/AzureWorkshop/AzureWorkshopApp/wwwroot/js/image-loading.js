@@ -76,7 +76,7 @@ var handleError = function (response) { return __awaiter(_this, void 0, void 0, 
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                console.log("Error", response);
+                console.error(response);
                 errorContainer = document.getElementById("errors");
                 if (!(response.status !== 500)) return [3 /*break*/, 2];
                 return [4 /*yield*/, response.json()];
