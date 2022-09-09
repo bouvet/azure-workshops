@@ -10,36 +10,30 @@ Les mer her: https://docs.microsoft.com/en-in/azure/key-vault/key-vault-whatis
 
 Frem til nå har blob storage-secrets vært lagret i appsettings.json. Vi skal opprette et key vault og kode om applikasjonen til å benytte dette.
 
-1. Last ned <a href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli">Azure CLI</a> (hvis du ikke har gjort dette steget tidligere)
-2. Åpne en terminal (cmd, powershell, terminal e.l. for ditt OS)
-3. Kjør kommandoen az login (hvis du ikke har Azure CLI vil dette feile)
-4. Etter å ha logget inn så vil det bli listet alle subscriptions du har tilgang til og en av disse vil ha isDefault: true
-5. Hvis du må bytte subscription så gjøres det med kommandoen >az account set --subscription "{subscription name or id}"
-6. For å lage en key vault så kjøres kommandoen >az keyvault create --resource-group "{resource group name}" --location norwayeast --name "{keyvaultname}"
-7. Gå til <a href="https://portal.azure.com/">Azure Portalen</a>, og finn din nylige opprettede Azure Key Vault.
-8. Gå til Settings -> Secrets og klikk Generate/Import
-9. Lag en nøkkel for Storage Account Name opprettet i forrige leksjon. Den skal ha følgende verdier:
+1. Gå til Azure-portalen om du ikke allerede er der
+2. Åpne Azure Shell (som du brukte til å opprette storage account i forrige leksjon)
+3. For å lage en key vault så kjøres kommandoen `az keyvault create --resource-group "{resource group name}" --location norwayeast --name "{keyvaultname}"` For å slippe å opprette en ny ressursgruppe, er det fint om du gjenbruker samme ressursgruppe som i tidligere leksjoner
+4. Finn ditt nylig opprettede KeyVault i portalen
+5. Gå til Settings -> Secrets og klikk Generate/Import
+6. Lag en nøkkel for ConnectionString opprettet i forrige leksjon. Den skal ha følgende verdier:
 
     | Name | Value (secret) |
     |---------------------------------|-----------------------------------------------------|
-    | `AzureStorageConfig--AccountName` | `Verdien som står i AccountName fra appsettings.json` |
-    
-10.  Lag en nøkkel for Storage Account Key opprettet i forrige leksjon. Den skal ha følgende verdier:
-    
-| Name | Value (secret) |
-|-------------------------------- | ----------------------------------------------------|
-| `AzureStorageConfig--AccountKey` | `Verdien som står i AccountKey fra appsettings.json` |
+    | `AzureStorageConfig--ConnectionString` | `Verdien som står i ConnectionString fra appsettings.json` |
 
 
 ### Bruk key vault
 
 Vi ønsker nå at applikasjonen skal bruke verdiene satt i Key Vault fremfor den gamle config-filen. Heldigvis er det god støtte i .net core for å ta i bruk dette.
 
+Først må du installere nødvendige NuGet-pakker:
+- Azure.Identity
+- Azure.Extensions.AspNetCore.Configuration.Secrets
+
 Start med å gå til appsettings.json og slett verdien i AccountName og AccountKey, slik at AzureStorageConfig ser slik ut: 
 ```
   "AzureStorageConfig": {
-    "AccountName": "",
-    "AccountKey": "",
+    "ConnectionString": "",
     "ImageContainer": "Navnet på din image container" (default er imagecontainer)
   }
 ```
@@ -51,28 +45,20 @@ private const string KeyVaultEndpoint = "https://<navn-på-keyvault>.vault.azure
 
 public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
     WebHost.CreateDefaultBuilder(args)
-           .ConfigureAppConfiguration((ctx, builder) =>
-           {
-               var azureServiceTokenProvider = new AzureServiceTokenProvider();
-               var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-               builder.AddAzureKeyVault(KeyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager());
-           })
-           .UseStartup<Startup>();
+            .ConfigureAppConfiguration((ctx, builder) =>
+            {
+                builder.AddAzureKeyVault(new Uri(KeyVaultEndpoint), new DefaultAzureCredential());
+            })
+            .UseStartup<Startup>();
 ```
 
-Referer til de nye komponentene:
-
-```
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
-```
+Her setter man opp KeyVault, og bruker DefaultAzureCredential til å autentisere mot KeyVault. Dette er en måte å autentisere på som prøver gjennom forskjellige credential-types, om man er interessert står det mer informasjon om dette [finnes det her](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme). I vårt tilfelle vil dette fungere i skyen når man senere setter opp managed identity for autentisering mellom appen og KeyVault, og den bør fungere lokalt ved å bruke innlogget bruker i Visual Studio.
 
 Til slutt gjenstår det bare å kjøre applikasjonen og se at alt fortsatt fungerer. Trykk F5 og se at innstillingene fra Key Vault blir brukt.
 
+> Dersom man ved kjøring av applikasjonen får feilmelding `"Azure.Identity.CredentialUnavailableException: 'DefaultAzureCredential failed to retrieve a token from the included credentials."`, kan man i Visual Studio gå til Tools -> Options -> Azure Services Authentication, og re-autentisere derfra.
 
-## Publisering til Azure og Managed Service Identity 
+### Publisering til Azure og Managed Service Identity 
 
 Publiser så applikasjonen din på nytt til Azure. Nå vil du mest sannsynlig se at applikasjonen din feiler.
 
@@ -82,7 +68,7 @@ Dersom du ønsker å finne ut hvorfor dette skjer kan du:
 2. Gå så til katalogen d:\home\LogFiles og inspiser filen eventlog.xml (bruk f.eks. kommandoen tail for å se slutten på filen)
 
 Det du finner ut er mest sannsynlig at Web App'en din ikke har tilgang til å lese ut secrets fra Key Vault. For å løse dette ønsker
-vi å bruke Managed Service Identity (MSI), som gjør at man kan opprette en identitet (Service Principal/"bruker") for Web App'en din som man igjen kan gi de tilganger man vil til andre tjenester i Azure (her i Key Vault).
+vi å bruke [Managed identities](https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview), som gjør at man kan velge å aktivere en managed identity (Service Principal/"bruker") for Web App'en din som man igjen kan gi de tilganger man vil til andre tjenester i Azure (her i Key Vault).
 
 1. Gå til Web Appen din i Azureportalen.
 2. Velg så `Identity` under Settings, og trykk på `On` og trykk Save. Kopier samtidig `Object ID` til din utklippstavle.
@@ -94,4 +80,4 @@ vi å bruke Managed Service Identity (MSI), som gjør at man kan opprette en ide
 8. Trykk på Add
 9. Husk å trykke Save for å lagre endringene til Key Vaultet
 
-Nå skal applikasjonen din ha tilgang til å lese secrets fra denne Key Vaulten.
+Nå skal applikasjonen din ha tilgang til å lese secrets fra denne Key Vaulten, og du kan prøve å oppdatere applikasjonen din og se at bildene blir vist.
