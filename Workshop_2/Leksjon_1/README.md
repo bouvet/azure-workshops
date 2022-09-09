@@ -77,7 +77,23 @@ Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
 4. Gå til Opprettet storage account, og navigerer inn i Containers.
 5. Opprett en ny Container som du kaller for: imagecontainer med private access level. 
 
-## 4: Sett opp build pipeline
+## 4: Sett opp connection mellom Azure DevOps og Azure Portalen. 
+Vi trenger å sette opp en tilgang for DevOps til ditt subscription i Azure. 
+Dette kan gjøres med en Service connection. 
+1. I Azure devops, klikker du på Project settings (tannhjul nede til venstre)
+2. Under Pipelines, så klikker du på Service Connections.
+3. Klikk på new Service Connection. Det vil dukke opp ett panel, her velger du Azure Resource Manager. Klikk så Next.
+4. Velg Service Principal (Automatic), klikk next.
+   1. Scope Level: Subscription.
+   2. Subscription: Velg riktig subscription.
+   3. Resource Group : La stå blankt. 
+   4. Service connection name: Fyll dette ut, navnet må du huske til ett senere steg.
+   5. Huk av Grant access permission to all pipelines
+5. Klikk Save.
+
+Nå har vi opprettet en Service connection som vi skal bruke for å deployere ressurser i senere steg. 
+
+## 5: Sett opp build pipeline
 Nå som du har opprettet et prosjekt i Azure DevOps og importert et Git repo kan vi sette opp en build pipeline for å automatisere bygging og testing av applikasjonen. Azure DevOps har to måter å sette opp en build pipeline på:
 >- Via build pipeline designeren
 >- Via YAML script
@@ -105,6 +121,7 @@ Om du har gjort alt riktig så burde build steget feile og det er meningen. .NET
 * Slett alt under steps: (burde være to linjer, en med 'script:' og en med 'displayname:')
 * Legg til .Net Core task
 * Velg publish under .Net Core tasken
+* Huk vekk Publish web projects
 * Under 'Path to project(s)' legger du inn 'AzureWorkshop/AzureWorkshop.sln'
 * Under Arguments skal det stå --configuration $(buildConfiguration)
 * Trykk Add
@@ -117,9 +134,9 @@ Se gjennom loggene og gjør deg litt kjent. Vi skal nemlig utvide yaml filen med
 
 Vi skal nå legge inn deploy av Web Appen til Azure i YAML-filen. Gå til edit av pipelinen og gjør følgende
 * Legg til tasken 'Azure App Service deploy'
-* Velg subscription
+* Velg ConnectionType Azure resource manager og Azure Subscription velger du Service connection du opprett i steg 4.
 * Sett App Service type til Windows/Linux (dette må matche det man valgte når man opprettet Web Appen)
-* Velg applikasjonen du valgte (velg test og ikke prod her)
+* Velg applikasjonen du lagde
 * Legg til displayName med et fornuftig navn på steget (f.eks. Deploy Web App to Azure)
 * Trykk Add
 * Trykk Save og Save (commit to pipeline)
@@ -147,18 +164,28 @@ stages:
   - stage: build
     jobs:
     - job: build
-      steps:
+      steps:  
       - task: DotNetCoreCLI@2
         inputs:
           ****
       - task: PublishBuildArtifacts@1
         inputs:
           ****
+  - stage: deploy
+    jobs:
+    - job: deploy
+      steps:
+      - task: DownloadBuildArtifacts@1
+        inputs:
+          ****
+      - task: AzureRmWebAppDeployment@4
+        inputs:
+          ****
 ```
 
 Pipelinen burde nå ha to stages, en build og en deploy og begge disse har hver sin job. Det vi nå kan gjøre er å bruke forskjellige stages og bruke environments til å styre publisering til dev og prod. Hvis noe har gått galt i bygg og deploy stegene så kan du se på azure-pipeline.yaml i komplett folderen for inspirasjon, men prøv å løse problemet selv først.
 
-## 5: Environments 
+## 6: Environments 
 Vi har nå en pipeline som har flere stages og flere kan legges inn. Det kan f.eks. legges inn en til for produksjon ved å bare kopiere deploy stagen og ha en som heter deployTest og en som heter deployProd. For å bruke environments med forskjellige regler som vi skal sette opp under så må vi derfor gjøre nettopp det. Gå til pipelines og editer pipelinen din slik at du nå får 3 stages: build, deployTest og deployProd (husk å endre på web appen du peker på for prod). Det går an å ha flere pipelines i samme YAML-fil eller som forskjellige YAML-filer, men dette går vi ikke gjennom nå.
 
 La oss lage vårt første Environment. 
@@ -186,21 +213,44 @@ Vi skal nå legge til brukergodkjenning for deploy til prod. Det gjør vi ved å
 
 Eksempel
 ```
-  - stage: deployProd
+  - stage: deploy_test
+    jobs:
+      - deployment: deploy
+        environment: Test
+        strategy: 
+          runOnce:
+            deploy:
+              steps:
+              - task: DownloadBuildArtifacts@1
+                displayName: 'Download artifacts'
+                inputs:
+                  ****
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Deploy web app to azure'
+                inputs:
+                  ****
+  - stage: deploy_prod
     jobs:
       - deployment: deploy
         environment: Prod
         strategy: 
-         runOnce:
-           deploy:
-            steps:
-            - task: DownloadBuildArtifacts@0
+          runOnce:
+            deploy:
+              steps:
+              - task: DownloadBuildArtifacts@1
+                displayName: 'Download artifacts'
+                inputs:
+                  ****
+              - task: AzureRmWebAppDeployment@4
+                displayName: 'Deploy web app to azure'
+                inputs:
+                 ****
 ```
 
 Nå skal Prod kreve at du godkjenner deploy før den kjører gjennom. Via environment kan vi nå styre Prod og Test deployment. Gå til environments og velg Test eller Prod og se litt på mulighetene som finnes.
 
 
-## 6: Legg til testing
+## 7: Legg til testing
 Siste steget vi skal gjøre er å få lagt til en task for å kjøre gjennom tester. Testen som finnes i prosjektet skal feile og du kan rette på koden etter at pipelinen stopper opp på grunn av testen, for så å laste opp endringen og se at alt går gjennom. Som vanlig må vi til pipelinen og editere denne.
 
 * Legg til en ny .NET Core task før PublishBuildArtifact
@@ -214,7 +264,7 @@ Gå tilbake til pipelinen og se at testen nå stopper første stagen fra å kjø
 
 >En artifact er produktet av en build pipeline i form av en zip fil. Denne filen inneholder alt som ble lagt i mappen man publisher artifacten fra. Zip filen vil beholde mappestruktur og alle filer som default. Artifakten lastes opp på en server og blir tilgjengelig for nedlasting og andre stager kan da bruke current build og vil resolve hvor den henter artifakten fra selv. 
 
-## 7: Endre trigger
+## 8: Endre trigger
 For å forberede til Leksjon 2 så ønsker vi å legge inn en sjekk på triggeren i YAML-filen vår. Vi er kun interessert i endringer som ikke skjer i AzureWorkshopInfrastruktur. Alle endringer i den mappen hører til infrastruktur og trenger ikke å starte en bygg og deploy prosess. Dette er fordi vi skal gjøre en del endringer i neste leksjon og ønsker ikke å binde opp unødvendig byggetid. Åpne YAML-filen, enten lokalt eller gjennom Azure DevOps slik du har gjort i de tidligere oppgavene og erstatt 
 ```
 trigger: 
@@ -233,4 +283,4 @@ trigger:
 Bytt ut main med master hvis du har master som branch og ikke main. Alternativt et annet branch navn hvis du har valgt å bruke det. Main er den nye standarden til git og master er den gamle, bare å bruke den du har.
 
 ## Mer? Lek deg litt
-Prøv å gjøre endringer til applikasjonen og sjekk inn. Om du vil ha en utfordring kan du prøve å sette opp variabel substitution i appsettings.json på hvert av stagene dine. Får du til å postfikse tittelen i applikasjonen med miljøet du er i? 
+Prøv å gjøre endringer til applikasjonen og sjekk inn. Om du vil ha en utfordring kan du prøve å sette opp variabel substitution i appsettings.json på hvert av stegene dine. Får du til å postfikse tittelen i applikasjonen med miljøet du er i? 
