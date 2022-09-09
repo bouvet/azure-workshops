@@ -90,7 +90,7 @@ var handleError = function (response) { return __awaiter(_this, void 0, void 0, 
                 error = _a;
                 paragraph = document.createElement("p");
                 paragraph.appendChild(document.createTextNode(error ? JSON.stringify(error) : response.statusText.toString()));
-                errorContainer.appendChild(paragraph);
+                errorContainer.replaceChildren(paragraph);
                 ;
                 return [2 /*return*/];
         }
