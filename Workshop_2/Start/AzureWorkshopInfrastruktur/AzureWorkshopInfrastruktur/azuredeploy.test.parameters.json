@@ -3,13 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "environment": {
-        "value": ""
-    },
-    "webSiteName": {
-      "value": ""
-    },
-    "storageAccountName": {
-      "value": ""
-    }    
+        "value": "test"
+    }
   }
 }

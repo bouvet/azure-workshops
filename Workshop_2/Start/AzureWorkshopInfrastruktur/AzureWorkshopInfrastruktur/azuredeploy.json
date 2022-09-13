@@ -8,14 +8,20 @@
     },
     "webSiteName": {
       "type": "string",
+      "defaultValue": "", // Todo Fyll inn.
+      "minLength": 2,
+      "maxLength": 36,
       "metadata": {
         "description": "The name of the web site."
       }
     },
     "storageAccountName": {
       "type": "string",
+      "defaultValue": "",// Todo fyll inn.
+      "minLength": 3,
+      "maxLength": 20,
       "metadata": {
-        "description": "The name of the Azure Storage account."
+        "description": "The name of the Azure Storage account. May contain numbers and lowercase letters only!"
       }
     },
     "appServiceSku": {
@@ -37,9 +43,7 @@
     "servicePlanName": "AppServicePlan",
     "blobContainerName": "imagecontainer",
     "websiteNameWithEnvironment": "[concat(parameters('webSiteName'),'-',parameters('environment'))]",
-    "keyvaultNameWithEnvironment": "[concat(parameters('webSiteName'),'-',parameters('environment'),'-kv')]",
-    "storageAccountNameWithEnvironment": "[concat(parameters('storageAccountName'),parameters('environment'))]",
-    "tenantId": "[subscription().tenantId]"
+    "storageAccountNameWithEnvironment": "[concat(parameters('storageAccountName'),parameters('environment'))]"
   },
   "resources": [
     {
@@ -62,17 +66,10 @@
       "name": "[variables('websiteNameWithEnvironment')]",
       "location": "[parameters('location')]",
       "comments": "This is the web app, also the default 'nameless' slot.",
-      "identity": {
-        "type": "SystemAssigned"
-      },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
         "siteConfig": {
           "appSettings": [
-            {
-              "name": "AzureStorageConfig:Connectionstring",
-              "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
-            },
             {
               "name": "AzureStorageConfig:ImageContainer",
               "value": "[variables('blobContainerName')]"
@@ -81,7 +78,8 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
+        "[variables('storageAccountNameWithEnvironment')]"
       ]
     },
     {
@@ -99,7 +97,7 @@
       },
       "resources": [
         {
-          "name": "[concat('default/', variables('blobContainerName'))]",
+          "name": "[concat(variables('storageAccountNameWithEnvironment'),'/default/', variables('blobContainerName'))]",
           "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
           "apiVersion": "2021-01-01",
           "properties": {
@@ -109,60 +107,5 @@
         }
       ]
     }
-    // {
-    //   "type": "Microsoft.KeyVault/vaults",
-    //   "apiVersion": "2021-10-01",
-    //   "name": "[variables('keyvaultNameWithEnvironment')]",
-    //   "location": "[parameters('location')]",
-    //   "properties": {
-    //     "enabledForDeployment": false,
-    //     "enabledForDiskEncryption": false,
-    //     "enabledForTemplateDeployment": false,
-    //     "enablePurgeProtection": true,
-    //     "enableRbacAuthorization": true,
-    //     "enableSoftDelete": true,
-    //     "softDeleteRetentionInDays": 90,
-    //     "tenantId": "[variables('tenantId')]",
-    //     "sku": {
-    //       "name": "standard",
-    //       "family": "A"
-    //     },
-    //     "accessPolicies": [
-    //       {
-    //         "tenantId": "[variables('tenantId')]",
-    //         "objectId": "[reference(variables('websiteNameWithEnvironment'),'2018-02-01', 'Full').identity.principalId]",
-    //         "permissions": {
-    //           "keys": [ "all" ],
-    //           "secrets": [ "all" ],
-    //           "certificates": [ "all" ],
-    //           "storage": [ "all" ]
-    //         }
-    //       }
-    //     ]
-    //     "networkAcls": {
-    //       "bypass": "AzureServices",
-    //       "virtualNetworkRules": [
-    //         {
-    //           "id": "[variables('secVDIInternalSN')]",
-    //           "ignoreMissingVnetServiceEndpoint": true
-    //         }
-    //       ],
-    //       "ipRules": [],
-    //       "defaultAction": "Deny"
-    //     }
-    //   }
-    // }
-    // {
-    //   "type": "Microsoft.KeyVault/vaults/secrets",
-    //   "apiVersion": "2018-02-14",
-    //   "name": "[concat(variables('keyvaultNameWithEnvironment'), '/AzureStorageConfig--Connectionstring')]",
-    //   "location": "[parameters('location')]",
-    //   "dependsOn": [
-    //       "[resourceId('Microsoft.KeyVault/vaults', variables('keyvaultNameWithEnvironment'))]"
-    //   ],
-    //   "properties": {
-    //       "value": ""
-    //   }
-    // }
   ]
 }
