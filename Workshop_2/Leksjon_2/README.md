@@ -118,16 +118,12 @@ Dette oppretter en managed identity som applikasjonen kan bruke for å autentise
         },
         "accessPolicies": [
         ],
-        "networkAcls": {
-          "bypass": "AzureServices",
-          "virtualNetworkRules": [],
-          "ipRules": [],
-          "defaultAction": "Deny"
-        }
+        "publicNetworkAccess": "Enabled"
       }
     }
 ```
 Dette oppretter ett keyvault, 
+Merk: at `"publicNetworkAccess": "Enabled"`, betyr at keyvaultet er tilgjengelig på internett. En god prakis er å opprette ett eget vnet, som vi kan bruke for at app servicen skal ha tilgang til key vaulten.
 
 *For å ikke skape sirkulær referanse, må vi gi tilgang til app servicen i ett eget steg. 
 I ressurs arrayet, legg inn følgende.
@@ -195,13 +191,18 @@ I Program.cs legger du inn følgende i CreateWebHostBuilder funksjonen mellom li
 })
 ```
 
-Denne kode biten her forteller applikasjonen til å hente ut secrets fra keyvault, med managed identitien som vi nettopp opprettet ved oppstart av applikasjonen. 
+Denne kodebiten her forteller applikasjonen til å hente ut secrets fra keyvault, med managed identitien som vi nettopp opprettet ved oppstart av applikasjonen. 
 
 Modellen vår støtter ikke `AccountKey` og `AccountName`, Gå til Models/AzureStorageConfig.cs 
 Bytt ut klassen med følgende: 
 
 ```
-
+public class AzureStorageConfig
+{
+    public string AccountKey { get; set; }
+    public string AccountName { get; set; }
+    public string ImageContainer { get; set; }
+}
 
 ```
 I StorageService, lag en private readonly string. og bytt ut følgende kodesnutter i UploadFileToStorage og GetImageUrls med 
@@ -220,6 +221,31 @@ public StorageService(IOptions<AzureStorageConfig> storageConfig)
 
 ```
 BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConnectionString);
+```
+
+Under helpers/StorageConfigValidator.cs 
+
+Fjern 
+```
+if (storageConfig.ConnectionString == string.Empty)
+{
+    validation.AddError("ConnectionString", "ConnectionString key is empty. Check configuration.");
+}
+```
+
+Og erstatt med 
+
+```
+if (storageConfig.AccountKey == string.Empty)
+{
+    validation.AddError("AccountKey", "AccountKey key is empty. Check configuration.");
+}
+
+if (storageConfig.AccountName == string.Empty)
+{
+    validation.AddError("AccountName", "AccountName key is empty. Check configuration.");
+}
+
 ```
 ### Redeploy av miljø
 For å teste at ting faktisk blir opprettet på konsistent vis, skal du nå slette og redeploye.
@@ -244,7 +270,7 @@ I neste leksjon skal du bruke Application Insights for å overvåke løsning. Fo
 1. Editer `azuredeploy.json`. Se https://docs.microsoft.com/en-us/azure/templates/microsoft.insights/2015-05-01/components for strukturen på denne komponenten. Legg også til en parameter til scriptet for navnet på komponenten. Vårt forslag er: 
 ```
     {
-      "name": "[parameters('appInsightsName')]",
+      "name": "[variables('appInsightsNameWithEnvironment')]",
       "type": "Microsoft.Insights/components",
       "apiVersion": "2015-05-01",
       "location": "[parameters('location')]",
@@ -262,8 +288,8 @@ I neste leksjon skal du bruke Application Insights for å overvåke løsning. Fo
           "appSettings": [
             ...eksisterende innstillinger her
             {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('Microsoft.Insights/components', parameters('appInsightsName')), '2014-04-01').InstrumentationKey]"
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsNameWithEnvironment')), '2015-05-01').ConnectionString]"
             },
             {
               "name": "APPINSIGHTS_PORTALINFO",
@@ -283,29 +309,16 @@ Vår dependsOn på Web App ser slik ut:
 ```
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
-        "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]"
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsNameWithEnvironment'))]"
       ]
 ```
 ​
-4. I `azuredeploy.json` må vi sørge for at det ny parameteret appInsightsName blir en del av templaten. Legg til objektet under nederst i parameters-seksjonen
+4. I `azuredeploy.json` må vi sørge for at appInsightsNameWithEnvironment blir en del av templaten. Legg til variabelen under nederst i variabel-seksjonen
 ​
 ```
-    ,"appInsightsName": {
-      "type": "string",
-      "metadata": {
-        "description": "The app insights name."
-      }
-    }
+    "appInsightsNameWithEnvironment": "[concat(parameters('webSiteName'),'-',parameters('environment'),'-ai')]"
 ```
-​
-5. Legg til parameteret under i `azuredeploy.parameters.test.json` for å sette navnet på Application Insights-instansen din.
-```
-    "appInsightsName": {
-      "value":  "my-great-insights" 
-    } 
-```
-​
-6. Sjekk inn endringene dine, og vent til at bygget ditt har gått igjennom.
-7. Lag en ny release og valider at komponenten blir opprettet. 
+5. Sjekk inn endringene dine, og vent til at bygget ditt har gått igjennom.
+6. Lag en ny release og valider at komponenten blir opprettet. 
 ​
 Du er nå klar for å begi deg ut på neste leksjon.
