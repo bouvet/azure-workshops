@@ -15,7 +15,8 @@ Parameter-filen i ARM-templates (kalt *azuredeploy.{environment}.parameters.json
   b. Log inn via ``az login``
   c. Sjekk at du har riktig subscription valgt eller endre subscription ved å kjøre ```az account set --subscription "{subscription name or id}" ```
   d. Naviger til riktig mappe (for eksempelet under så bør man være i samme mappe som AzureWorkshopInfrastruktur.sln filen)
-  e. Kjør kommandoen ```
+  e. Kjør kommandoen 
+  ```
   az deployment group what-if `
     --name {ExampleDeployment} `
     --resource-group {dinRessursGruppe} `
