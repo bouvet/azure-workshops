@@ -6,28 +6,26 @@ Infrastructure as Code (IaC) er at man oppretter og vedlikeholder IT-infrastrukt
 ​
 Parameter-filen i ARM-templates (kalt *azuredeploy.{environment}.parameters.json* i dette prosjektet), gjør det mulig å spinne opp et sett med Azure ressurser med ulik konfigurasjon til forskjellige miljøer. For hvert miljø kan du legge inn parameters, eksempel hvis du vil oppskalere produksjonsmiljøet i forhold til test. Det er også vanlig å definere navn på ressurser her. 
 ​
-1. Gjenbruk ressursgruppen du brukte for test-miljøet. Slett Web App'en og App Service Plan du opprettet i den gruppen. Merk deg navnet på Web App'en din, da du skal gjenbruke denne i steg 3. 
-2. Kopier `azuredeploy.test.parameters.json` og opprett `azuredeploy.prod.parameters.json` , Dette vil være parameter-filene dine for test og prod.
-3. I `azuredeploy.test.parameters.json`, sett inn 3 unike navn i *value* feltene. Dette bestemmer navnet ressursene dine får - bruk samme navn på App service som før. Gi komponentene navn slik at man kan se hvilket miljø de tilhører.
-4. Valider templaten din ved å gjøre en test-deploy via Visual Studio (gå til steg 5 hvis du ikke har Visual Studio)
-  a. Deploy via Visual Studio ved å høyre-klikke på prosjektet (AzureWorkshopInfrastruktur.sln)
-  b. Velg riktige filer og rett ressursgruppe i Azure
-  c. Publish. (Dersom du får spørsmål om navn på ressursgruppe., kan det være noen problemer med Visual Studio-versjonen din, og da må du fylle ut dette manuelt). Hvis du ikke har visual studio eller av en annen grunn ikke kan publishe direkte kan du prøve via Azure CLI (se steg 5)
-5. Valider templaten din ved å gjøre en test-deploy via Azure CLI (har du gjort steg 4 kan du hoppe over denne)  
+1. Gjenbruk ressursgruppen og ressurser du opprettet for brukte for test-miljøet og . Slett Web App'en og App Service Plan du opprettet i den gruppen. Merk deg navnet på Web App'en din, da du skal gjenbruke denne i steg 3. 
+2. I `azuredeploy.json` Fyll ut default verdier for `webSiteName` og `storageAccountName` uten miljø. Templaten vil concate disse verdiene med parameteren `environment` som du skal fylle ut i neste steg.
+3. Kopier `azuredeploy.test.parameters.json` og opprett `azuredeploy.prod.parameters.json` , Dette vil være parameter-filene dine for test og prod.
+4. I `azuredeploy.prod.parameters.json`, endre value i `environment` fra 'test' -> 'prod' inn. Bruk gjerne samme navn base navn ( uten miljø) som i forrige leksjon.
+5. Valider templaten din ved å gjøre en `az deployment group what-if` deploy via Azure CLI
   a. Åpne Powershell eller en terminal
   b. Log inn via ``az login``
   c. Sjekk at du har riktig subscription valgt eller endre subscription ved å kjøre ```az account set --subscription "{subscription name or id}" ```
   d. Naviger til riktig mappe (for eksempelet under så bør man være i samme mappe som AzureWorkshopInfrastruktur.sln filen)
-  e. Kjør kommandoen ```az deployment group create
-  --name {ExampleDeployment}
-  --resource-group {dinRessursGruppe} 
-  --template-file .\AzureWorkshopInfrastruktur\azuredeploy.json 
-  --parameters '@AzureWorkshopInfrastruktur\azuredeploy.test.parameters.json' ```
-  f. Deploymenten bør da liste opp både en storage og en web app og ha "provisionState": "Succeeded"
-6. Hvis du får feil i steget over er sannsynligvis ett av ressursnavnene dine brukt. Se på output og prøv på nytt   
-7. Undersøk om ressursene dine ble opprettet i ressursgruppen din. Hvis ikke, gjør steg 4. eller 5. på nytt eller spør om hjelp. 
-8. Slett ressursene som ble opprettet i ressurgruppen.
-9. Lag en commit og push den til ditt DevOps-repo.
+  e. Kjør kommandoen ```
+  az deployment group what-if `
+    --name {ExampleDeployment} `
+    --resource-group {dinRessursGruppe} `
+    --template-file .\AzureWorkshopInfrastruktur\azuredeploy.json ` 
+    --parameters '@AzureWorkshopInfrastruktur\azuredeploy.test.parameters.json' 
+  ```
+  f. Deploymenten bør da liste opp både keyvault, storage og en web app. Avhengig av hva slags ressurser du har slettet. Så betyr grønn/+: Ny ressurser, Lilla/~: Endringer på eksisterende ressurser, Oransje/-: Fjerning.
+
+6. Selv om du får grønt her, så betyr det ikke nødvendigvis at navnet du har angitt er globalt unikt. Men du vil få en verifikasjon på at templaten din er gyldig og for spesielt ved endringer av allerede deployerte ressurser vil du enkelt kunne se endringer. Hvis du får noen feilmeldinger, så forsøk å rette dem og prøv på nytt.
+7. Lag en commit og push den til ditt DevOps-repo.
 ​
 ## Build-pipeline 
 Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det eneste den trenger å gjøre er å tilgjengeliggjøre ARM-templaten din til neste steg i kjeden (release-pipeline).
@@ -41,7 +39,7 @@ Lag en ny byggedefinisjon i Azure DevOps. Den vil være veldig kort, fordi det e
 7. Lagre og commit til git
 
 ​
-Når du har fått build-pipelinen din til å kjøre, sjekk at bygge-artefakten din inneholder ARM-templaten. Dette gjøres enten gjennom loggen på jobben eller siden som viser jobben som ble kjørt (under "Related" skal det stå "1 published"). Vi har nå publisert hele mappe strukturen, vi kunne selvfølgelig ha bare publisert infrastruktur mappen også ved å endre på "Path to publish".
+Når du har fått build-pipelinen din til å kjøre, sjekk at bygge-artifacten din inneholder ARM-templaten. Dette gjøres enten gjennom loggen på jobben eller siden som viser jobben som ble kjørt (under "Related" skal det stå "1 published"). Vi har nå publisert hele mappe strukturen, vi kunne selvfølgelig ha bare publisert infrastruktur mappen også ved å endre på "Path to publish".
 ​
 ## Release-pipeline
 ​
@@ -51,20 +49,178 @@ For å deploye infrastrukturen trenger å opprette en Release-pipeline som tar e
 2. Her velger du "Empty job" helt øverst, og ikke noen ferdig template.
 3. Gi steget "Stage 1" et nytt navn, og kall det f.eks. "Test". Dette vil være navnet på miljøet ditt.
 4. Gi release-pipelinen din et navn, f.eks. "Infrastruktur" (på toppen av siden).
-5. Velg artefakt til venstre fra build-pipelinen du lagde i forrige oppgave, trykk "Add an artifact". Velg byggepipelinen du opprettet i forrige steg. Her kan du også velge om du vil spesifisere hvilket bygg du vil bruke for hver release, eller om den skal bruke siste bygget hver gang.
+5. Velg artifact til venstre fra build-pipelinen du lagde i forrige oppgave, trykk "Add an artifact". Velg byggepipelinen du opprettet i forrige steg. Her kan du også velge om du vil spesifisere hvilket bygg du vil bruke for hver release, eller om den skal bruke siste bygget hver gang.
 6. Trykk så på "Pre-deployment conditions" for Test-miljøet ditt. Her kan du velge om du ønsker at det skal bli deployet automatisk når du oppretter en release, eller om du må gjøre dette manuelt. Dette er liten oval runding til venstre for Test-boksen med et lyn og en person på.
 7. Åpne så Tasks->"Navnet på din stage (f.eks. Test)" (menyen øverst står på pipeline, bytt til Tasks) og legg til tasken "ARM Template Deployment". 
-8. Velge Azure subscription, ressursgruppen du har laget og sett location til samme sted som ressursgruppen.
-9. Åpne opp "Template" settings
-10. I template feltet, finn stien til `azuredeploy.json`.
-11. I template parameters feltet, finn stien til `azuredeploy.test.parameters.json`
-12. Trykk så på "Save" og "Ok".
-13. Trykk så på "Create Release" og lag en release
-14. Gå inn i releasen
-15. Klikk på deploy 
+8. Velg så Azure Resource Manager connection som du valgte i forrige leksjon.
+9. Velge Azure subscription, ressursgruppen du har laget og sett location til samme sted som ressursgruppen.
+10. Åpne opp "Template" settings
+11. I template feltet, finn stien til `azuredeploy.json`.
+12. I template parameters feltet, finn stien til `azuredeploy.test.parameters.json`
+13. Trykk så på "Save" og "Ok".
+14. Trykk så på "Create Release" og lag en release
+15. Gå inn i releasen
+16. Klikk på deploy 
 ​
 Verifiser at ressursene dine blir deployet ut til ressursgruppen din.
-​
+​Forsøk å kjøre what if kommandoen igjen, og se om om det evenutelt oppstår noen endringer. 
+
+
+### Tilpass applikasjonen til å hente ut secrets fra Keyvault. 
+I forrige leksjon lagret vi connection stringen til storage accounten direkte i konfigen til applikasjonen, dette er worst practise. 
+I denne leksjonen skal vi istedenfor opprette ett eget keyvault, lagre account keyen under secrets i keyvault og gi applikasjonen rettigheter til å hente ut secrets fra keyvaulten. 
+
+Åpne `azuredeploy.json` og gjør følgende endringer:
+* Under variables legg til følgende: 
+```
+"keyvaultNameWithEnvironment": "[concat(parameters('webSiteName'),'-',parameters('environment'),'-kv')]"
+```
+
+* Søk etter `Microsoft.Web/sites` og legg inn følgende 
+```
+"identity": {
+  "type": "SystemAssigned"
+}
+```
+
+og under properties.siteConfig.appsettings, legg inn følgende setting: 
+```
+{
+  "name": "KeyVaultUri",
+  "value": "[reference(variables('keyVaultName')).vaultUri]"
+},
+{
+  "name": "AzureStorageConfig:AccountName",
+  "value": "[variables('storageAccountNameWithEnvironment')]"
+},
+```
+Dette oppretter en managed identity som applikasjonen kan bruke for å autentisere seg mot Azure AD istedenfor å bruke f.eks connection strings mot azure tjenester. 
+
+* Under resources legg inn følgende: 
+```
+{
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2021-10-01",
+      "name": "[variables('keyvaultNameWithEnvironment')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "enabledForDeployment": false,
+        "enabledForDiskEncryption": false,
+        "enabledForTemplateDeployment": false,
+        "enablePurgeProtection": true,
+        "enableRbacAuthorization": false,
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": 90,
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "accessPolicies": [
+        ],
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "defaultAction": "Deny"
+        }
+      }
+    }
+```
+Dette oppretter ett keyvault, 
+
+*For å ikke skape sirkulær referanse, må vi gi tilgang til app servicen i ett eget steg. 
+I ressurs arrayet, legg inn følgende.
+
+```
+{
+  "type": "Microsoft.KeyVault/vaults/accessPolicies",
+  "name": "[concat(variables('keyvaultNameWithEnvironment'), '/add')]",
+  "apiVersion": "2018-02-14",
+  "properties": {
+    "accessPolicies": [
+      {
+        "tenantId": "[subscription().tenantId]",
+        "objectId": "[reference(variables('websiteNameWithEnvironment'),'2018-02-01', 'Full').identity.principalId]",
+        "permissions": {
+          "keys": [ "all" ],
+          "secrets": [ "all" ],
+          "certificates": [ "all" ],
+          "storage": [ "all" ]
+        }
+      }
+    ]
+  }
+}
+```
+Dette gir managed identityen til app servicen full tilgang via keyvaultet sin access policy.  
+Merk: Anbefalt practise er å heller assigne Azure RBAC rolle til App servicen sin managed identity. For hvordan man gjør det, se bonus leksjon. 
+
+* Legg så inn følgende: 
+
+```
+{
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2018-02-14",
+      "name": "[concat(variables('keyvaultNameWithEnvironment'), '/AzureStorageConfig--AccountKey')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+          "[resourceId('Microsoft.KeyVault/vaults', variables('keyvaultNameWithEnvironment'))]",
+          "[variables('storageAccountNameWithEnvironment')]"
+      ],
+      "properties": {
+          "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountNameWithEnvironment')), '2019-04-01').keys[0].value]"
+      }
+    }
+
+```
+
+Dette lager en secret i keyvaulten som inneholder storage account key'en. Denne skal vi i neste steg hente ut automatisk.
+
+Commit og push koden til devops. Trigg en ny deploy til test miljø.
+
+### Åpne Azureworkshop.sln 
+
+Legg inn følgende Nuget pakker: `Azure.Extensions.AspNetCore.Configuration.Secrets` og `Azure.Identity`. 
+I Program.cs legger du inn følgende i CreateWebHostBuilder funksjonen mellom linjene: WebHost.CreateDefaultBuilder(args) og .UseStartup<Startup>();
+```
+.ConfigureAppConfiguration((context, builder) =>
+{
+    var config = builder.Build();
+    if (!string.IsNullOrEmpty(config["KeyVaultUri"]))
+    {
+        var secretClient = new SecretClient(new Uri(config["KeyVaultUri"]), new DefaultAzureCredential());
+        builder.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
+    }
+})
+```
+
+Denne kode biten her forteller applikasjonen til å hente ut secrets fra keyvault, med managed identitien som vi nettopp opprettet ved oppstart av applikasjonen. 
+
+Modellen vår støtter ikke `AccountKey` og `AccountName`, Gå til Models/AzureStorageConfig.cs 
+Bytt ut klassen med følgende: 
+
+```
+
+
+```
+I StorageService, lag en private readonly string. og bytt ut følgende kodesnutter i UploadFileToStorage og GetImageUrls med 
+
+```
+private readonly AzureStorageConfig _storageConfig;
+private readonly string _storageConnectionString;
+
+public StorageService(IOptions<AzureStorageConfig> storageConfig)
+{
+    _storageConfig = storageConfig != null ? storageConfig.Value : throw new ArgumentNullException(nameof(storageConfig));
+
+    _storageConnectionString = $"DefaultEndpointsProtocol=https;AccountName={_storageConfig.AccountName};AccountKey={_storageConfig.AccountKey};EndpointSuffix=core.windows.net";
+}
+```
+
+```
+BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConnectionString);
+```
 ### Redeploy av miljø
 For å teste at ting faktisk blir opprettet på konsistent vis, skal du nå slette og redeploye.
 ​

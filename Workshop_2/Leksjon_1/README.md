@@ -45,8 +45,8 @@ Gå til Repos og initialisere med VisualStudio gitignore. Clone repoet ned til d
 For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, og en for prod i [Azure](https://portal.azure.com). Husk å bruke samme brukeren i Azure som i Azure DevOps. 
 
 Det er som oftest lurt å lage separate ressursgrupper for forskjellige miljøer. Når det gjelder app service plan trenger vi ikke noen kraftige greier. Det holder med en F1 pricing tier. Anbefaler at dere gir ressursgruppene, app service planene, og app servicene et navn som gjør det lett å få oversikt over hvilke Azure ressurser som hører til hvilket miljø. Dette gjør det lettere å identifisere miljøene når vi skal sette opp build pipelinen. Eksempelvis for app servicene:
-- **Test**: [NavnPåApp]Test
-- **Prod**: [NavnPåApp]
+- **Test**: [NavnPåApp]-test
+- **Prod**: [NavnPåApp]-prod
 
 Fremgangsmåte:
 1. Gå til [Azure](https://portal.azure.com)
@@ -68,7 +68,7 @@ Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
 
 1. Gå til [Azure](https://portal.azure.com) 
 2. Lag en storage account for hvert miljø, velg samme ressursgruppe som web applikasjonen. 
-   * <b>Storage account name</b> Navnet må være unikt i hele azure, lengde fra 3-24 tegn og kan kun innholde små bokstaver og tall.
+   * <b>Storage account name</b> Navnet må være unikt i hele azure, lengde fra 3-24 tegn og kan kun innholde små bokstaver og tall. Postfix storage accounten med `test`/ `prod`. Eksempel `ws2knuteltest`
    * <b>Region</b> Velg samme region som ressursgruppen.
    * <b>Performance</b> Standard
    * <b>Redundancy</b> LRS
