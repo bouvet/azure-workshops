@@ -2,22 +2,26 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "environment": {
+      "allowedValues": ["test", "prod"],
+      "type": "string"
+    },
     "webSiteName": {
       "type": "string",
+      "defaultValue": "workshop2-knutel", // Todo Fyll inn.
+      "minLength": 2,
+      "maxLength": 36,
       "metadata": {
         "description": "The name of the web site."
       }
     },
     "storageAccountName": {
       "type": "string",
+      "defaultValue": "workshop2knutel",// Todo fyll inn.
+      "minLength": 3,
+      "maxLength": 20,
       "metadata": {
-        "description": "The name of the Azure Storage account."
-      }
-    },
-    "blobContainerName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the container for storing images."
+        "description": "The name of the Azure Storage account. May contain numbers and lowercase letters only!"
       }
     },
     "appServiceSku": {
@@ -27,12 +31,6 @@
         "description": "The SKU of the App Service Plan"
       }
     },
-    "appInsightsName": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the Application Insights instance" 
-      } 
-    }, 
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -42,9 +40,27 @@
     }
   },
   "variables": {
-    "servicePlanName": "AppServicePlan" 
+    "servicePlanName": "AppServicePlan",
+    "blobContainerName": "imagecontainer",
+    "websiteNameWithEnvironment": "[concat(parameters('webSiteName'),'-',parameters('environment'))]",
+    "keyvaultNameWithEnvironment": "[concat(parameters('webSiteName'),'-',parameters('environment'),'-kv')]",
+    "storageAccountNameWithEnvironment": "[concat(parameters('storageAccountName'),parameters('environment'))]",
+    "appInsightsNameWithEnvironment": "[concat(parameters('webSiteName'),'-',parameters('environment'),'-ai')]"
   },
   "resources": [
+    {
+      "name": "[variables('appInsightsNameWithEnvironment')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2015-05-01",
+      "location": "[parameters('location')]",
+      "tags": {},
+      "kind": "string",
+      "properties": {
+        "Application_Type": "web",
+        "Flow_Type": "Bluefield",
+        "Request_Source": "rest"
+      }
+    },
     {
       "apiVersion": "2021-03-01",
       "type": "Microsoft.Web/serverfarms",
@@ -62,16 +78,31 @@
       "apiVersion": "2021-03-01",
       "type": "Microsoft.Web/sites",
       "kind": "app",
-      "name": "[parameters('webSiteName')]",
+      "name": "[variables('websiteNameWithEnvironment')]",
       "location": "[parameters('location')]",
       "comments": "This is the web app, also the default 'nameless' slot.",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
         "siteConfig": {
-          "appSettings": [
+          "appSettings": [            
             {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('Microsoft.Insights/components', parameters('appInsightsName')), '2014-04-01').InstrumentationKey]"
+              "name": "AzureStorageConfig:AccountName",
+              "value": "[variables('storageAccountNameWithEnvironment')]"
+            },
+            {
+              "name": "AzureStorageConfig:ImageContainer",
+              "value": "[variables('blobContainerName')]"
+            },
+            {
+              "name": "KeyVaultUri",
+              "value": "[reference(variables('keyvaultNameWithEnvironment')).vaultUri]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(concat('microsoft.insights/components/', variables('appInsightsNameWithEnvironment')), '2015-05-01').ConnectionString]"
             },
             {
               "name": "APPINSIGHTS_PORTALINFO",
@@ -84,31 +115,20 @@
             {
               "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
               "value": "1.0.0"
-            },
-            {
-              "name": "AzureStorageConfig:AccountName",
-              "value": "[parameters('storageAccountName')]"
-            },
-            {
-              "name": "AzureStorageConfig:AccountKey",
-              "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
-            },
-            {
-              "name": "AzureStorageConfig:ImageContainer",
-              "value": "[parameters('blobContainerName')]"
             }
           ]
         }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
-        "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]"
+        "[variables('storageAccountNameWithEnvironment')]",
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsNameWithEnvironment'))]"
       ]
     },
     {
-      "name": "[parameters('storageAccountName')]",
+      "name": "[variables('storageAccountNameWithEnvironment')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2021-01-01",
       "location": "[parameters('location')]",
       "kind": "StorageV2",
       "sku": {
@@ -120,29 +140,69 @@
       },
       "resources": [
         {
-          "name": "[concat('default/', parameters('blobContainerName'))]",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-03-01-preview",
+          "name": "[concat(variables('storageAccountNameWithEnvironment'),'/default/', variables('blobContainerName'))]",
+          "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+          "apiVersion": "2021-01-01",
           "properties": {
-            "publicAccess": "Container"
+            "publicAccess": "None"
           },
-          "dependsOn": [
-            "[parameters('storageAccountName')]"
-          ]
+          "dependsOn": ["[variables('storageAccountNameWithEnvironment')]"]
         }
       ]
     },
     {
-      "name": "[parameters('appInsightsName')]",
-      "type": "Microsoft.Insights/components",
-      "apiVersion": "2015-05-01",
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2021-10-01",
+      "name": "[variables('keyvaultNameWithEnvironment')]",
       "location": "[parameters('location')]",
-      "tags": {},
-      "kind": "string",
       "properties": {
-        "Application_Type": "web",
-        "Flow_Type": "Bluefield",
-        "Request_Source": "rest"
+        "enabledForDeployment": false,
+        "enabledForDiskEncryption": false,
+        "enabledForTemplateDeployment": false,
+        "enablePurgeProtection": true,
+        "enableRbacAuthorization": false,
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": 90,
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "accessPolicies": [          
+        ],
+        "publicNetworkAccess": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/accessPolicies",
+      "name": "[concat(variables('keyvaultNameWithEnvironment'), '/add')]",
+      "apiVersion": "2018-02-14",
+      "properties": {
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[reference(variables('websiteNameWithEnvironment'),'2018-02-01', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": [ "all" ],
+              "secrets": [ "all" ],
+              "certificates": [ "all" ],
+              "storage": [ "all" ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2018-02-14",
+      "name": "[concat(variables('keyvaultNameWithEnvironment'), '/AzureStorageConfig--AccountKey')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+          "[resourceId('Microsoft.KeyVault/vaults', variables('keyvaultNameWithEnvironment'))]",
+          "[variables('storageAccountNameWithEnvironment')]"
+      ],
+      "properties": {
+          "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountNameWithEnvironment')), '2019-04-01').keys[0].value]"
       }
     }
   ]

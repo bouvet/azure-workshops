@@ -60,9 +60,9 @@ stages:
                 displayName: 'Deploy web app to azure'
                 inputs:
                   ConnectionType: 'AzureRM'
-                  azureSubscription: 'ServiceConnectionTest'
+                  azureSubscription: 'Test'
                   appType: 'webApp'
-                  WebAppName: 'ws2-kel-test'
+                  WebAppName: 'workshop2-knutel-test'
                   packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
   - stage: deploy_prod
     jobs:
@@ -83,7 +83,7 @@ stages:
                 displayName: 'Deploy web app to azure'
                 inputs:
                   ConnectionType: 'AzureRM'
-                  azureSubscription: 'ServiceConnectionTest'
+                  azureSubscription: 'Test'
                   appType: 'webApp'
-                  WebAppName: 'ws2-kel-prod'
+                  WebAppName: 'workshop2-knutel-prod'
                   packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
