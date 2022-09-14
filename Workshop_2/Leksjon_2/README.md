@@ -150,8 +150,7 @@ I ressurs arrayet, legg inn følgende.
   }
 }
 ```
-Dette gir managed identityen til app servicen full tilgang via keyvaultet sin access policy.  
-Merk: Anbefalt practise er å heller assigne Azure RBAC rolle til App servicen sin managed identity. For hvordan man gjør det, se bonus leksjon. 
+Dette gir managed identityen til app servicen full tilgang via keyvaultet sin access policy.
 
 * Legg så inn følgende: 
 
