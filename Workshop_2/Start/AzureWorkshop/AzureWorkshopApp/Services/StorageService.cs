@@ -53,7 +53,7 @@ namespace AzureWorkshopApp.Services
 
             //Create a BlobContainerClient
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(_storageConfig.ImageContainer);
-
+            
             BlobSasBuilder builder;
             await foreach(var blobItem in blobContainerClient.GetBlobsAsync())
             {

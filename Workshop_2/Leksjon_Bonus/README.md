@@ -1,9 +1,9 @@
 # Bonus leksjon
 Her en noen ekstra-oppgaver dersom du skulle bli raskt ferdig.
 
-## Flere miljøer med infrastruktur
-
-Sett opp release-pipelines for qa og produksjon i infrastruktur-prosjektet. 
+## Tags 
+Forsøk å tagge alle ressurser i med App = Workshop2. 
+Etter at det er blitt deployet, kan du gå i portalen og forsøke å finne alle ressurser som du har gitt med den taggen.
 
 ## Slot-deployment i produksjon
 

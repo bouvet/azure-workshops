@@ -1,23 +1,27 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "environment": {
+      "allowedValues": ["test", "prod"],
+      "type": "string"
+    },
     "webSiteName": {
       "type": "string",
+      "defaultValue": "", // Todo Fyll inn.
+      "minLength": 2,
+      "maxLength": 36,
       "metadata": {
         "description": "The name of the web site."
       }
     },
     "storageAccountName": {
       "type": "string",
+      "defaultValue": "",// Todo fyll inn.
+      "minLength": 3,
+      "maxLength": 20,
       "metadata": {
-        "description": "The name of the Azure Storage account."
-      }
-    },
-    "blobContainerName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the container for storing images."
+        "description": "The name of the Azure Storage account. May contain numbers and lowercase letters only!"
       }
     },
     "appServiceSku": {
@@ -36,11 +40,14 @@
     }
   },
   "variables": {
-    "servicePlanName": "AppServicePlan" 
+    "servicePlanName": "AppServicePlan",
+    "blobContainerName": "imagecontainer",
+    "websiteNameWithEnvironment": "[concat(parameters('webSiteName'),'-',parameters('environment'))]",
+    "storageAccountNameWithEnvironment": "[concat(parameters('storageAccountName'),parameters('environment'))]"
   },
   "resources": [
     {
-      "apiVersion": "2017-08-01",
+      "apiVersion": "2021-03-01",
       "type": "Microsoft.Web/serverfarms",
       "kind": "app",
       "name": "[variables('servicePlanName')]",
@@ -53,10 +60,10 @@
       }
     },
     {
-      "apiVersion": "2016-08-01",
+      "apiVersion": "2021-03-01",
       "type": "Microsoft.Web/sites",
       "kind": "app",
-      "name": "[parameters('webSiteName')]",
+      "name": "[variables('websiteNameWithEnvironment')]",
       "location": "[parameters('location')]",
       "comments": "This is the web app, also the default 'nameless' slot.",
       "properties": {
@@ -64,28 +71,21 @@
         "siteConfig": {
           "appSettings": [
             {
-              "name": "AzureStorageConfig:AccountName",
-              "value": "[parameters('storageAccountName')]"
-            },
-            {
-              "name": "AzureStorageConfig:AccountKey",
-              "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
-            },
-            {
               "name": "AzureStorageConfig:ImageContainer",
-              "value": "[parameters('blobContainerName')]"
+              "value": "[variables('blobContainerName')]"
             }
           ]
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
+        "[variables('storageAccountNameWithEnvironment')]"
       ]
     },
     {
-      "name": "[parameters('storageAccountName')]",
+      "name": "[variables('storageAccountNameWithEnvironment')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2021-01-01",
       "location": "[parameters('location')]",
       "kind": "StorageV2",
       "sku": {
@@ -97,15 +97,13 @@
       },
       "resources": [
         {
-          "name": "[concat('default/', parameters('blobContainerName'))]",
-          "type": "blobServices/containers",
-          "apiVersion": "2018-03-01-preview",
+          "name": "[concat(variables('storageAccountNameWithEnvironment'),'/default/', variables('blobContainerName'))]",
+          "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+          "apiVersion": "2021-01-01",
           "properties": {
-            "publicAccess": "Container"
+            "publicAccess": "None"
           },
-          "dependsOn": [
-            "[parameters('storageAccountName')]"
-          ]
+          "dependsOn": ["[variables('storageAccountNameWithEnvironment')]"]
         }
       ]
     }

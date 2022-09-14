@@ -8,7 +8,7 @@ namespace AzureWorkshopAppTests
         [Fact]
         public void TestShouldPass()
         {
-            const bool testShouldPass = false;
+            const bool testShouldPass = true;
 
             Assert.True(testShouldPass);
         }

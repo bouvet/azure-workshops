@@ -13,10 +13,13 @@ namespace AzureWorkshopApp.Services
     public class StorageService : IStorageService
     {
         private readonly AzureStorageConfig _storageConfig;
+        private readonly string _storageConnectionString;
 
         public StorageService(IOptions<AzureStorageConfig> storageConfig)
         {
             _storageConfig = storageConfig != null ? storageConfig.Value : throw new ArgumentNullException(nameof(storageConfig));
+
+            _storageConnectionString = $"DefaultEndpointsProtocol=https;AccountName={_storageConfig.AccountName};AccountKey={_storageConfig.AccountKey};EndpointSuffix=core.windows.net";
         }
 
         public AzureStorageConfigValidationResult ValidateConfiguration()
@@ -27,7 +30,7 @@ namespace AzureWorkshopApp.Services
         public async Task<bool> UploadFileToStorage(Stream fileStream, string fileName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConfig.ConnectionString);
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConnectionString);
 
             //Create a BlobContainerClient
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(_storageConfig.ImageContainer);
@@ -49,11 +52,12 @@ namespace AzureWorkshopApp.Services
             List<string> imageUrls = new List<string>();
 
             // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConfig.ConnectionString);
+
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConnectionString);
 
             //Create a BlobContainerClient
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(_storageConfig.ImageContainer);
-
+            
             BlobSasBuilder builder;
             await foreach(var blobItem in blobContainerClient.GetBlobsAsync())
             {
