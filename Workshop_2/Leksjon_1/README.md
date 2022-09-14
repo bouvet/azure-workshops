@@ -119,6 +119,8 @@ Om du har gjort alt riktig så burde build steget feile og det er meningen. .NET
 * Velg Pipelinen du lagde
 * Trykk Edit
 * Slett alt under steps: (burde være to linjer, en med 'script:' og en med 'displayname:')
+* Legg til Npm Task
+* Velg `Install` som command. og Working Folder: `AzureWorkshop/AzureWorkshopApp`
 * Legg til .Net Core task
 * Velg publish under .Net Core tasken
 * Huk vekk Publish web projects
@@ -164,7 +166,10 @@ stages:
   - stage: build
     jobs:
     - job: build
-      steps:  
+      steps: 
+      - task: Npm@1
+        inputs: 
+          ***** 
       - task: DotNetCoreCLI@2
         inputs:
           ****

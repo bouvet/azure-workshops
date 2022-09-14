@@ -22,6 +22,10 @@ stages:
     jobs:
     - job: build
       steps:  
+      - task: Npm@1
+        inputs:
+          command: 'install'
+          workingDir: 'AzureWorkshop/AzureWorkshopApp'
       - task: DotNetCoreCLI@2
         displayName: 'dotnet publish $(buildConfiguration)'
         inputs:
