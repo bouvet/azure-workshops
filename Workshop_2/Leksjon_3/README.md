@@ -4,27 +4,27 @@ Vi har nå lagt til en Application Insights instans i ARM templaten. I forrige l
 ## Legg til Application Insights
 For Visual Studio
 1. Åpne `AzureWorkshopApp.sln`
-2. Åpne Package Manager Console og skriv `Install-Package Microsoft.ApplicationInsights.AspNetCore -Version 2.5.1` (det kan hende at du må bruke GUI til å legge til NuGet-Pakken `Microsoft.ApplicationInsights.AspNetCore`)
+2. Åpne Package Manager Console og skriv `Install-Package Microsoft.ApplicationInsights.AspNetCore -Version 2.21.0` (det kan hende at du må bruke GUI til å legge til NuGet-Pakken `Microsoft.ApplicationInsights.AspNetCore`)
 ​
 
 For Visual Studio Code
 1. Åpne Terminal vindu
 2. Naviger til riktig mappe (Start/AzureWorkshop/AzureWorkshopApp)
-3. Kjør kommandoen `dotnet add .\AzureWorkshopApp.csproj package --version 2.5.1 Microsoft.ApplicationInsights.AspNetCore`
+3. Kjør kommandoen `dotnet add .\AzureWorkshopApp.csproj package --version 2.21.0 Microsoft.ApplicationInsights.AspNetCore`
 
-Åpne filen `Program.cs` og modifiser koden slik at det nå står
+Åpne filen `Startup.cs` og endre ConfigureServices til
 <font size="4">
 
 ```C#
-        public static void Main(string[] args)
-        {
-            CreateWebHostBuilder(args).Run();
-        }
-​
-        public static IWebHost CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseApplicationInsights().Build();
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMvc();
+    services.AddOptions();
+    services.AddApplicationInsightsTelemetry(); // Legg til denne
+    services.AddScoped<IStorageService, StorageService>();
+    services.Configure<AzureStorageConfig>(Configuration.GetSection("AzureStorageConfig"));
+}
+      
 ```
 </font>
 ​
@@ -47,7 +47,6 @@ Commit (skrive en bra commit-melding, f.eks. `add ApplicationInsights telemetry`
 ​
 Når release er ferdig, naviger til azure-websiten og generer litt trafikk. Bonuspoeng for alle som klarer å lage en exception 
 ​
-_hint: last opp en `.txt-fil`, det burde kræsje_
 ​
 ## Se på telemetri
 - Gå til portal.azure.com
@@ -70,18 +69,7 @@ Se https://docs.microsoft.com/en-us/azure/azure-monitor/log-query/get-started-po
 ## Lage egne events
 Ved å lage våre egne events kan vi følge handlingene brukerne våre tar. Det gjør oss i stand til å kunne bekrefte eller avkrefte hypotesene vi har laget oss om hvordan en endring vil påvirke bruken av systemet. Dette er verdifull feedback som vi kan bruke til å forbedre utviklingsprosessen vår.
 ​
-Først må vi gå til Visual Studio og legge til TelemetryClient som dependency i startup:
-​
-Gå til `Startup.cs` og metoden `public void ConfigureServices(IServiceCollection services)`
-​
-Legg til følgende linje:
-<font size="4">
-
-```c#
-   services.AddApplicationInsightsTelemetry(Configuration);
-```
-</font>
-Deretter skal vi konfigurere `ImagesController.cs` til å lage egendefinert telemetri
+Først må vi konfigurere `ImagesController.cs` til å lage egendefinert telemetri
 - Åpne filen `ImagesController.cs`
 - Endre konstruktør og lokale variabler til følgende:
 <font size="4">
@@ -102,31 +90,29 @@ Deretter skal vi konfigurere `ImagesController.cs` til å lage egendefinert tele
 <font size="4">
 
 ```c#
-        foreach (var formFile in files)
-        {
-            if (!FileFormatHelper.IsImage(formFile))
+         foreach (var formFile in files)
             {
-                return new UnsupportedMediaTypeResult();
-            }
-            if (formFile.Length <= 0)
-            {
-                continue;
-            }
-​
-            _telemetryClient.TrackEvent("UPLOADED_FILE", new Dictionary<string, string>
-            {
-                { "FILE_NAME", formFile.FileName},
-                { "CONTENT_LENGTH", formFile.Length.ToString()}
-            });
-​
-            using (var stream = formFile.OpenReadStream())
-            {
-                if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
+                if (FileFormatHelper.IsImage(formFile))
                 {
-                    return new AcceptedResult();
+                    if (formFile.Length > 0)
+                        using (var stream = formFile.OpenReadStream())
+                        {
+                            if (await _storageService.UploadFileToStorage(stream, formFile.FileName))
+                            {
+                                _telemetryClient.TrackEvent("UPLOADED_FILE", new Dictionary<string, string>
+                                    {
+                                        { "FILE_NAME", formFile.FileName},
+                                        { "CONTENT_LENGTH", formFile.Length.ToString()}
+                                    });
+                                return new AcceptedResult();
+                            }
+                        }
+                }
+                else
+                {
+                    return new UnsupportedMediaTypeResult();
                 }
             }
-        }
 ```
 </font>
 
