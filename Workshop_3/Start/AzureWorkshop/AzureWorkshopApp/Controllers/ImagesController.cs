@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AzureWorkshopApp.Controllers
 {
     // TODO: Legg til attributt for at bruker må være innlogget for å aksessere controller
-    [Authorize] 
+    // [Authorize] 
     [Route("api/[controller]")]
     public class ImagesController : Controller
     {

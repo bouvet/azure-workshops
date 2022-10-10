@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 // TODO: Kommenter inn usings
 // using Microsoft.Identity.Web;
 // using Microsoft.Identity.Web.UI;
-// using Microsoft.AspNetCore.Authentication;
 // using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
