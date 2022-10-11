@@ -76,9 +76,6 @@ namespace AzureWorkshopApp.Services
 
                 //Create the sasUri and add it to the list                
                 imageUrls.Add(blobClient.GenerateSasUri(builder).AbsoluteUri);
-
-                // TODO: Kommenter ut denne
-                imageUrls.Add(blobClient.Uri.AbsoluteUri);
             }
 
             return imageUrls;
