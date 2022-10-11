@@ -67,9 +67,12 @@
       "name": "[parameters('webSiteName')]",
       "location": "[parameters('location')]",
       "comments": "This is the web app, also the default 'nameless' slot.",
+      "identity": {
+        "type" : "SystemAssigned"
+      },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
-        "siteConfig": {
+        "siteConfig": {          
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",

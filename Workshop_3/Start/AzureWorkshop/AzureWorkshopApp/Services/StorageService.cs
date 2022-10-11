@@ -62,22 +62,20 @@ namespace AzureWorkshopApp.Services
                 //Create a blobclient from the blobItem.Name
                 var blobClient = blobContainerClient.GetBlobClient(blobItem.Name);
 
-                //Create a shared access signature builder with name of the container, the blob, type of resource and expiration
-                // TODO: Kommenter inn denne for å generere et Shared Access Signature token (SAS-token)
+                //Create a shared access signature builder with name of the container, the blob, type of resource and expiration                
                 // Tokenet gir kun lesetilgang til bildet (blob) i 15 minutter.
-                //builder = new BlobSasBuilder()
-                //{
-                //    BlobContainerName = blobContainerClient.Name,
-                //    BlobName = blobClient.Name,
-                //    Resource = "b",
-                //    ExpiresOn = DateTime.UtcNow.AddMinutes(15),
-                //};
+                builder = new BlobSasBuilder()
+                {
+                   BlobContainerName = blobContainerClient.Name,
+                   BlobName = blobClient.Name,
+                   Resource = "b",
+                   ExpiresOn = DateTime.UtcNow.AddMinutes(15),
+                };
                 ////Set type of access, we only need read so we set that 
-                //builder.SetPermissions(BlobAccountSasPermissions.Read);
+                builder.SetPermissions(BlobAccountSasPermissions.Read);
 
-                //Create the sasUri and add it to the list
-                // TODO: kommenter inn denne for å lage uri med sasToken
-                //imageUrls.Add(blobClient.GenerateSasUri(builder).AbsoluteUri);
+                //Create the sasUri and add it to the list                
+                imageUrls.Add(blobClient.GenerateSasUri(builder).AbsoluteUri);
 
                 // TODO: Kommenter ut denne
                 imageUrls.Add(blobClient.Uri.AbsoluteUri);
