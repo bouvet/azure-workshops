@@ -129,7 +129,7 @@ Legg inn connection string til Storage Account som secret i keyvault. NB! Secret
 ```
 
 **Gi applikasjonen tilgang til å lese secrets**
-For dette steget trenger du ObjektID'en til webapplikasjonens _Managed Service Identity_. Den finner du enklest ved å kjøre `az webapp show --name {dinWebApp} --resource-group {dinRessursgruppe}`, og lese av verdien identity->principalId. Du kan også gå til webapplikasjonen i portalen og lese ut verdien under "Identity"-fanen.
+For dette steget trenger du ObjektID'en til webapplikasjonens _Managed Service Identity_. Den finner du enklest ved å kjøre `az webapp show --name {dinWebApp} --resource-group {dinRessursgruppe}`, og lese av verdien identity->principalId. Du kan også gå til webapplikasjonen i portalen og lese ut verdien under "Identity"-fanen.  Verdien for resourceID  er den samme du fant i tidligere steg.
 ```
 az role assignment create --role "Key Vault Secrets User" --assignee {principalId} --scope {resourceId}
 ```
