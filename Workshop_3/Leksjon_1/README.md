@@ -47,15 +47,14 @@ Først må vi konfigurere navn på tjenestene som brukes av applikasjonen slik a
    ​
 
 #### _For å deploye infrastrukturen med Azure CLI_
-
 1. Åpne Powershell/Terminal
 1. Naviger til `Start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur`
 1. Logg inn ved å kjøre `az login`
 1. Bytt subscription hvis du trenger det med kommandoen `az account set --subscription "{subscription name or id}"`
-1. Kjør kommandoen
+1. Opprett en ressursgruppe ved å kjøre kommandoen ```az group create --name {dinRessursgruppe} --location {dinLocation}``` Gi ressursgruppen et selvvalgt navn. For location kan du f.eks. bruke `westeurope`  eller `norwayeast`.
+1. Kjør kommandoen 
    ```powershell
    az deployment group create `
-   --name {ExampleDeployment} `
    --resource-group {dinRessursGruppe} `
    --template-file .\azuredeploy.json `
    --parameters '@azuredeploy.parameters.json'
@@ -102,26 +101,56 @@ Nå skal du deploye selve applikasjonen fra Visual Studio Code.
 
 Nå skal du ha en fungerende applikasjon i Azure. Du kan jo prøve å laste opp et bilde for se at det fungerer.
 
-## Sikring av bilder i Storage Account
+## Sikring av hemmeligheter
+For å sikre hemmeligheter som passord og connection strings kan man bruke Azure KeyVault. For å sørge for at disse hemmelighetene ikke er lett tilgjengelig legges disse inn i et keyvault, som man begrenser tilgangen til.
+(Denne oppgaven var bonusleksjon i WS1, hvis noen synes den ser kjent ut. Har du gjort den før kan du velge om du vil forsøke å gjøre endringene i ARM-templates i stedet for å bruke Azure CLI).
 
-​
-Frem til nå har applikasjonen brukt en container i storage account med public-access. Dette gjør at hele bildekatalogen er åpen for hele verden. Med de endringene vi gjør i applikasjonen, ønsker vi ikke dette lenger.
-​
+### _Azure CLI_
+**Opprett keyvault**
+```
+az keyvault create  --name {dittKeyVault} --enable-rbac-authorization true --resource-group {dinRessursGruppe}
+```
+**Gi deg selv rettigheter til å administrere secrets**
+For dette steget trenger du å finne to verdier. Det første er din userid, den finner du enklest ved å kjøre `az ad signed-in-user show`. 
+Deretter trenger du Resource identifier (id) til keyvaultet. Den finner du ved å kjøre `az keyvault show --name {dittKeyVault}`. Den ser typisk slik ut: `/subscriptions/{subscriptionid}/resourceGroups/{dinRessursgruppe}/providers/Microsoft.KeyVault/vaults/{dittKeyVault}`
 
-1. Editer `azuredeploy.json` i infrastruktur-prosjektet, og under konfigurasjon av Storage Account, bytt ut linjen
-   `"publicAccess": "Container"` med `"publicAccess": "None"`.
-2. Deploy prosjektet på nytt, ved å gå gjennom de samme stegene du gjorde for infrastruktur deployment.
+```
+az role assignment create --role "Key Vault Administrator" --assignee {userid} --scope {resourceId}
+```
 
-   Hvis du tester applikasjon din i Azure nå, vil du se at bildene ikke vil vises.
+**Finn connection string til Storage Account**
+```
+az storage account show-connection-string --name {dinStorageAccount} 
+```
+**Legg til secret i keyvault** 
+Legg inn connection string til Storage Account som secret i keyvault. NB! Secreten må hete `AzureStorageConfig--ConnectionString` for at den skal plukkes opp av konfigurasjonssystemet til webapplikasjonen.
+```
+ az keyvault secret set --name AzureStorageConfig--ConnectionString --vault-name {dittKeyVault} --value {connectionString}
+```
 
-   For å kunne gi de brukerne som skal se bilder tilgang til bilder, skal vi bruke Shared Access Signature Tokens (SAS-token.) SAS-token er et token som gir en tidsbegrenset tilgang (lese, slette osv) til en ressurs (blob, container etc.) i storage account. Vi ønsker å gi kun lese-tilgang til bildene, samt at tilgangen skal være tidsbegrenset.
-   ​
+**Gi applikasjonen tilgang til å lese secrets**
+For dette steget trenger du ObjektID'en til webapplikasjonens _Managed Service Identity_. Den finner du enklest ved å kjøre `az webapp show --name {dinWebApp} --resource-group {dinRessursgruppe}`, og lese av verdien identity->principalId. Du kan også gå til webapplikasjonen i portalen og lese ut verdien under "Identity"-fanen.  Verdien for resourceID  er den samme du fant i tidligere steg.
+```
+az role assignment create --role "Key Vault Secrets User" --assignee {principalId} --scope {resourceId}
+```
 
-3. Editer filen `Services/StorageService.cs` filen i AzureWorkshopApp-filen. Vi har laget flere TODO-kommentarer som beskriver endringene som skal gjøres.
-4. Publiser prosjektet på nytt (høyreklikk på prosjektet og trykk "Publish")
-   ​
-   Nå skal du igjen se bildene, og hvis du høyreklikker på bildet og ser URL'en, så ser du at SAS-tokenet er lagt til på slutten. Du tenker
-   kanskje at alle har fortsatt tilgang, men det skal vi gjøre noe med i leksjon 2.
+**Oppdater applikasjonen**
+Oppdater webapplikasjonen til å bruke KeyVault for config-settings.
+Legg til nuget-pakkene `Azure.Identity` og `Azure.Extensions.AspNetCore.Configuration.Secrets`.
+
+Endre Program.cs: 
+```cs
+private const string KeyVaultEndpoint = "https://<navn-på-keyvault>.vault.azure.net/";
+public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+    WebHost.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((ctx, builder) =>
+            {
+                builder.AddAzureKeyVault(new Uri(KeyVaultEndpoint), new DefaultAzureCredential());
+            })
+            .UseStartup<Startup>().Build();
+```
+
+Deploy applikasjonen på nytt og sjekk at du får lastet opp og vist bilder.
    ​
 
 ## Microsoft Defender for Cloud (1)
