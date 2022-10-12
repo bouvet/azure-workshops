@@ -78,7 +78,7 @@ Nå skal du deploye selve applikasjonen fra Visual Studio. Åpne `AzureWorkshop/
 6. Velg så riktig subscription og ressursgruppe/app service som du opprettet i forrige oppgave.
 7. Trykk på OK - dette vil starte deploy til Azure.
    ​
-   Nå skal du ha en fungerende applikasjon i Azure. Du kan jo prøve å laste opp et bilde for se at det fungerer.
+   Nå skal du ha en fungerende applikasjon i Azure. Hvis du forsøker å gå til applikasjonen vil du få en feilmelding om manglende connection string. Det skal vi fikse i neste steg.
    ​
 
 #### _For brukere med Visual Studio Code_
@@ -99,7 +99,7 @@ Nå skal du deploye selve applikasjonen fra Visual Studio Code.
 12. Naviger til `Start/AzureWorkshop/AzureWorkshopApp/bin/Release/`
 13. Velg net6.0/publish-mappen
 
-Nå skal du ha en fungerende applikasjon i Azure. Du kan jo prøve å laste opp et bilde for se at det fungerer.
+Nå skal du ha en fungerende applikasjon i Azure. Hvis du forsøker å gå til applikasjonen vil du få en feilmelding om manglende connection string. Det skal vi fikse i neste steg.
 
 ## Sikring av hemmeligheter
 For å sikre hemmeligheter som passord og connection strings kan man bruke Azure KeyVault. For å sørge for at disse hemmelighetene ikke er lett tilgjengelig legges disse inn i et keyvault, som man begrenser tilgangen til.
