@@ -174,7 +174,7 @@ Microsoft Defender for Cloud bruker litt tid for å scanne tjenestene dine etter
 - Finn Microsoft Defender for Cloud fra menyen på venstre.
 - Klikk litt rundt i tjenesten og gjør deg litt kjent med hva som finnes her. Er tjenestene dine dukket opp, og er det kommet noen anbefalinger allerede?
 
-> Det er ikke sikkert du får anbefalinger i Azure Security Center med en gang. Det tar gjerne litt tid og derfor skal vi komme tilbake til Azure Security Center i leksjon 3, hvor vi skal se om vi får utbedret noen sårbarheter.
+> Det er ikke sikkert du får anbefalinger i Microsoft Defender for Cloud med en gang. Det tar gjerne litt tid og derfor skal vi komme tilbake til Microsoft Defender for Cloud i leksjon 3, hvor vi skal se om vi får utbedret noen sårbarheter.
 
 ​
 
