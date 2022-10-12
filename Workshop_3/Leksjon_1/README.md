@@ -140,14 +140,19 @@ Legg til nuget-pakkene `Azure.Identity` og `Azure.Extensions.AspNetCore.Configur
 
 Endre Program.cs: 
 ```cs
+using System;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration;
+...
 private const string KeyVaultEndpoint = "https://<navn-på-keyvault>.vault.azure.net/";
-public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-    WebHost.CreateDefaultBuilder(args)
+public static IWebHost CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((ctx, builder) =>
             {
-                builder.AddAzureKeyVault(new Uri(KeyVaultEndpoint), new DefaultAzureCredential());
+               builder.AddAzureKeyVault(new Uri(KeyVaultEndpoint), new DefaultAzureCredential());
             })
-            .UseStartup<Startup>().Build();
+            .UseStartup<Startup>()
+            .UseApplicationInsights().Build();
 ```
 
 Deploy applikasjonen på nytt og sjekk at du får lastet opp og vist bilder.
