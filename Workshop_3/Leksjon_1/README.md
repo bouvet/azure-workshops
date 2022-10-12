@@ -48,18 +48,19 @@ Først må vi konfigurere navn på tjenestene som brukes av applikasjonen slik a
 
 #### _For å deploye infrastrukturen med Azure CLI_
 1. Åpne Powershell/Terminal
-1. Naviger til `Start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur`
-1. Logg inn ved å kjøre `az login`
-1. Bytt subscription hvis du trenger det med kommandoen `az account set --subscription "{subscription name or id}"`
-1. Opprett en ressursgruppe ved å kjøre kommandoen ```az group create --name {dinRessursgruppe} --location {dinLocation}``` Gi ressursgruppen et selvvalgt navn. For location kan du f.eks. bruke `westeurope`  eller `norwayeast`.
-1. Kjør kommandoen 
+2. Naviger til `Start/AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur`
+3. Logg inn ved å kjøre `az login`
+4. Bytt subscription hvis du trenger det med kommandoen `az account set --subscription "{subscription name or id}"`
+5. Opprett en ressursgruppe ved å kjøre kommandoen ```az group create --name {dinRessursgruppe} --location {dinLocation}``` Gi ressursgruppen et selvvalgt navn. For location kan du f.eks. bruke `westeurope`  eller `norwayeast`.
+6. Kjør kommandoen 
    ```powershell
    az deployment group create `
    --resource-group {dinRessursGruppe} `
    --template-file .\azuredeploy.json `
    --parameters '@azuredeploy.parameters.json'
    ```
-1. Hvis noe feiler så prøv å endre på navnene du bruker i `azuredeploy.parameters.json`
+   Dersom du er på Mac, skal det være `./azuredeploy.json`
+7. Hvis noe feiler så prøv å endre på navnene du bruker i `azuredeploy.parameters.json`
 
 > Hvis du Azure CLI sier at det ikke finnes en az deployment group kommando så må du oppdatere Azure CLI ([Link](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli))
 
@@ -123,7 +124,7 @@ az role assignment create --role "Key Vault Administrator" --assignee {userid} -
 az storage account show-connection-string --name {dinStorageAccount} 
 ```
 **Legg til secret i keyvault** 
-Legg inn connection string til Storage Account som secret i keyvault. NB! Secreten må hete `AzureStorageConfig--ConnectionString` for at den skal plukkes opp av konfigurasjonssystemet til webapplikasjonen.
+Legg inn connection string til Storage Account som secret i keyvault. NB! Secreten må hete `AzureStorageConfig--ConnectionString` for at den skal plukkes opp av konfigurasjonssystemet til webapplikasjonen. Pass også på å få med `""` rundt connection string-en.
 ```
  az keyvault secret set --name AzureStorageConfig--ConnectionString --vault-name {dittKeyVault} --value {connectionString}
 ```
