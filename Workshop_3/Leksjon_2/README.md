@@ -35,8 +35,8 @@ Først må vi klargjøre for applikasjonen vår i Azure AD ved å lage en App Re
 
 ​
 Vi må sette noen konfigurasjonsverdier i applikasjonen vår.
-Åpne filen AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur/azuredeploy.json. Søk etter "Microsoft.Web/sites" i dette objectet under "properties/siteConfig/appSettings" legger du til.
-Fyll også inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave.:
+Åpne filen AzureWorkshopInfrastruktur/AzureWorkshopInfrastruktur/azuredeploy.json. Søk etter "Microsoft.Web/sites", og i dette objectet under "properties/siteConfig/appSettings" legger du til følgende.
+Fyll også inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave:
 ​
 
 ```json
@@ -64,7 +64,9 @@ Fyll også inn verdiene for TenantID og ClientID som du fikk tak i forrige oppga
 ```
 
 ​
-Deploy så endringen din til Azure.
+Etter du har gjort endringer i ARM-templaten, må infrastrukturen deployes på nytt. Dette var en av de aller første tingene du gjorde i leksjon 1, så kommandoen for det kan finnes der.
+
+Dersom du ønsker å se endringene som ble gjort av infrastrukturdeployen, kan du logge deg på Azure-portalen, finne frem til app servicen din, trykke på `Configuration` og verifisere at de nye settingsene ligger under Application settings.
 ​
 (Dersom du skulle trenge å logge deg på lokalt, så må de samme verdiene settes i appsettings.json
 Editer filen AzureWorkshop/AzureWorkshopApp/appsettings.json legg inn konfigurasjon for AzureID. Fyll inn verdiene for TenantID og ClientID som du fikk tak i forrige oppgave.)
@@ -75,7 +77,7 @@ Editer filen AzureWorkshop/AzureWorkshopApp/appsettings.json legg inn konfiguras
 ​
 Nå når er det på tide å legge til funksjonaliteten til AzureWorkshop prosjektet.
 ​
-Først må du legge til Microsoft.AspNetCore.Authentication.AzureAD.UI nuget-pakke som har funksjonalitet for autentisering mot Azure AD.
+Vi har allerede lagt til Microsoft.Identity.Web og Microsoft.Identity.Web.UI NuGet-pakker, som gjør funksjonalitet for innlogging via Azure AD tilgjengelig.
 ​
 I denne workshoppen har vi valgt å legge inn kodeendringer som kommentarer som må kommenteres inn/ut for å få den funksjonaliten. Alle endringer har TODO: foran, slik at man lett kan finne dem. Alle filer som må endres:
 ​
@@ -85,7 +87,9 @@ I denne workshoppen har vi valgt å legge inn kodeendringer som kommentarer som 
 3. Controllers/HomeController.cs: Legg til Authorize-attributt som krever at man må være logget inn, og videresender til Azure AD for autentisering hvis ikke brukeren er autentisert.
 4. Controllers/ImageController.cs: Legg til Authorize-attributt på controlleren for å kreve innlogging også her (NB! Ikke utkommenter koden som krever rollen Uploader for å laste opp ennå.)
    ​
+   
    Publish så til Azure og du kan nå teste innlogging, samt opplasting av bilder.
+   > **Obs:** Dersom du bruker Azure-extension i VS Code til å publisere, må du kjøre `dotnet publish --configuration Release` på nytt før du deployer
    ​
 
 ## Autorisasjon - legg til roller
