@@ -140,14 +140,19 @@ Legg til nuget-pakkene `Azure.Identity` og `Azure.Extensions.AspNetCore.Configur
 
 Endre Program.cs: 
 ```cs
+using System;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration;
+...
 private const string KeyVaultEndpoint = "https://<navn-på-keyvault>.vault.azure.net/";
-public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-    WebHost.CreateDefaultBuilder(args)
+public static IWebHost CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((ctx, builder) =>
             {
-                builder.AddAzureKeyVault(new Uri(KeyVaultEndpoint), new DefaultAzureCredential());
+               builder.AddAzureKeyVault(new Uri(KeyVaultEndpoint), new DefaultAzureCredential());
             })
-            .UseStartup<Startup>().Build();
+            .UseStartup<Startup>()
+            .UseApplicationInsights().Build();
 ```
 
 Deploy applikasjonen på nytt og sjekk at du får lastet opp og vist bilder.
@@ -169,11 +174,11 @@ Microsoft Defender for Cloud bruker litt tid for å scanne tjenestene dine etter
 - Finn Microsoft Defender for Cloud fra menyen på venstre.
 - Klikk litt rundt i tjenesten og gjør deg litt kjent med hva som finnes her. Er tjenestene dine dukket opp, og er det kommet noen anbefalinger allerede?
 
-> Det er ikke sikkert du får anbefalinger i Azure Security Center med en gang. Det tar gjerne litt tid og derfor skal vi komme tilbake til Azure Security Center i leksjon 3, hvor vi skal se om vi får utbedret noen sårbarheter.
+> Det er ikke sikkert du får anbefalinger i Microsoft Defender for Cloud med en gang. Det tar gjerne litt tid og derfor skal vi komme tilbake til Microsoft Defender for Cloud i leksjon 3, hvor vi skal se om vi får utbedret noen sårbarheter.
 
 ​
 
 ## Oppsummering
 
 ​
-I denne øvelsen har vi satt opp applikasjonen, fjernet åpen tilgang i Storage Account og undersøkt sårbarheter/anbefalinger i Azure Security Center.
+I denne øvelsen har vi satt opp applikasjonen, fjernet åpen tilgang i Storage Account og undersøkt sårbarheter/anbefalinger i Microsoft Defender for Cloud.
