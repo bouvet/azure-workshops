@@ -181,4 +181,4 @@ Microsoft Defender for Cloud bruker litt tid for å scanne tjenestene dine etter
 ## Oppsummering
 
 ​
-I denne øvelsen har vi satt opp applikasjonen, fjernet åpen tilgang i Storage Account og undersøkt sårbarheter/anbefalinger i Azure Security Center.
+I denne øvelsen har vi satt opp applikasjonen, fjernet åpen tilgang i Storage Account og undersøkt sårbarheter/anbefalinger i Microsoft Defender for Cloud.
