@@ -62,6 +62,9 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
 
    **UploadFileToStorage (Stream fileStream, string fileName)**
 
+   Se dokumentasjon: 
+   * https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-upload
+
    Følgende klasser og metoder fra Azure.Storage.Blobs ble brukt i løsningsforslaget.
 
    | Klasse              | Metoder               |
@@ -77,6 +80,11 @@ I solution ligger en klasse som heter StorageService hvor det meste av funksjona
 4. Implementer metoden for å hente ut URL-er til blob-ene.
 
    **GetImageUrls ()**
+
+   Se dokumentasjon: 
+   * https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-list
+   * https://learn.microsoft.com/en-us/azure/storage/blobs/sas-service-create
+
 
    Følgende klasser og metoder fra Azure.Storage.Blobs ble brukt i løsningsforslaget.
 
