@@ -53,7 +53,7 @@ namespace AzureWorkshopApp.Controllers
         public async Task<IActionResult> GetImages()
         {
             var configValidation = _storageService.ValidateConfiguration();
-            if (!configValidation.IsValid()) return BadRequest(configValidation.GetErrors());
+            if (!configValidation.IsValid()) return BadRequest("The application is running, but storage must be configured. This is a later step in Workshop 1 ");
 
             var imageUrls = await _storageService.GetImageUrls();
 

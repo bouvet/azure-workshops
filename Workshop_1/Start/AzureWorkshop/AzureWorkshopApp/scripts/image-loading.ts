@@ -38,9 +38,9 @@ const fetchImageLinks = () => {
 const handleError = async (response: Response) => {
     console.log("Error", response);
     var errorContainer = document.getElementById("errors");
-    var error = response.status !== 500 ? await response.json() : null;
+    var error = response.status !== 500 ? await response.text() : null;
     var paragraph = document.createElement("p");
-    paragraph.appendChild(document.createTextNode(error ? JSON.stringify(error) : response.statusText.toString()));
+    paragraph.appendChild(document.createTextNode(error ? error : response.statusText.toString()));
     errorContainer.replaceChildren(paragraph);;
 }
 

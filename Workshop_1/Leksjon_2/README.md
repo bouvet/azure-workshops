@@ -17,7 +17,7 @@ Mere informasjon om App Services finnes her: https://azure.microsoft.com/en-us/s
 For å opprette ressurser med portalen i Azure, så går du til https://portal.azure.com og logger inn med din Microsoft konto. Opprett ressurser ved å trykke "Create a resource" i venstre hjørne.
 
 1. Opprett en ressursgruppe (Resource Group). Du kan velge hvilken datasenter du vil det skal ligge i, men pga. nett-forsinkelse anbefales det en av de europeiske  (Western Europe eller Northern Europe). Test gjerne med Azure Speed Test for å kunne ta en avgjørelse: http://www.azurespeed.com/
-2. Opprett en Web App med navn &lt;appservicenavn&gt; (her velger du selv).
+1. Opprett en Web App med navn &lt;appservicenavn&gt; (her velger du selv).
    
     * <b>Name:</b> Dette navnet må være unikt i hele Azure, da den vil kunne   nås fra &lt;appservicenavn&gt;.azurewebsites.net. 
     * <b>Publish:</b> Code
@@ -35,15 +35,15 @@ For å opprette ressurser med portalen i Azure, så går du til https://portal.a
 I denne øvelsen skal du deploye start-versjonen av web-applikasjonen. Dette er en "fungerende" applikasjon, men har ikke funksjonaliteten for å laste opp bilder.
 
 1. Åpne solution som ligger i mappen Workshop_1/Start.
-2. Bygg prosjektet.
+1. Bygg prosjektet.
    1. Dersom prosjektet ikke vil bygge, høyreklikk på `package.json` og velg "Restore Packages"
-3. Høyreklikk på prosjektet og velg "Publish". Velg Target "Azure" og Specific target "Azure App Service (Windows)". Logg så inn med Microsoft-kontoen som er tilknyttet Azure-abonnementet ditt.
-4. Velg samme "Web app" som du opprettet tidligere. Pass på at riktig  Subscription er valgt, hvis du har tilgang til flere.
-5. Velg Publish som Deployment type.
-6. Det generers når en "Publish Profile"-fil som lagres i prosjektet.
-7. Trykk publish for å publisere prosjektet til Azure.
-8. Se at &lt;appservicenavn&gt;.azurewebsites.net serverer applikasjonen.
-9.  Legg merke til at IP-adressen oppe til høyre ikke endres, selv om du trykker F5 flere ganger i nettleseren.
+1. Høyreklikk på prosjektet og velg "Publish". Velg Target "Azure" og Specific target "Azure App Service (Windows)". Logg så inn med Microsoft-kontoen som er tilknyttet Azure-abonnementet ditt.
+1. Velg samme "Web app" som du opprettet tidligere. Pass på at riktig  Subscription er valgt, hvis du har tilgang til flere.
+1. Velg Publish som Deployment type.
+1. Det generers når en "Publish Profile"-fil som lagres i prosjektet.
+1. Trykk publish for å publisere prosjektet til Azure.
+1. Se at &lt;appservicenavn&gt;.azurewebsites.net serverer applikasjonen.
+1.  Legg merke til at IP-adressen oppe til høyre ikke endres, selv om du trykker F5 flere ganger i nettleseren.
 
 ## Test av skalering 
 
@@ -54,6 +54,6 @@ I denne øvelsen skal du teste å skalere opp (kraftigere App Service Plan/"VM")
 1. Gå til til valget "Scale up", endre denne til en plan i "Standard tier" under "Production". Man kan kun skalere opp med flere instanser ved å bruke Standard eller Premium tier. Disse koster mer enn Free/Shared/Basic tier.
 1. Dersom du refresher applikasjonen, samtidig som du ser på IP-adressen i høyre hjørne, så vil du se at den endrer seg én gang. Dette fordi applikasjonen er flyttet til en større App Service Plan/"VM" og fått en ny IP-adresse.
 1. Velg så "Scale out", og velg flere instanser enn 1 (f.eks. 3). Vent så til den er ferdig å skalere ut (visuelle indikatorer på toppen av siden).
-1. Selv om du trykker gjentatte ganger på F5 i nettleseren på websiden din, så vil du se at IP-adressen ikke endrer seg, selv om vi nå har flere servere som vi potensielt kan få svar fra. Grunnen til at denne ikke endrer seg er fordi ARR Affinity er slått på, og dette gjør at requests fra samme nettleser blir tildelt samme server. Test gjerne med en annen type browser (hvis du har installert), og se om denne får en annen IP-adresse.
+1. Selv om du trykker gjentatte ganger på F5 i nettleseren på websiden din, så vil du se at IP-adressen ikke endrer seg, selv om vi nå har flere servere som vi potensielt kan få svar fra. Grunnen til at denne ikke endrer seg er fordi ARR Affinity er slått på, og dette gjør at requests fra samme nettleser blir tildelt samme server. Test gjerne med en annen type browser (hvis du har installert), og se om denne får en annen IP-adresse. `Merk: For linux-baserte webapps er ARR-affinity default av, da endrer IP'en seg hver gang. Slå da ARR Affinity On i neste steg og verifiser at man bare får svar fra en server`
 1. I menyen for Web App'en din, gå inn på Configuration og skru ARR Affinity til Off, slik at vi ikke lenger kun får svar fra en server. Trykk så gjentatte ganger på F5 for å se om IP-adressen nå endrer seg mellom hver gang.
 1. Sett så tilbake 1 instans og velg Free tier igjen.

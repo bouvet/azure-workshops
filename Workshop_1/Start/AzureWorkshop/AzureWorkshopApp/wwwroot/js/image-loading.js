@@ -79,7 +79,7 @@ var handleError = function (response) { return __awaiter(_this, void 0, void 0, 
                 console.log("Error", response);
                 errorContainer = document.getElementById("errors");
                 if (!(response.status !== 500)) return [3 /*break*/, 2];
-                return [4 /*yield*/, response.json()];
+                return [4 /*yield*/, response.text()];
             case 1:
                 _a = _b.sent();
                 return [3 /*break*/, 3];
@@ -89,7 +89,7 @@ var handleError = function (response) { return __awaiter(_this, void 0, void 0, 
             case 3:
                 error = _a;
                 paragraph = document.createElement("p");
-                paragraph.appendChild(document.createTextNode(error ? JSON.stringify(error) : response.statusText.toString()));
+                paragraph.appendChild(document.createTextNode(error ? error : response.statusText.toString()));
                 errorContainer.replaceChildren(paragraph);
                 ;
                 return [2 /*return*/];
