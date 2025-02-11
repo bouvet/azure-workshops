@@ -309,3 +309,4 @@ OpenCover/
 
 # Custom
 profile.arm.json
+**/package-lock.json
