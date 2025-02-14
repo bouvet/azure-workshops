@@ -1,36 +1,38 @@
-# Github actions
+# GitHub Devops
 
-Denne leksjonen tar for seg devops. Vi bruker her Github som er en platform som inneholder tjenester man trenger for å drive et moderne utviklingsprosjekt.
+Denne leksjonen tar for seg devops. Vi bruker her GitHub som er en plattform som inneholder tjenester man trenger for å drive et moderne utviklingsprosjekt.
 
->Github er en av to plattformer Microsoft tilbyr for å implementere en devops pipeline. Azure Devops er den "klassiske" plattformen som fortsatt har mest funskjonalitet som understøtter store bedrifts prosjekt, men Github er plattformen Microsoft ønsker å gå videre med selv om Azure Devops ikke blirlagt ned på lenge. Vi bruker GIthub i denne leksjonen også fordi den er enklere å bruke som enkeltperson og derfor egner seg ypperlig til å teste på.
+>GitHub er en av to plattformer Microsoft tilbyr for å implementere en devops pipeline. Azure Devops er den "klassiske" plattformen som fortsatt har mest funksjonalitet som understøtter store bedrifts prosjekt, men GitHub er plattformen Microsoft ønsker å gå videre med selv om Azure Devops blir ikke lagt ned på lenge. Vi bruker GitHub i denne leksjonen også fordi den er enklere å bruke som enkeltperson og derfor egner seg ypperlig til å teste på.
 
 I denne leksjonen skal vi lage bygg og release pipeline for løsningen som ble laget i workshop 1. I grove trekk skal vi gjøre følgende:
 
-1. Lage et nytt prosjekt i [Github](https://github.com/)
+1. Lage et nytt prosjekt i [GitHub](https://github.com/)
 2. Sette opp pipeline med build og delivery skritt
 3. Sette opp release, hvis du har et MSDN abonnement
 4. Gjøre endringer til kildekoden
 5. (Valgfritt) Lage App Services i [Azure](https://portal.azure.com)
-6. Deploye til alle miljøene
+6. Publisere til alle miljøene
 
-## Nytt repo i Github
+>**Forutsetninger** for denne leksjonen er at du har både en egen github konto og en egen Azure subsription. Enten som en del av MSDN eller en demo Azure konto.
 
-Gå til [Github](https://github.com/) og logg inn.
+## Nytt repo i GitHub
 
-Om du ikke har registrert deg på Github, opprett ny bruker lag en nytt repository. Du kan godt gjøre det offentlig siden det gir deg mer "kreditt" og repo er bare for å teste.
+Gå til [GitHub](https://github.com/) og logg inn.
 
-I tillegg til versjonskontroll med Git består Github av moduler for å drive utviklingsprosesser, som prosjekt, automatisering og overvåkning. Vi skal her konsentre oss om å bruke automatisering til å sette opp en CI/CD pipeline. (I Github kan du automatisere mer enn bare bygging av pipeline.)
+Om du ikke har registrert deg på GitHub, opprett ny bruker lag en nytt repository. Du kan godt gjøre det offentlig siden det gir deg mer "kreditt" og repo er bare for å teste.
 
->### Github er strukturert som følger
+I tillegg til versjonskontroll med Git består GitHub av moduler for å drive utviklingsprosesser, som prosjekt, automatisering og overvåkning. Vi skal her konsentrere oss om å bruke automatisering til å sette opp en CI/CD pipeline. (I GitHub kan du automatisere mer enn bare bygging av pipeline.)
+
+>### GitHub er strukturert som følger
 >
->- **Repository:** Repositori er der prosjektets filer og revisjonshistorikk er lagret. De støtter samarbeid ved å la flere bidragsytere jobbe på samme prosjekt, spore endringer og administrere versjoner.
+>- **Repository:** Repository er der prosjektets filer og revisjonshistorikk er lagret. De støtter samarbeid ved å la flere bidragsytere jobbe på samme prosjekt, spore endringer og administrere versjoner.
 >- **GitHub Actions:** GitHub Actions kan brukes som en CI/CD-plattform (Continuous Integration/Continuous Deployment) som automatiserer arbeidsflyter. Den lar deg bygge, teste og distribuere koden din direkte fra GitHub.
 >- **Prosjekter:** GitHub Projects er et prosjektstyringsverktøy som integreres med depotene dine. Det hjelper deg med å organisere og prioritere arbeidet ditt ved hjelp av tavler i Kanban-stil.
 >- **Overvåking:** GitHub inneholder overvåkingsverktøy for å spore statusen og ytelsen til arbeidsflytene og repositoriene dine. Dette inkluderer visning av logger, måledata og varsler.
 >- **Artifacts:** @actions/artifact pakken i GitHub Actions brukes til å laste opp og laste ned artefakter i arbeidsflytene dine. Artefakter er filer eller samlinger av filer som genereres under en arbeidsflytkjøring, for eksempel kompilering, testresultater eller loggfiler. Denne pakken lar deg beholde disse filene etter at en jobb er fullført og dele dem mellom jobber i samme arbeidsflyt.
->- **@actions:** Github har et helt biliotek med actions som du kan laste ned å bruke i en automatiseringsprosess du ønsker å opprette.
+>- **@actions:** GitHub har et helt bibliotek med actions som du kan laste ned å bruke i en automatiseringsprosess du ønsker å opprette.
 
->### Komponenter i en Github arbeidsflyt
+>### Komponenter i en GitHub arbeidsflyt
 >
 >1. **Workflow:** En arbeidsflyt er en automatiseringsenhet fra start til slutt, inkludert definisjonen av hva som utløser automatiseringen, hvilket miljø eller andre aspekter som bør tas i betraktning under automatiseringen, og hva som skal skje som et resultat av utløseren.
 >2. **Job:** En jobb er en del av arbeidsflyten, og består av ett eller flere trinn. I denne delen av arbeidsflyten definerer malen trinnene som utgjør byggejobben.
@@ -41,27 +43,27 @@ I tillegg til versjonskontroll med Git består Github av moduler for å drive ut
 
 Først la oss opprette en dafult action og se hvordan vi kan koble den til en arbeidsflyt
 
-### AKtivitet: Opprett standard arbeidsflyt
+### Aktivitet: Opprett standard arbeidsflyt
 
-1. Åpne din Github konto i en nettleser.
+1. Åpne din GitHub konto i en nettleser.
 2. Opprett et nytt repo. Valgfritt: Legg på beskyttelse av main branch.
 3. Gå til Actions fanen.
 4. Klikk på New workflow.
 5. Søk etter "Simple workflow" and klikk konfigurer.
 6. Gi din arbeidsflyt et navn som, ci.yml.
-7. KLikk Commit changes..., og velg å opprette en ny branch og gi den navnet ci. Ikke velg merge til main direkte.
+7. Klikk Commit changes..., og velg å opprette en ny branch og gi den navnet ci. Ikke velg merge til main direkte.
 8. Klikk Propose changes.
-9. KLikk Create pull request.
+9. Klikk Create pull request.
 10. Vent noen sekunder og velg å laste inn siden på nytt.
 11. Sjekk framdrift og status på jobben
 
 ### Filstruktur
 
-Åpne koden i ditt repository. Kan du finne den fila du nettop opprettet?
+Åpne koden i ditt repository. Kan du finne den fila du nettopp opprettet?
 
 ### Lokalt miljø
 
-1. Klon repoet ditt til ditt lokale miljør
+1. Klon repoet ditt til ditt lokale miljø
 2. Åpne yaml fila i VS Code.
 
 ### 2: Redigere Bicept
@@ -79,22 +81,82 @@ Først la oss opprette en dafult action og se hvordan vi kan koble den til en ar
 
 Sjekk inn koden og lag en PR til deg selv. Se at pipeline kjører når du ber om PR.
 
+## Konfigurere GitHub actions til publisere til Azure
+
+### Lag en web app
+
+Vi starter i Azure Entra ID før vi går over til GitHub.
+
+>Azure subsription
+>
+>Bruk din MSDN subscription hvis du har. Hvis du ikke har kan du opprette en test bruker med en epost konto du ikke har brukt tidligere.
+
+## 4: Sett opp forbindelse mellom GitHub og Azure Portalen
+
+Vi trenger å sette opp en tilgang for GitHub Actions til din subscription i Azure. Dette kan gjøres med federated identity mellom GitHub og Azure Entra ID med OpenID Connect.
+
+Vi skal bruke Azure Login-action med Open ID Connect (OIDC). Først må vi konfigurere en federated identity credential på en Microsoft Entra applikasjon.
+
+### Opprett app registration i Azure
+
+Logg inn i Microsoft Entra Admin Center med din MSDN eller Azure Demo konto, ikke Bouvet.
+
+1. Gå til [Entra ID admin](https://entra.microsoft.com/)
+
+#### App registration
+
+- Gi applikasjonen et brukervennlig navn som: GitHub-devops.
+- Velg single tenant API aksess.
+- Hopp over de valgfrie alternativene.
+- Klikk registrer.
+
+**Federated credetials**
+Gå inn på applikasjonen du nettopp registrerte
+
+- Velg «Certificates and secrets».
+- Klikk på «Federated Credentials» fanen
+- Klikk på «Add credentials»
+
+Under Federated credential scenario velg:
+
+- Github actions deploying Azure resources
+- Organization: Din GitHub organisasjon
+- Repository: Ditt repo
+- Entity type: Her velger du hvilken entitet som skal være en del av hemmeligheten som styrer tilgang i Azure. For GitHub kan du velge: Environment, Branch, Pull request eller Tag. 
+Velg environment og skriv TEST.
+
+>Kopier innholdet i feltet Subject identifier. Vi skal bruke det i GitHub actions. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions. (Mer om det senere, enn så lenge ta vare på denne.)
+
+### Tilordne vår GitHub devops app en rolle
+
+Vi starter med å gi GitHub actions tilgang til Azure ressurser. For å få det til må appen tilordnes en rolle (RBAC) på et område i Azure. Vi kan tilordne GitHubDevops rollen contibutor på vår subscription. (Hvis vi allerede har er ressursgruppe vi ønsker å bruke kunne vi lagt rollen på denne i stedet for hele subscription. 
+
+1. Logg på [Azure-portalen](https://portal.azure.com/)
+2. Velg omfangsnivået. Hvis du ikke har en ressursgruppe, klikk deg inn på  subscription.
+3. Velg **Access control**  (IAM).
+4. Velg **Add**, og velg deretter **Add role assignment**.
+5. I  fanen **Role** velger du rollen du ønsker å tilordne applikasjonen i listen.
+6. Velg **Next**.
+7. På  **Member**-fanen, for **Assign access to**, velger du **User, group, or service principal**.
+8. Velg **Select members**. Som standard vises ikke Microsoft Entra-programmer i de tilgjengelige alternativene. For å finne søknaden din, søk etter den etter navn.
+9. Klikk **Select** knappen, og deretter **Review + assign**.
 
 
 
 
-## Jobber her
 
->**Har alle tilgang til Azure?**
 
-Lag App Services i [Azure](https://portal.azure.com)
 
-For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, og en for prod i [Azure](https://portal.azure.com). Husk å bruke samme brukeren i Azure som i Azure DevOps.
+For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, og en for prod i [Azure](https://portal.azure.com).
 
 Det er som oftest lurt å lage separate ressursgrupper for forskjellige miljøer. Når det gjelder app service plan trenger vi ikke noen kraftige greier. Det holder med en F1 pricing tier. Anbefaler at dere gir ressursgruppene, app service planene, og app servicene et navn som gjør det lett å få oversikt over hvilke Azure ressurser som hører til hvilket miljø. Dette gjør det lettere å identifisere miljøene når vi skal sette opp build pipelinen. Eksempelvis for app servicene:
 
 - **Test**: [NavnPåApp]-test
 - **Prod**: [NavnPåApp]-prod
+
+>Manuell opprettelse av Azure ressurser
+>
+> Merk at vi her oppretter Azure resurser dirkete i portalen. Dette er for å forenkle øvingsoppgaven. Det man heller vil ønske å gjøre i et utviklingsprojsket er å benytte Github actions automatisering til også å opprette ressursene i Azure ved hjelp av Bicep kode.
 
 Fremgangsmåte:
 
@@ -104,33 +166,40 @@ Fremgangsmåte:
 
     - **Name:** Dette navnet må være unikt i hele Azure, da den vil kunne nås fra &lt;appservicenavn&gt;.azurewebsites.net.
     - **Publish:** Code
-    - **Runtime Stack:** .NET 6 (LTS)
-    - **OS:** Windows
+    - **Runtime Stack:** .NET 8 (LTS)
+    - **OS:** Linux eller Windows
     - **Region:** Benytt samme region som ressursgruppen.
     - **App service plan:** Endre sku and size til Free F1 under dev/test.
 
 4. Klikk på review and create.
 
-## 3: Opprett storage accounts i [Azure](https://portal.azure.com)
+### 3: Opprett storage accounts i [Azure](https://portal.azure.com)
 
 For at web applikasjonen skal fungere i begge miljøer, behøver vi en storage account for test, og en for prod.
 Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
 
+>Fordelen med å ha alle ressurser i samme ressursgruppe er at det gjør det enklere å administrere ressursene som applikasjonen bruker. Man kan f.eks. slette alle ressurene som applikasjonen bruker samtidig ved å slette selve ressursgruppen.
+
 1. Gå til [Azure](https://portal.azure.com)
-2. Lag en storage account for hvert miljø, velg samme ressursgruppe som web applikasjonen.
+2. Lag en storage account for hvert miljø, velg samme ressursgrupper som web applikasjonen.
    - **Storage account name** Navnet må være unikt i hele azure, lengde fra 3-24 tegn og kan kun innholde små bokstaver og tall. Postfix storage accounten med `test`/ `prod`. Eksempel `ws2knuteltest`
    - **Region** Velg samme region som ressursgruppen.
    - **Performance** Standard
-   - **Redundancy** LRS
+   - **Redundancy** LRS (3 kopier eksisterer kun i samme datasenter.)
 
 3. Klikk på Review og create.
 4. Gå til Opprettet storage account, og navigerer inn i Containers.
 5. Opprett en ny Container som du kaller for: imagecontainer med private access level.
 
-## 4: Sett opp connection mellom Azure DevOps og Azure Portalen
 
-Vi trenger å sette opp en tilgang for DevOps til ditt subscription i Azure.
-Dette kan gjøres med en Service connection.
+
+
+
+
+
+
+
+
 
 1. I Azure devops, klikker du på Project settings (tannhjul nede til venstre)
 2. Under Pipelines, så klikker du på Service Connections.
