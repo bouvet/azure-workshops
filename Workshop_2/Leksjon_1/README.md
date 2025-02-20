@@ -105,31 +105,112 @@ Logg inn i Microsoft Entra Admin Center med din MSDN eller Azure Demo konto, ikk
 
 #### App registration
 
+- I Microsoft Entra admin center velg **App registration** under **Applications**
+- Velg **New registration**.
 - Gi applikasjonen et brukervennlig navn som: GitHub-devops.
 - Velg single tenant API aksess.
 - Hopp over de valgfrie alternativene.
-- Klikk registrer.
+- Klikk **registrer**.
 
-**Federated credetials**
-Gå inn på applikasjonen du nettopp registrerte
+#### Federated credetials
+
+Gå inn på applikasjonen du nettopp registrerte: (GitHub-devops)
 
 - Velg «Certificates and secrets».
 - Klikk på «Federated Credentials» fanen
 - Klikk på «Add credentials»
 
-Under Federated credential scenario velg:
+På **Add a credential** siden
 
-- Github actions deploying Azure resources
-- Organization: Din GitHub organisasjon
-- Repository: Ditt repo
-- Entity type: Her velger du hvilken entitet som skal være en del av hemmeligheten som styrer tilgang i Azure. For GitHub kan du velge: Environment, Branch, Pull request eller Tag. 
-Velg environment og skriv TEST.
+- Under Federated credential scenario velg:
+  - **Github actions deploying Azure resources**
+- **Organization**: Din GitHub organisasjon
+- **Repository**: Ditt repo
+- **Entity type**: Her velger du hvilken entitet som skal være en del av hemmeligheten som styrer tilgang i Azure. For GitHub kan du velge: Environment, Branch, Pull request eller Tag.
+- Velg **Branch** og skriv **Azure-skolen**. (Denne verdien skal vi bruke senere i oppgaven.)
 
->Kopier innholdet i feltet Subject identifier. Vi skal bruke det i GitHub actions. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions. (Mer om det senere, enn så lenge ta vare på denne.)
+>Kopier innholdet i feltet Subject identifier. Vi skal bruke det i GitHub actions. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions. (Mer om det senere, enn så lenge ta vare på denne. Du kan alltids komme tilbake her for å kopiere den senere.)
+
+- Klikk **Create**
+
+### Legg til hemmeligheter til Github repo
+
+Naviger til GitHub og åpne ditt repo. Vi skal nå legge til informasjon om vår applikasjons innstillinger inn som hemmeligheter i Github for å kunne sette opp integrasjon mellom Github og Entra ID.
+
+Vi trenger:
+
+- Azure CLient ID: Denne finner du på siden til din applikasjons registrering i Entra ID. (Kalt Github-devops tidligere.)
+- Tenant ID finner du på samme app reg side.
+- Subscription ID finner du ved å gå inn i Azure portalen.
+
+Vi skal legge til sikkrhet på repo nivå: Gå til:
+**Settings > Secrets and variables > Actions > New repository secret**.
+
+Leg til disse tre hemmelighetene, en om gangen:
+
+- AZURE_CLIENT_ID: Din application (client) ID
+- AZURE_TENANT_ID: Din directory (tenant) ID
+- AZURE_SUBSCRIPTION_ID: Din subscription ID
+
+Klikk **Add Secret** etter hver gang.
+
+Merk at du kan ikke se den hemmelighetene du har lagt inn i ettertid, men du kan slette den og legge til en ny.
+
+## 5 Test forbindelsen
+
+For å teste forbindelsen vi nettopp har satt opp skal vi skrive en liten BICEP fil.
+
+1. Opprett en nye yaml fil i **workflows** kanalogen. Kall den noe slikt som azure-login.yaml.
+
+```yaml
+name: Azure Login
+
+on:
+  push:
+    branches:
+      - main  # Triggers on push to the main branch
+  workflow_dispatch:  # Allows manual triggering
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  login:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Test Azure Connection
+      run: |
+        az account show
+```
+
+Sjekk inn fila på en barnch med samme navn som du oppgave tidligere. Hvis du fulgte teksten i oppgaven skal barnchen hete:
+
+>Azure-skolen
+
+
+## Jobber her
 
 ### Tilordne vår GitHub devops app en rolle
 
-Vi starter med å gi GitHub actions tilgang til Azure ressurser. For å få det til må appen tilordnes en rolle (RBAC) på et område i Azure. Vi kan tilordne GitHubDevops rollen contibutor på vår subscription. (Hvis vi allerede har er ressursgruppe vi ønsker å bruke kunne vi lagt rollen på denne i stedet for hele subscription. 
+Vi starter med å gi GitHub actions tilgang til Azure ressurser. For å få det til må appen tilordnes en rolle (RBAC) på et område i Azure. Vi kan tilordne GitHubDevops rollen contibutor på vår subscription. (Hvis vi allerede har er ressursgruppe vi ønsker å bruke kunne vi lagt rollen på denne i stedet for hele subscription.)
+
+
+
+
+
+
+
 
 1. Logg på [Azure-portalen](https://portal.azure.com/)
 2. Velg omfangsnivået. Hvis du ikke har en ressursgruppe, klikk deg inn på  subscription.
