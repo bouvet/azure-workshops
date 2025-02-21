@@ -47,13 +47,13 @@ Først la oss opprette en dafult action og se hvordan vi kan koble den til en ar
 
 1. Åpne din GitHub konto i en nettleser.
 2. Opprett et nytt repo. Valgfritt: Legg på beskyttelse av main branch.
-3. Gå til Actions fanen.
-4. Klikk på New workflow.
+3. Gå til **Actions** fanen.
+4. Klikk på **New workflow**.
 5. Søk etter "Simple workflow" and klikk konfigurer.
-6. Gi din arbeidsflyt et navn som, ci.yml.
-7. Klikk Commit changes..., og velg å opprette en ny branch og gi den navnet ci. Ikke velg merge til main direkte.
-8. Klikk Propose changes.
-9. Klikk Create pull request.
+6. Gi din arbeidsflyt et navn som f.eks, **ci.yml**.
+7. Klikk **Commit changes...**, og velg å opprette en ny branch og gi den navnet ci. Ikke velg merge til main direkte.
+8. Klikk **Propose changes**.
+9. Klikk **Create pull request**.
 10. Vent noen sekunder og velg å laste inn siden på nytt.
 11. Sjekk framdrift og status på jobben
 
@@ -68,7 +68,7 @@ Først la oss opprette en dafult action og se hvordan vi kan koble den til en ar
 
 ### 2: Redigere Bicept
 
-Åpne ci.yml fila du lagde ovenfor og endre på bicep koden. Du kan for eksempel liste ut dato og antall filer i repo: 
+Åpne **ci.yml** fila du lagde ovenfor og endre på bicep koden. Du kan for eksempel liste ut dato og antall filer i repo: 
 
 ```yaml
       - name: Run a simple script
@@ -111,6 +111,18 @@ Logg inn i Microsoft Entra Admin Center med din MSDN eller Azure Demo konto, ikk
 - Velg single tenant API aksess.
 - Hopp over de valgfrie alternativene.
 - Klikk **registrer**.
+
+I tillegg må du gi din app registration reader tilgang til din subscription for å kunne logge på Azure fra GIthub Actions.
+
+- Åpne din subscription i Azure portalen
+- Velg **Access control (IAM)** og legg til ny rolle.
+- Velg **Role assignments** under add fanen. **Role** fanen er valgt som standard.
+- Velg **Job function roles** og søk etter **Reader** rollen. Velg denne.
+- Bytt til **Memeber** fanen
+- Under **Assign access to** velg **User, group, or service principal**
+- Klikk **+ Select members** og søk etter din app registration "GitHub-devops".
+- Klikk **Select** for å legge denne til.
+- Til slutt klikk **Review and assign** en gang for å sjekke potensielle endringer og klikk en gang til for å iverksette ednringer.
 
 #### Federated credetials
 
@@ -166,9 +178,10 @@ For å teste forbindelsen vi nettopp har satt opp skal vi skrive en liten BICEP 
 name: Azure Login
 
 on:
-  push:
+  pull_request:
     branches:
-      - main  # Triggers on push to the main branch
+    - master
+
   workflow_dispatch:  # Allows manual triggering
 
 permissions:
@@ -201,39 +214,21 @@ Sjekk inn fila på en barnch med samme navn som du oppgave tidligere. Hvis du fu
 
 ## Jobber her
 
-### Tilordne vår GitHub devops app en rolle
-
-Vi starter med å gi GitHub actions tilgang til Azure ressurser. For å få det til må appen tilordnes en rolle (RBAC) på et område i Azure. Vi kan tilordne GitHubDevops rollen contibutor på vår subscription. (Hvis vi allerede har er ressursgruppe vi ønsker å bruke kunne vi lagt rollen på denne i stedet for hele subscription.)
-
-
-
-
-
-
-
-
-1. Logg på [Azure-portalen](https://portal.azure.com/)
-2. Velg omfangsnivået. Hvis du ikke har en ressursgruppe, klikk deg inn på  subscription.
-3. Velg **Access control**  (IAM).
-4. Velg **Add**, og velg deretter **Add role assignment**.
-5. I  fanen **Role** velger du rollen du ønsker å tilordne applikasjonen i listen.
-6. Velg **Next**.
-7. På  **Member**-fanen, for **Assign access to**, velger du **User, group, or service principal**.
-8. Velg **Select members**. Som standard vises ikke Microsoft Entra-programmer i de tilgjengelige alternativene. For å finne søknaden din, søk etter den etter navn.
-9. Klikk **Select** knappen, og deretter **Review + assign**.
-
-
-
-
-
-
+## Infrastruktur i Azure
 
 For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, og en for prod i [Azure](https://portal.azure.com).
 
 Det er som oftest lurt å lage separate ressursgrupper for forskjellige miljøer. Når det gjelder app service plan trenger vi ikke noen kraftige greier. Det holder med en F1 pricing tier. Anbefaler at dere gir ressursgruppene, app service planene, og app servicene et navn som gjør det lett å få oversikt over hvilke Azure ressurser som hører til hvilket miljø. Dette gjør det lettere å identifisere miljøene når vi skal sette opp build pipelinen. Eksempelvis for app servicene:
+Microsoft har en abefalt navnestandard for å navngi ressurser i Azure. Standarden har følgende struktur:
+>Ressurs type - navn på artifact - miljø - Azure region - versjon.
 
-- **Test**: [NavnPåApp]-test
-- **Prod**: [NavnPåApp]-prod
+**rg** er forkortelsen for ressursgruppe, **azskolen** er vår forkortelse for Azure Skolen, **test** er miljøet. Siden denne ressursgruppen ikke vil ha flere instanser og bare vil eksistere i ett miljø dropper vi de to siste elementene i navnet.
+
+- **Test**: rg-azskolen-test
+- **Prod**: rg-azskolen-prod
+
+Du kan finne flere forkortelser for Azure ressurser her:
+[Abbreviation recommendations for Azure resources](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations)
 
 >Manuell opprettelse av Azure ressurser
 >
@@ -242,19 +237,20 @@ Det er som oftest lurt å lage separate ressursgrupper for forskjellige miljøer
 Fremgangsmåte:
 
 1. Gå til [Azure](https://portal.azure.com)
-2. Lag en resource group for hvert av miljøene, Valgfritt (anbefalt: west europe, north europe eller norway east/west)
-3. Lag en app service for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
+2. Lag en resource group for hvert av miljøene. Se navnestandard ovenfor.
+3. Lag en **Web App (app)** for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
 
-    - **Name:** Dette navnet må være unikt i hele Azure, da den vil kunne nås fra &lt;appservicenavn&gt;.azurewebsites.net.
+    - **Name:** Starter på app-. Dette navnet må være unikt i hele Azure, da den vil kunne nås fra &lt;appservicenavn&gt;.azurewebsites.net.
     - **Publish:** Code
     - **Runtime Stack:** .NET 8 (LTS)
     - **OS:** Linux eller Windows
-    - **Region:** Benytt samme region som ressursgruppen.
-    - **App service plan:** Endre sku and size til Free F1 under dev/test.
+    - **Region:** Benytt samme region som ressursgruppen. (Det er alltid en god ide å benytte samme region som flesteparten av dine brkere er.)
+    - **App service plan:** Azure vil opprette en app service plan for deg.
+    - **Pricing plan:** Endre sku and size til Free F1 under dev/test.
 
 4. Klikk på review and create.
 
-### 3: Opprett storage accounts i [Azure](https://portal.azure.com)
+### 3: Opprett storage account i Azure
 
 For at web applikasjonen skal fungere i begge miljøer, behøver vi en storage account for test, og en for prod.
 Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
@@ -263,45 +259,70 @@ Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
 
 1. Gå til [Azure](https://portal.azure.com)
 2. Lag en storage account for hvert miljø, velg samme ressursgrupper som web applikasjonen.
-   - **Storage account name** Navnet må være unikt i hele azure, lengde fra 3-24 tegn og kan kun innholde små bokstaver og tall. Postfix storage accounten med `test`/ `prod`. Eksempel `ws2knuteltest`
+   - **Storage account name (st)** Navnet må være unikt i hele azure, state med **st** og ha en lengde fra 3-24 tegn og kan kun innholde små bokstaver og tall. Merk, her er det ikke tillatt med bindestrek i navnet.
    - **Region** Velg samme region som ressursgruppen.
+   - **Primary service** Velg **Azure Blob Storage or Azure Data Lake Storage Gen 2**
    - **Performance** Standard
    - **Redundancy** LRS (3 kopier eksisterer kun i samme datasenter.)
 
 3. Klikk på Review og create.
-4. Gå til Opprettet storage account, og navigerer inn i Containers.
-5. Opprett en ny Container som du kaller for: imagecontainer med private access level.
+4. Gå til Opprettet storage account, og navigerer inn i **Blob Containers**.
+5. Opprett en ny Container som du kaller for: **imagecontainer**. Contaneren vil ha private access level siden vi satte det på selve Storage kontoen.
+
+## Start prosjekt 2
+
+Gjør en fork av Leksjon 2 Start projsektet her: xxxxxxxxx
+
+### 5: Github Actions pipeline
+
+Nå som du har opprettet et prosjekt i Github Actions og "forke" et Git repo kan vi sette opp en pipeline for å automatisere bygging og testing av applikasjonen.
+
+La oss først bygge prosjektet med Github Actions. Vi skal senere kombinere alle Bicep modulene vi oppretter til en sammenhengende bicept fil som bygger prosjektet, kjører tester, logger på Azure og publiserer koden til Azure.
+
+>Merk. Trigger av action **on:** er her satt opp med manuell trigger for at vi enklere skal kunne kjøre workflow for debugging.
+
+```yaml
+name: Build and Deploy .NET Web App
+
+on:
+  push:
+    branches:
+      - '**'  # This will trigger the workflow on push to any branch
+  workflow_dispatch:  # This will allow you to manually trigger the workflow from the Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish --configuration Release --output ./publish --no-build
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-app
+        path: ./publish
+```
 
 
+## Jobber her
 
 
-
-
-
-
-
-
-
-1. I Azure devops, klikker du på Project settings (tannhjul nede til venstre)
-2. Under Pipelines, så klikker du på Service Connections.
-3. Klikk på new Service Connection. Det vil dukke opp ett panel, her velger du Azure Resource Manager. Klikk så Next.
-4. Velg Service Principal (Automatic), klikk next.
-   1. Scope Level: Subscription.
-   2. Subscription: Velg riktig subscription.
-   3. Resource Group : La stå blankt.
-   4. Service connection name: Fyll dette ut, navnet må du huske til ett senere steg.
-   5. Huk av Grant access permission to all pipelines
-5. Klikk Save.
-
-Nå har vi opprettet en Service connection som vi skal bruke for å deployere ressurser i senere steg.
-
-## 5: Sett opp build pipeline
-
-Nå som du har opprettet et prosjekt i Azure DevOps og importert et Git repo kan vi sette opp en build pipeline for å automatisere bygging og testing av applikasjonen. Azure DevOps har to måter å sette opp en build pipeline på:
->
->- Via build pipeline designeren
->- Via YAML script
->
 Microsoft anbefaler å sette opp et YAML script som definerer build pipelinen din. Fordelen med å definere build pipelinen din i et script er at man kan sjekke det inn i kildekoden. Azure DevOps vil lese YAML fila og sette opp pipelinen din som et steg før selve applikasjonen din kjøres gjennom den. På den måten kan man ikke bare endre selve applikasjonen ved en commit, men pipelinen også. Det blir i tillegg mulig å rulle tilbake selve pipelinen din om en feil skulle oppstå.
 
 Den andre måten å gjøre det på er gjennom designeren. Det negative med denne fremgangsmetoden er at definisjonen av pipelinen din ikke er lagret i kildekoden din, med alle implikasjoner det gir. Microsoft ønsker at man skal bruke YAML og har nå gjort det ca like lett å bruke yaml som designeren (med pek og klikk).
@@ -506,3 +527,7 @@ Bytt ut main med master hvis du har master som branch og ikke main. Alternativt 
 ## Mer? Lek deg litt
 
 Prøv å gjøre endringer til applikasjonen og sjekk inn. Om du vil ha en utfordring kan du prøve å sette opp variabel substitution i appsettings.json på hvert av stegene dine. Får du til å postfikse tittelen i applikasjonen med miljøet du er i?
+
+## Dokumentasjon
+
+[Github - About security hardening with OpenID Connect](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
