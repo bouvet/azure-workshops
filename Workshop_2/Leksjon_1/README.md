@@ -81,7 +81,89 @@ Først la oss opprette en dafult action og se hvordan vi kan koble den til en ar
 
 Sjekk inn koden og lag en PR til deg selv. Se at pipeline kjører når du ber om PR.
 
-## Konfigurere GitHub actions til publisere til Azure
+## Start prosjekt 2
+
+Gjør en fork av Leksjon 2 Start prosjektet her: xxxxxxxxx
+
+### 5: Github Actions pipeline
+
+Nå som du har opprettet et prosjekt i Github Actions og "forke" et Git repo kan vi sette opp en pipeline for å automatisere bygging og testing av applikasjonen.
+
+La oss først bygge prosjektet med Github Actions. Vi skal senere kombinere alle Bicep modulene vi oppretter til en sammenhengende bicept fil som bygger prosjektet, kjører tester, logger på Azure og publiserer koden til Azure.
+
+>Merk. Trigger av action **on:** er her satt opp med manuell trigger for at vi enklere skal kunne kjøre workflow for debugging.
+
+```yaml
+# Workflow name - appears in GitHub Actions UI
+name: Build and Deploy .NET Web App
+
+# Define when this workflow should run
+on:
+  push:
+    branches:
+      - '**'  # Triggers on push to any branch - useful for development
+  workflow_dispatch:  # Enables manual trigger from GitHub UI - helpful for testing
+
+# Jobs are the main building blocks of a workflow
+jobs:
+  build:
+    # Specifies the type of runner to execute the job
+    runs-on: ubuntu-latest
+
+    # Sequential steps to be executed as part of the job
+    steps:
+    # Check out your repository code to the runner
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Set up .NET SDK environment
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'  # Specifies .NET 8 version
+
+    # Set up Node.js for frontend dependencies
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    # Install frontend dependencies from package.json
+    - name: Install npm packages
+      working-directory: ./AzureWorkshopApp  # Changes directory to where package.json is located
+      run: npm install
+
+    # Restore .NET project dependencies
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # Build the .NET project in Release mode
+    - name: Build
+      run: dotnet build --configuration Release --no-restore  # --no-restore skips restore since we already did it
+
+    # Publish the application - creates deployment-ready files
+    - name: Publish
+      run: dotnet publish ./AzureWorkshopApp/AzureWorkshopApp.csproj --configuration Release --output ./publish --no-build
+
+    # Upload the published app as an artifact
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4  # v4 is the latest version as of 2024
+      with:
+        name: dotnet-app  # Name of the artifact in GitHub
+        path: ./publish   # Directory containing files to upload
+```
+
+### Artifact
+
+Du kan se hva du nettopp har bygget ved å:
+
+- Gå inn på **Actions**
+- Klikk på det bygget du vil se på
+- Nederst på siden ser du resultatet av ditt bygg som en zip fil: **dotnet-app**
+
+## Konfigurere GitHub actions tilgang til Azure
+
+Nå som vi har satt opp en Github Actions pipeline, er det på tide å sette opp en deploy pipeline til Azure. For å få det til må vi i tillegg til selve deploy pipeline også sette opp pålogging fra Github Actions til Azure. For å få det til må vi legge Github "pipeline" inn som en applikasjon i Azure Entra Id og gi den applikasjonen tilstrekkelige rettigheter til å kunne publisere kode til Azure. (I denne leksjonen vil vi bare se på å publisere en applikasjon til en eksisterende infrastruktur. Vi vil ikke se på å publisere infrastruktur som kode.)
 
 ### Lag en web app
 
@@ -139,7 +221,7 @@ På **Add a credential** siden
 - **Organization**: Din GitHub organisasjon
 - **Repository**: Ditt repo
 - **Entity type**: Her velger du hvilken entitet som skal være en del av hemmeligheten som styrer tilgang i Azure. For GitHub kan du velge: Environment, Branch, Pull request eller Tag.
-- Velg **Branch** og skriv **Azure-skolen**. (Denne verdien skal vi bruke senere i oppgaven.)
+- Velg **environment** og skriv **TEST**. (Denne verdien skal vi bruke senere i oppgaven.)
 
 >Kopier innholdet i feltet Subject identifier. Vi skal bruke det i GitHub actions. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions. (Mer om det senere, enn så lenge ta vare på denne. Du kan alltids komme tilbake her for å kopiere den senere.)
 
@@ -175,44 +257,54 @@ For å teste forbindelsen vi nettopp har satt opp skal vi skrive en liten BICEP 
 1. Opprett en nye yaml fil i **workflows** kanalogen. Kall den noe slikt som azure-login.yaml.
 
 ```yaml
+# Name of the workflow - this appears in the GitHub Actions UI
 name: Azure Login
 
+# Defines when this workflow can be triggered
 on:
-  pull_request:
-    branches:
-    - master
+  workflow_dispatch:  # Allows manual triggering from GitHub UI
+  workflow_call:      # Allows this workflow to be called by other workflows
 
-  workflow_dispatch:  # Allows manual triggering
-
+# Security permissions needed for Azure authentication
 permissions:
-  id-token: write
-  contents: read
+  id-token: write    # Required for Azure OIDC authentication
+  contents: read     # Needed to read repository contents
 
 jobs:
   login:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest     # Specifies the type of virtual machine to run on
+    environment: TEST          # Links to GitHub Environment named 'TEST' with its secrets
+
     steps:
+    # Clear any existing Azure credentials to ensure clean authentication
+    - name: Clear Azure CLI Account
+      run: |
+        az account clear
+    
+    # Check out the repository code - needed for accessing workflow files
     - name: Checkout
       uses: actions/checkout@v2
 
+    # Authenticate with Azure using OIDC (OpenID Connect)
+    # This is more secure than using traditional service principal secrets
     - name: Azure Login
       uses: azure/login@v1
       with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        # These secrets should be configured in your GitHub Environment
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}         # Azure AD application ID
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}         # Azure AD tenant ID
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} # Azure subscription ID
 
+    # Verify the Azure connection was successful
+    # Useful for debugging and confirming authentication worked
     - name: Test Azure Connection
       run: |
+        echo "Running in environment: ${{ env.ENVIRONMENT }}"
         az account show
 ```
 
-Sjekk inn fila på en barnch med samme navn som du oppgave tidligere. Hvis du fulgte teksten i oppgaven skal barnchen hete:
-
->Azure-skolen
-
-
-## Jobber her
+>Her styrer vi tilgangen til Azure ved å sette miljøet til TEST som er det samme som vi satte opp når vi opprette aaplikasjonen i Azure Entra Id. 
+>Hadde vi benyttet branch som subjekt i Entra måtte vi nå ha sjekket inn på samme barnch som vi hadde satt i app registreringen. 
 
 ## Infrastruktur i Azure
 
@@ -269,59 +361,16 @@ Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
 4. Gå til Opprettet storage account, og navigerer inn i **Blob Containers**.
 5. Opprett en ny Container som du kaller for: **imagecontainer**. Contaneren vil ha private access level siden vi satte det på selve Storage kontoen.
 
-## Start prosjekt 2
+## Github actions pipeline
 
-Gjør en fork av Leksjon 2 Start projsektet her: xxxxxxxxx
+Vi skal nå fullføre vår GitHub Actions til Azure pipeline. Siste module vi mangler er deploy. For å kunne fullføre dette siste skrittet kreves det at du har en Azure subscription. Hvis du ikke har en MSDN subscription kan du bruke en demo konto.
 
-### 5: Github Actions pipeline
+### Main.yml
 
-Nå som du har opprettet et prosjekt i Github Actions og "forke" et Git repo kan vi sette opp en pipeline for å automatisere bygging og testing av applikasjonen.
-
-La oss først bygge prosjektet med Github Actions. Vi skal senere kombinere alle Bicep modulene vi oppretter til en sammenhengende bicept fil som bygger prosjektet, kjører tester, logger på Azure og publiserer koden til Azure.
-
->Merk. Trigger av action **on:** er her satt opp med manuell trigger for at vi enklere skal kunne kjøre workflow for debugging.
-
-```yaml
-name: Build and Deploy .NET Web App
-
-on:
-  push:
-    branches:
-      - '**'  # This will trigger the workflow on push to any branch
-  workflow_dispatch:  # This will allow you to manually trigger the workflow from the Actions tab
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-
-    - name: Publish
-      run: dotnet publish --configuration Release --output ./publish --no-build
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: dotnet-app
-        path: ./publish
-```
+For å koble de ulike bicep modulene sammen må vi opprette en bicep fil som refererer til de ulike modulene. For at denne filen skal kunne trigge bicep scriptene i de andre modulene må disse bicep scriptene ha en trigger av type "workflow_call". 
 
 
 ## Jobber her
-
 
 Microsoft anbefaler å sette opp et YAML script som definerer build pipelinen din. Fordelen med å definere build pipelinen din i et script er at man kan sjekke det inn i kildekoden. Azure DevOps vil lese YAML fila og sette opp pipelinen din som et steg før selve applikasjonen din kjøres gjennom den. På den måten kan man ikke bare endre selve applikasjonen ved en commit, men pipelinen også. Det blir i tillegg mulig å rulle tilbake selve pipelinen din om en feil skulle oppstå.
 
