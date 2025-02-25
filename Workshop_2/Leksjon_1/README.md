@@ -91,7 +91,17 @@ Nå som du har opprettet et prosjekt i Github Actions og "forke" et Git repo kan
 
 La oss først bygge prosjektet med Github Actions. Vi skal senere kombinere alle Bicep modulene vi oppretter til en sammenhengende bicept fil som bygger prosjektet, kjører tester, logger på Azure og publiserer koden til Azure.
 
->Merk. Trigger av action **on:** er her satt opp med manuell trigger for at vi enklere skal kunne kjøre workflow for debugging.
+#### Legg til Test miljø
+
+VI trenger å legge til et test miljø i vårt GitHub repo. I føreste omgang trenger vi bare selve miljøet, senere skal vi legge til verdier som vi skal bruke i workflow.
+
+- Velg **Settings** fanen på forsiden av ditt GitHUb repo
+- I menye til venstre velg **Environments**
+- Klikk **New Environement** gi det navnet TEST. Hopp over resten. Vi kommer tilbake til denne senere.
+
+#### BICEP script
+
+>Merk. Trigger av action **on: workflow_dispatch** er her satt opp med manuell trigger for at vi enklere skal kunne kjøre workflow for debugging.
 
 ```yaml
 # Workflow name - appears in GitHub Actions UI
@@ -254,7 +264,7 @@ Merk at du kan ikke se den hemmelighetene du har lagt inn i ettertid, men du kan
 
 For å teste forbindelsen vi nettopp har satt opp skal vi skrive en liten BICEP fil.
 
-1. Opprett en nye yaml fil i **workflows** kanalogen. Kall den noe slikt som azure-login.yaml.
+1. Opprett en nye yaml fil i **workflows** katalogen. Kall den noe slikt som azure-login.yaml.
 
 ```yaml
 # Name of the workflow - this appears in the GitHub Actions UI
@@ -303,8 +313,8 @@ jobs:
         az account show
 ```
 
->Her styrer vi tilgangen til Azure ved å sette miljøet til TEST som er det samme som vi satte opp når vi opprette aaplikasjonen i Azure Entra Id. 
->Hadde vi benyttet branch som subjekt i Entra måtte vi nå ha sjekket inn på samme barnch som vi hadde satt i app registreringen. 
+>Her styrer vi tilgangen til Azure ved å sette miljøet til TEST som er det samme som vi satte opp når vi opprette aaplikasjonen i Azure Entra Id.
+>Hadde vi benyttet branch som subjekt i Entra måtte vi nå ha sjekket inn på samme barnch som vi hadde satt i app registreringen.
 
 ## Infrastruktur i Azure
 
@@ -367,8 +377,75 @@ Vi skal nå fullføre vår GitHub Actions til Azure pipeline. Siste module vi ma
 
 ### Main.yml
 
-For å koble de ulike bicep modulene sammen må vi opprette en bicep fil som refererer til de ulike modulene. For at denne filen skal kunne trigge bicep scriptene i de andre modulene må disse bicep scriptene ha en trigger av type "workflow_call". 
+For å koble de ulike bicep modulene sammen må vi opprette en bicep fil som refererer til de ulike modulene. For at denne filen skal kunne trigge bicep scriptene i de andre modulene må disse bicep scriptene ha en trigger av type "workflow_call".
 
+```yaml
+# This is the main orchestrator workflow that coordinates the entire CI/CD pipeline
+# It demonstrates how to organize deployments into separate, reusable workflows
+name: CI/CD Pipeline
+
+# Define when this workflow should run
+on:
+  push:
+    branches:
+      - '**'  # Runs on any branch push - useful during development
+  workflow_dispatch:  # Allows manual triggers from GitHub UI
+
+# Jobs run in parallel by default unless 'needs' is specified
+jobs:
+  # First job: Build the .NET application
+  build:
+    uses: ./.github/workflows/build.yml  # References our build workflow. It compiles the app and creates artifacts
+
+  # Second job: Authenticate with Azure
+  login:
+    uses: ./.github/workflows/azure-login.yml  # References our Azure login workflow
+    secrets: inherit  # Inherits secrets from the calling workflow 
+
+  # Third job: Deploy using Bicep
+  deploy:
+    uses: ./.github/workflows/deploy.yml  # References our deployment workflow
+    secrets: inherit  # Inherits secrets for Azure deployment
+    needs: [build, login]  # This job won't start until both 'build' and 'login' complete. It ensures we have built artifacts and Azure authentication before deployment
+```
+
+### deploy.yml
+
+Now we need to create a the deploy bicep script.
+
+```yaml
+# This workflow handles the deployment of our application to Azure Web App Service
+# It's called by the main.yml workflow after build and login steps complete
+name: Deploy to Azure
+
+# Indicates this workflow can be called by other workflows
+# This enables modular workflow design and reusability
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest    # Using Ubuntu for deployment tasks
+    environment: TEST         # Links to GitHub Environment 'TEST' containing deployment variables
+    
+    steps:
+    # First, retrieve the build artifacts that were created in the build job
+    # These artifacts contain our compiled application ready for deployment
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: dotnet-app      # Must match the artifact name from build.yml
+        path: ./publish       # Local path where artifacts will be downloaded
+
+    # Deploy the application to Azure Web App
+    # This step requires prior Azure authentication from azure-login.yml
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ vars.AZURE_WEBAPP_NAME }}  # Name of your Azure Web App
+        package: ./publish                       # Path to deployment package
+        slot-name: 'production'                  # Target deployment slot
+```
 
 ## Jobber her
 
