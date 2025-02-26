@@ -375,14 +375,37 @@ Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
 
 Vi skal nå fullføre vår GitHub Actions til Azure pipeline. Siste module vi mangler er deploy. For å kunne fullføre dette siste skrittet kreves det at du har en Azure subscription. Hvis du ikke har en MSDN subscription kan du bruke en demo konto.
 
+### Azure rettigheter
+
+For at Github Actions skal kunne publisere til vår web app i Azure må den service principal som vi opprettet ha riktig rettigheter. For å publisere kreves **contributor** rollen. Dette er en priviligert rolle som har litt mye rettigheter ut fra prinsippet om **Principle of Least Privilege**. Vi kan komme rundt det ved å lage en egendefinert rolle, men det er utenfor "scope" for denne leksjonen. Vi legger rettighetene på ressursgruppe, som regel legger vi ikke til rettigheter direkte på ressursen siden det fort blir alt for mye å holde styr på.
+
+- Ressursgruppen du opprettet i Azure tidligere. (rg-azskolen-test)
+- Velg **Access control (IAM)** fra menyen til venstre.
+- Klikk på **+ Add** og velg **Add role assignment**
+- Velg fanen **Privileged administrative role**.
+- Velg **Contributor** fra listen. (Som sagt, vær forsiktig med denne.)
+- Klikk **Next**. Det vil åpne **Members** fanen.
+- Sjekk at valgt rolle er Contributor.
+- Under **Assign access to** velg **User, group or service principal**.
+- Klikk på lenken **+  Select members** og søk etter github app registration du laget tidligere.
+- Trykk på **Select** knappen og velg **Review + assign** knappen. Vi trenger ikke konfigurere mer.
+- Trykk på **Assign** knappen til slutt for å tilordne rettigheter til din serviceprincipal.
+
 ### Main.yml
 
-For å koble de ulike bicep modulene sammen må vi opprette en bicep fil som refererer til de ulike modulene. For at denne filen skal kunne trigge bicep scriptene i de andre modulene må disse bicep scriptene ha en trigger av type "workflow_call".
+Tilbake til GitHub actions. Nå som rettigheter er satt kan vi fullføre pipline til å inkludere deploy.
+>Merk. Når vi nå syr sammen alt må vi gjøre noen endringer i de filene vi allerede har skrevet.
+For å koble de ulike bicep modulene sammen må vi opprette en bicep fil som refererer til de ulike modulene. For at denne filen skal kunne trigge bicep scriptene i de andre modulene må disse bicep scriptene ha en trigger av type "workflow_call". Tidligere satte vi tillatelser til å skrive id-token og lese innholdt i vår **azure-login.yml** fil. Disse instillingtene må vi nå flytte til **Main.yml**. (Du kan fjern dem fra login fila, eller slette hele login fila siden vi ikke trenger den mer.)
 
 ```yaml
 # This is the main orchestrator workflow that coordinates the entire CI/CD pipeline
 # It demonstrates how to organize deployments into separate, reusable workflows
 name: CI/CD Pipeline
+
+# Add permissions block at workflow level
+permissions:
+  id-token: write    # Required for OIDC authentication with Azure
+  contents: read     # Required for checking out code
 
 # Define when this workflow should run
 on:
@@ -397,21 +420,16 @@ jobs:
   build:
     uses: ./.github/workflows/build.yml  # References our build workflow. It compiles the app and creates artifacts
 
-  # Second job: Authenticate with Azure
-  login:
-    uses: ./.github/workflows/azure-login.yml  # References our Azure login workflow
-    secrets: inherit  # Inherits secrets from the calling workflow 
-
   # Third job: Deploy using Bicep
   deploy:
     uses: ./.github/workflows/deploy.yml  # References our deployment workflow
     secrets: inherit  # Inherits secrets for Azure deployment
-    needs: [build, login]  # This job won't start until both 'build' and 'login' complete. It ensures we have built artifacts and Azure authentication before deployment
+    needs: [build]  # This job won't start until both 'build' and 'login' complete. It ensures we have built artifacts and Azure authentication before deployment
 ```
 
 ### deploy.yml
 
-Now we need to create a the deploy bicep script.
+Nå må generere deploy bicep skriptet. Siden credentials ikke består mellom moduler, må vi legge inn Azure pålogging i deploy skriptet. Vi vil ikke lengre bruke påloggingsskriptet fra tidligere. 
 
 ```yaml
 # This workflow handles the deployment of our application to Azure Web App Service
@@ -429,6 +447,14 @@ jobs:
     environment: TEST         # Links to GitHub Environment 'TEST' containing deployment variables
     
     steps:
+    # Move Azure login step
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
     # First, retrieve the build artifacts that were created in the build job
     # These artifacts contain our compiled application ready for deployment
     - name: Download artifact
@@ -446,6 +472,9 @@ jobs:
         package: ./publish                       # Path to deployment package
         slot-name: 'production'                  # Target deployment slot
 ```
+
+
+
 
 ## Jobber her
 
