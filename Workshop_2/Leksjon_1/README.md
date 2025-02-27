@@ -91,13 +91,13 @@ Nå som du har opprettet et prosjekt i Github Actions og "forke" et Git repo kan
 
 La oss først bygge prosjektet med Github Actions. Vi skal senere kombinere alle Bicep modulene vi oppretter til en sammenhengende bicept fil som bygger prosjektet, kjører tester, logger på Azure og publiserer koden til Azure.
 
-#### Legg til Test miljø
+#### Legg til test miljø
 
 VI trenger å legge til et test miljø i vårt GitHub repo. I føreste omgang trenger vi bare selve miljøet, senere skal vi legge til verdier som vi skal bruke i workflow.
 
 - Velg **Settings** fanen på forsiden av ditt GitHUb repo
 - I menye til venstre velg **Environments**
-- Klikk **New Environement** gi det navnet TEST. Hopp over resten. Vi kommer tilbake til denne senere.
+- Klikk **New Environement** gi det navnet test. Hopp over resten. Vi kommer tilbake til denne senere.
 
 #### BICEP script
 
@@ -231,11 +231,25 @@ På **Add a credential** siden
 - **Organization**: Din GitHub organisasjon
 - **Repository**: Ditt repo
 - **Entity type**: Her velger du hvilken entitet som skal være en del av hemmeligheten som styrer tilgang i Azure. For GitHub kan du velge: Environment, Branch, Pull request eller Tag.
-- Velg **environment** og skriv **TEST**. (Denne verdien skal vi bruke senere i oppgaven.)
+- Velg **tag** og skriv **azureskl**. (Denne verdien skal vi bruke senere i oppgaven.)
 
->Kopier innholdet i feltet Subject identifier. Vi skal bruke det i GitHub actions. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions. (Mer om det senere, enn så lenge ta vare på denne. Du kan alltids komme tilbake her for å kopiere den senere.)
+TAG:
+
+>Kopier innholdet i feltet Subject identifier. Vi skal bruke det i GitHub actions. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions.
 
 - Klikk **Create**
+  
+### Opprett TAG
+
+For enkelhets skyld bruker vi TAG som filter i denne leksjonen. Mar aktuelt hadde det vært og brukt miljø som filter, men da måtte vi ha lagt til en app registrering for hvert miljø og Githib sikkerhet for tilsvarende miljø.
+
+```bash
+# Create the tag
+git tag azureskl
+
+# Push the tag to GitHub
+git push origin azureskl
+```
 
 ### Legg til hemmeligheter til Github repo
 
@@ -260,7 +274,7 @@ Klikk **Add Secret** etter hver gang.
 
 Merk at du kan ikke se den hemmelighetene du har lagt inn i ettertid, men du kan slette den og legge til en ny.
 
-## 5 Test forbindelsen
+## 5 test forbindelsen
 
 For å teste forbindelsen vi nettopp har satt opp skal vi skrive en liten BICEP fil.
 
@@ -283,7 +297,7 @@ permissions:
 jobs:
   login:
     runs-on: ubuntu-latest     # Specifies the type of virtual machine to run on
-    environment: TEST          # Links to GitHub Environment named 'TEST' with its secrets
+    environment: test          # Links to GitHub Environment named 'test' with its secrets
 
     steps:
     # Clear any existing Azure credentials to ensure clean authentication
@@ -307,13 +321,13 @@ jobs:
 
     # Verify the Azure connection was successful
     # Useful for debugging and confirming authentication worked
-    - name: Test Azure Connection
+    - name: test Azure Connection
       run: |
         echo "Running in environment: ${{ env.ENVIRONMENT }}"
         az account show
 ```
 
->Her styrer vi tilgangen til Azure ved å sette miljøet til TEST som er det samme som vi satte opp når vi opprette aaplikasjonen i Azure Entra Id.
+>Her styrer vi tilgangen til Azure ved å sette miljøet til test som er det samme som vi satte opp når vi opprette aaplikasjonen i Azure Entra Id.
 >Hadde vi benyttet branch som subjekt i Entra måtte vi nå ha sjekket inn på samme barnch som vi hadde satt i app registreringen.
 
 ## Infrastruktur i Azure
@@ -326,7 +340,7 @@ Microsoft har en abefalt navnestandard for å navngi ressurser i Azure. Standard
 
 **rg** er forkortelsen for ressursgruppe, **azskolen** er vår forkortelse for Azure Skolen, **test** er miljøet. Siden denne ressursgruppen ikke vil ha flere instanser og bare vil eksistere i ett miljø dropper vi de to siste elementene i navnet.
 
-- **Test**: rg-azskolen-test
+- **test**: rg-azskolen-test
 - **Prod**: rg-azskolen-prod
 
 Du kan finne flere forkortelser for Azure ressurser her:
@@ -444,7 +458,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest    # Using Ubuntu for deployment tasks
-    environment: TEST         # Links to GitHub Environment 'TEST' containing deployment variables
+    environment: test         # Links to GitHub Environment 'test' containing deployment variables
     
     steps:
     # Move Azure login step
@@ -473,216 +487,110 @@ jobs:
         slot-name: 'production'                  # Target deployment slot
 ```
 
+## tester
 
+Siste steget vi skal gjøre er å få lagt til en task for å kjøre gjennom tester. testen som finnes i prosjektet skal feile og du kan rette på koden etter at pipelinen stopper opp på grunn av testen. Start med å opprette en ny fil
 
+- under **.github/workflows** opprett en ny fil, kall den test.yml.
+- Åpne fila i din editor og legg til skript for kjøre tester.
+- Modifisert **Main.yml** fila som orkestrerer hele workflow'en til å ta høyde for den nye test modulen.
 
-## Jobber her
-
-Microsoft anbefaler å sette opp et YAML script som definerer build pipelinen din. Fordelen med å definere build pipelinen din i et script er at man kan sjekke det inn i kildekoden. Azure DevOps vil lese YAML fila og sette opp pipelinen din som et steg før selve applikasjonen din kjøres gjennom den. På den måten kan man ikke bare endre selve applikasjonen ved en commit, men pipelinen også. Det blir i tillegg mulig å rulle tilbake selve pipelinen din om en feil skulle oppstå.
-
-Den andre måten å gjøre det på er gjennom designeren. Det negative med denne fremgangsmetoden er at definisjonen av pipelinen din ikke er lagret i kildekoden din, med alle implikasjoner det gir. Microsoft ønsker at man skal bruke YAML og har nå gjort det ca like lett å bruke yaml som designeren (med pek og klikk).
-
->Azure DevOps gjør det forholdsvis enkelt å traversere mellom å bruke designeren og YAML filer om det skulle ønskes. Så man kan starte med designeren for så å konvertere pipelinen YAML om man skulle ønske det.
-
-I Azure DevOps, gå til "*Pipelines*" => "*Pipelines*" => "*Create pipeline*".
-
-- Velg deretter "Azure Repos Git (YAML)".
-- Velg så det repoet vi importerte til Azure DevOps prosjektet vårt i steg 1 (det er det som er valgt for oss som default om vi kun har et repo i prosjektet vårt).
-- På neste steg kan vi velge å enten benytte en YAML fil som allerede finnes i repoet, starte med en minimalistisk YAML fil, eller starte fra en template.
-- Velg templaten "ASP.NET CORE". Denne templaten gir oss alt vi trenger for å komme i gang. Må muligens klikke på Show more for å få opp alle templates.
-- Trykk så på "Save and Run", DevOps vil så gi deg muligheten til å commite yaml filen til repoet.
-- Trykk "Save and Run".
-
-Nå har vi kommet til siden hvor vi kan se byggingen av koden. YAML-filen som devops gir når vi bygger .NET Core er ikke stor, den inneholder bare ett steg. Følg med på bygg jobben og se om noe går galt.
-
-Om du har gjort alt riktig så burde build steget feile og det er meningen. .NET Core YAML-filen har build steg uten at prosjekt er oppgitt, i filen oppgir vi ikke hvilket prosjekt vi skal bruke og vi har to mapper i repoet så den finner ingen csproj eller sln filer. Dette skal vi nå gjøre noe med.
-
-- Gå til Pipelines
-- Velg Pipelinen du lagde
-- Trykk Edit
-- Slett alt under steps: (burde være to linjer, en med 'script:' og en med 'displayname:')
-- Legg til Npm Task
-- Velg `Install` som command. og Working Folder: `AzureWorkshop/AzureWorkshopApp`
-- Legg til .Net Core task
-- Velg publish under .Net Core tasken
-- Huk vekk Publish web projects
-- Under 'Path to project(s)' legger du inn 'AzureWorkshop/AzureWorkshop.sln'
-- Under Arguments skal det stå --configuration $(buildConfiguration)
-- Trykk Add
-- Trykk Save og Save (commit to pipeline)
-- Trykk Run
-
->Hvis du trykker på Job så kan du se på outputen til pipelinen din. Her burde alt gå grønt (eller ikke få farge) hvis alt går riktig, hvis noe går galt blir det rødt.
-
-Se gjennom loggene og gjør deg litt kjent. Vi skal nemlig utvide yaml filen med deploy og da kan det være at du støter borti problemer og loggene kan da brukes til å finne ut hva som gikk galt.
-
-Vi skal nå legge inn deploy av Web Appen til Azure i YAML-filen. Gå til edit av pipelinen og gjør følgende
-
-- Legg til tasken 'Azure App Service deploy'
-- Velg ConnectionType Azure resource manager og Azure Subscription velger du Service connection du opprett i steg 4.
-- Sett App Service type til Windows/Linux (dette må matche det man valgte når man opprettet Web Appen)
-- Velg applikasjonen du lagde
-- Legg til displayName med et fornuftig navn på steget (f.eks. Deploy Web App to Azure)
-- Trykk Add
-- Trykk Save og Save (commit to pipeline)
-- Trykk Run
-
-Nå kan du se på jobben og hvis alt ble grønt så kan du gå til Deploy Web App to Azure tasken og åpne linken til applikasjonen du lastet opp til azure. Alternativt så kan du finne urlen via portalen. Se at nettsiden nå funker.
-Hvis noe gikk galt i bygg eller deploy stegene så se gjennom loggene og prøv å fikse problemet før du ber om hjelp.
-
-Vi har nå laget en basic build og deploy pipeline, men for å få en fullstendig pipeline så pleier man ha en stødigere struktur enn det vi har laget til nå hvor alt er samme job og stage. Vi skal nå endre litt på strukturen og her må man være forsiktig med whitespace for man må fort endre på det manuelt.
-
-- Gå til edit av pipeline
-- Endre på steps til stages
-- Nå må du legge til et par linjer før - task (se eksempel under)
-- Legg til stage for build og deploy før hver sine respektive tasker
-- Legg til en publish build artifact task etter dotnet core publish tasken
-- I arguments til dotnet core publish tasken legger du til  --output $(Build.ArtifactStagingDirectory) (ikke fjern --configuration )
-- Legg til en download build artifact task før app service deploy tasken i den andre stagen
-- Sett artifact name til drop
-- Sett destination directory til $(System.DefaultWorkingDirectory) (denne må matche med inputen 'packageForLinux' i app service deploy tasken)
-- Lagre og kjør pipelinen
-
-Resultatet burde ligne på dette:
+### test.yml
 
 ```yaml
-stages:
-  - stage: build
-    jobs:
-    - job: build
-      steps: 
-      - task: Npm@1
-        inputs: 
-          ***** 
-      - task: DotNetCoreCLI@2
-        inputs:
-          ****
-      - task: PublishBuildArtifacts@1
-        inputs:
-          ****
-  - stage: deploy
-    jobs:
-    - job: deploy
-      steps:
-      - task: DownloadBuildArtifacts@1
-        inputs:
-          ****
-      - task: AzureRmWebAppDeployment@4
-        inputs:
-          ****
+name: Run tests
+
+on:
+  workflow_call:  
+  
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Run tests
+      run: |
+        dotnet test AzureWorkshopApptests/AzureWorkshopApptests.csproj\
+          --configuration Release\
+          --no-restore\
+          --verbosity normal
 ```
 
-Pipelinen burde nå ha to stages, en build og en deploy og begge disse har hver sin job. Det vi nå kan gjøre er å bruke forskjellige stages og bruke environments til å styre publisering til dev og prod. Hvis noe har gått galt i bygg og deploy stegene så kan du se på azure-pipeline.yaml i komplett folderen for inspirasjon, men prøv å løse problemet selv først.
+### Oppdater Main.yml
 
-## 6: Environments
+Gjør følgende endring i Main.yml fila:
 
-Vi har nå en pipeline som har flere stages og flere kan legges inn. Det kan f.eks. legges inn en til for produksjon ved å bare kopiere deploy stagen og ha en som heter deployTest og en som heter deployProd. For å bruke environments med forskjellige regler som vi skal sette opp under så må vi derfor gjøre nettopp det. Gå til pipelines og editer pipelinen din slik at du nå får 3 stages: build, deployTest og deployProd (husk å endre på web appen du peker på for prod). Det går an å ha flere pipelines i samme YAML-fil eller som forskjellige YAML-filer, men dette går vi ikke gjennom nå.
-
-La oss lage vårt første Environment.
-
-- Gå til Environments under Pipelines
-- Trykk Create environment
-- Skriv inn Test som Name (dette blir test miljøet vårt)
-- Legg til en beskrivelse som passer
-- La none stå som resources
-- Trykk Create
-- Gå ut av Test environmentet
-- Trykk på New environment
-- Repeter stegene over for Produksjon
-
-Vi skal nå legge til brukergodkjenning for deploy til prod. Det gjør vi ved å gå inn i environmentet Prod/Produksjon. Oppe i høyre hjørnet er det en knapp med dre dots på, trykk her og så på "Approvals and checks". Velg så Approvals og legg til deg selv som Approver (dette kan gjøres gjennom + tegnet eller ved å trykke på Approvals under "Add your first check"). Etter å ha trykket på create så skal "Approvals and checks" siden nå inneholde en entry med "All approvers must approve". Nå må vi bare koble dette miljøet sammen med deployProd stagen i YAML-filen. Gå tilbake til edit av pipeline og gjør følgende:
-
-- Finn deployProd Stagen (det er her vi skal gjøre endringer)
-- Under jobs: så skal vi endre fra "- job: deploy" til "- deployment: deploy"
-- Legg til "environment: Prod " under "- deployment" (dette må matche environment navnet til produksjon)
-- Steps blir nå gule (de er feil sted)
-- Under environment legg til "strategy:"
-- Under strategy (ett hakk inn) legges "runOnce:"
-- Legg så "deploy:" ett hakk inn under "runOnce:"
-- Tab så resten av YAML-filen slik at steps kommer ett hakk inn for "deploy:"
-- Lagre og kjør pipeline
-
-Eksempel
+Først endrer vi på når Main.yml trigges:
 
 ```yaml
-  - stage: deploy_test
-    jobs:
-      - deployment: deploy
-        environment: Test
-        strategy: 
-          runOnce:
-            deploy:
-              steps:
-              - task: DownloadBuildArtifacts@1
-                displayName: 'Download artifacts'
-                inputs:
-                  ****
-              - task: AzureRmWebAppDeployment@4
-                displayName: 'Deploy web app to azure'
-                inputs:
-                  ****
-  - stage: deploy_prod
-    jobs:
-      - deployment: deploy
-        environment: Prod
-        strategy: 
-          runOnce:
-            deploy:
-              steps:
-              - task: DownloadBuildArtifacts@1
-                displayName: 'Download artifacts'
-                inputs:
-                  ****
-              - task: AzureRmWebAppDeployment@4
-                displayName: 'Deploy web app to azure'
-                inputs:
-                 ****
-```
-
-Nå skal Prod kreve at du godkjenner deploy før den kjører gjennom. Via environment kan vi nå styre Prod og Test deployment. Gå til environments og velg Test eller Prod og se litt på mulighetene som finnes.
-
-## 7: Legg til testing
-
-Siste steget vi skal gjøre er å få lagt til en task for å kjøre gjennom tester. Testen som finnes i prosjektet skal feile og du kan rette på koden etter at pipelinen stopper opp på grunn av testen, for så å laste opp endringen og se at alt går gjennom. Som vanlig må vi til pipelinen og editere denne.
-
-- Legg til en ny .NET Core task før PublishBuildArtifact
-- Sett command til test
-- Under 'Path to Project(s)' legger du 'AzureWorkshop/AzureWorkshopAppTests/AzureWorkshopAppTests.csproj'
-- Legg til displayName for tasken
-- Endre stage og jobb navnet fra build til buildAndTest
-- Lagre
-
-Gå tilbake til pipelinen og se at testen nå stopper første stagen fra å kjøre gjennom. Fiks testen i prosjektet og last opp koden og se at det går gjennom. Nå har vi blandet build og test i samme stage og job, men det er ofte man gjør forskjellige tester basert på hvor langt i pipelinen man har kommet. Da lager man egne stages for f.eks. Unit test, integration test og smoke test og legger de inn som egne stages med DownloadArtifact og unzip task for så å kjøre gjennom, for integration tester vil man kanskje sette opp connections til andre tjenester i stagen eller kjøre mot test miljøet sitt.
-
->En artifact er produktet av en build pipeline i form av en zip fil. Denne filen inneholder alt som ble lagt i mappen man publisher artifacten fra. Zip filen vil beholde mappestruktur og alle filer som default. Artifakten lastes opp på en server og blir tilgjengelig for nedlasting og andre stager kan da bruke current build og vil resolve hvor den henter artifakten fra selv.
-
-## 8: Endre trigger
-
-For å forberede til Leksjon 2 så ønsker vi å legge inn en sjekk på triggeren i YAML-filen vår. Vi er kun interessert i endringer som ikke skjer i AzureWorkshopInfrastruktur. Alle endringer i den mappen hører til infrastruktur og trenger ikke å starte en bygg og deploy prosess. Dette er fordi vi skal gjøre en del endringer i neste leksjon og ønsker ikke å binde opp unødvendig byggetid. Åpne YAML-filen, enten lokalt eller gjennom Azure DevOps slik du har gjort i de tidligere oppgavene og erstatt
-
-```yaml
-trigger: 
-- main
-```
-
- med
-
-```yaml
-trigger:
-  branches: 
-    include:
+on:
+  push:
+    branches:
       - main
-  paths:
-    exclude:
-      - AzureWorkshopInfrastruktur
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 ```
 
-Bytt ut main med master hvis du har master som branch og ikke main. Alternativt et annet branch navn hvis du har valgt å bruke det. Main er den nye standarden til git og master er den gamle, bare å bruke den du har.
+Under jobs, legg til:
 
-## Mer? Lek deg litt
+```yaml
+  test:
+    uses: ./.github/workflows/test.yml
+    needs: [build]
+```
 
-Prøv å gjøre endringer til applikasjonen og sjekk inn. Om du vil ha en utfordring kan du prøve å sette opp variabel substitution i appsettings.json på hvert av stegene dine. Får du til å postfikse tittelen i applikasjonen med miljøet du er i?
+For å redusere bygging i GitHub, fjern også trigger for alle brancher i **build.yml**. Bhold de andre triggere.
 
-## Dokumentasjon
+```yaml
+  push:
+    branches:
+      - '**' 
+```
 
-[Github - About security hardening with OpenID Connect](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect)
+Vi må sikre oss at testene kjører før vi prøver å publisere løsningen. Legg til at deploy er avhengig av at test modulen er kjørt først.
+
+```yaml
+  deploy:
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    needs: [build, test]
+```
+
+Gjør en commit og PR og se at pipeline stopper før deploy.
+
+#### test = true
+
+Endre testen til true, gjør en commit og PR og se at pipeline går gjennom igjen.
+
+## Stages - Environments
+
+Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Actions sikrer kvalitetssikring, kontrollert distribusjon ved å bruke miljøspesifikke konfigurasjoner. Det hjelper til med kontroll med flyt av koden fra fase til fase når man ikke ønsker en kontinuerlig prodsetting. Vi skal her sette opp en arbeidsflyt med to miljøer, test og produksjon. Vi vi legge til en manuell avsjekk for å kunne publisere kode fra test til prod miljø.
+
+### GIthub repo
+
+Åpne ditt (forked) repo:
+
+- Velg **Settings** fanen på toppen.
+- Klikk på **Environments** i venstre menyen.
+- Klikk på **New environment**.
+- Gi mljøet et navn som produksjon.
+- Hak av for **Required reviewers**. Legg til deg selv. (Dette sikrer at deployment ikke blir gjennomført før det er godkjent. Vi har ikke lagt til dette på test miljøet siden vi vil at det skal publiseres til test i Azure uten godkjenning.)
+- Klikk **Save protection rules**.
+- Legg til en ny variabel. **Add environment variable**
+- SKriv inn navn: **AZURE_WEBAPP_NAME**
+- Legg inn verdi: **app-azskolen-prod**. (Eller hva du har kalt din web app i prod.)
+
+>Secrets. Siden vi lag secrets på repo nivå i Github og på subscription nivå i Azure, og filterer på en felles tag så trenger vi ikke å gjøre noe ekstra for prod miljøet. (I et virkelig senario vil du kunne ha en app registration (service principle) for hvert miljø med tilsvarnde hemmeligheter i GitHub miljøene.)
