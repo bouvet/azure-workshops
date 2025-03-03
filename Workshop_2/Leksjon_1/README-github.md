@@ -68,7 +68,7 @@ Først la oss opprette en dafult action og se hvordan vi kan koble den til en ar
 
 ### 2: Redigere Bicept
 
-Åpne **ci.yml** fila du lagde ovenfor og endre på bicep koden. Du kan for eksempel liste ut dato og antall filer i repo: 
+Åpne **ci.yml** fila du lagde ovenfor og endre på bicep koden. Du kan for eksempel liste ut dato og antall filer i repo:
 
 ```yaml
       - name: Run a simple script
@@ -231,26 +231,12 @@ På **Add a credential** siden
 - **Organization**: Din GitHub organisasjon
 - **Repository**: Ditt repo
 - **Entity type**: Her velger du hvilken entitet som skal være en del av hemmeligheten som styrer tilgang i Azure. For GitHub kan du velge: Environment, Branch, Pull request eller Tag.
-- Velg **tag** og skriv **azureskl**. (Denne verdien skal vi bruke senere i oppgaven.)
+- Velg **Environment** og skriv **test**.
 
-TAG:
-
->Kopier innholdet i feltet Subject identifier. Vi skal bruke det i GitHub actions. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions.
+>Innholdet i feltet Subject identifier er det vi skal generere i vår bicrpt skript og sende til Azure Entra. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions. Hvis det ikke stemmer vil du få en feilmelding.
 
 - Klikk **Create**
   
-### Opprett TAG
-
-For enkelhets skyld bruker vi TAG som filter i denne leksjonen. Mar aktuelt hadde det vært og brukt miljø som filter, men da måtte vi ha lagt til en app registrering for hvert miljø og Githib sikkerhet for tilsvarende miljø.
-
-```bash
-# Create the tag
-git tag azureskl
-
-# Push the tag to GitHub
-git push origin azureskl
-```
-
 ### Legg til hemmeligheter til Github repo
 
 Naviger til GitHub og åpne ditt repo. Vi skal nå legge til informasjon om vår applikasjons innstillinger inn som hemmeligheter i Github for å kunne sette opp integrasjon mellom Github og Entra ID.
@@ -403,7 +389,9 @@ For at Github Actions skal kunne publisere til vår web app i Azure må den serv
 - Under **Assign access to** velg **User, group or service principal**.
 - Klikk på lenken **+  Select members** og søk etter github app registration du laget tidligere.
 - Trykk på **Select** knappen og velg **Review + assign** knappen. Vi trenger ikke konfigurere mer.
-- Trykk på **Assign** knappen til slutt for å tilordne rettigheter til din serviceprincipal.
+- Trykk på **Review + assign** knappen til slutt for å tilordne rettigheter til din serviceprincipal.
+
+>Gjør dette på både **test** og **produksjon** ressursgruppene du har opprettet.
 
 ### Main.yml
 
@@ -484,7 +472,6 @@ jobs:
       with:
         app-name: ${{ vars.AZURE_WEBAPP_NAME }}  # Name of your Azure Web App
         package: ./publish                       # Path to deployment package
-        slot-name: 'production'                  # Target deployment slot
 ```
 
 ## tester
@@ -593,4 +580,147 @@ Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Action
 - SKriv inn navn: **AZURE_WEBAPP_NAME**
 - Legg inn verdi: **app-azskolen-prod**. (Eller hva du har kalt din web app i prod.)
 
->Secrets. Siden vi lag secrets på repo nivå i Github og på subscription nivå i Azure, og filterer på en felles tag så trenger vi ikke å gjøre noe ekstra for prod miljøet. (I et virkelig senario vil du kunne ha en app registration (service principle) for hvert miljø med tilsvarnde hemmeligheter i GitHub miljøene.)
+<img src="review-config.png" width="800" height="300" />
+
+>Secrets. Siden vi lag secrets på repo nivå i Github så trenger vi ikke å legge til ny hemmeligheter for produksjonsmiljøet, men vi må legge til en ny federated identitet i Entra for prod.
+
+- Åpne Azure Entra portalen.
+- Klikk på **Applications** i venstre meny.
+- Klikk på **App registrations**.
+- Åpne Github registration du la til. (**Github-Devop**)
+- Certificates & Secrets og velg **+ Add credential**.
+- Fra scenario velg som tidligere: **GitHub Actions deploying Azure resources**.
+- **Organization**: Din GitHub organisasjon
+- **Repository**: Ditt repo
+- Velg **Environment** og skriv **production**. (Dette tilsvarer det miljøet du har satt opp i GitHub for ditt repo ovenfor.)
+
+### Bicep endringer
+
+Nå som vi har satt opp nytt produksjonsmijø og lagt til ny federated identity i Azure Entra ID er det på tide å endre Bicep skriptene våre.
+
+Først endrer vi vårt deploy script slik at det virker med flere miljøer enn test. Hvilket miljø det skal gjøre en deploy til avgjør vi ved å sende inn miljøet som et prameter til deploy skriptet. For å få det til må vi legge til en beskrivelse av hva input parameteret fram **Main.yml** er. **workflow_call** lar denne modulen bli kalt fra en annen modul, som main.yml.
+
+```yaml
+# This workflow handles deployment of our application to Azure Web App Service
+name: Deploy to Azure
+
+# Define when this workflow can be triggered:
+on:
+  workflow_dispatch:      # Enables manual trigger from GitHub UI
+  workflow_call:         # Allows this workflow to be called by the main workflows
+    inputs:
+      releaseType:       # Input parameter to specify deployment environment
+        description: 'Where to release (test or prod)?'
+        type: string
+        required: true
+        default: 'test'  # Default to test environment for safety
+
+jobs:
+  # Main deployment job
+  deploy:
+    # Dynamic naming based on deployment target
+    name: Deploy to ${{ inputs.releaseType }}
+    # Uses GitHub environments for managing deployment configurations
+    environment: ${{ inputs.releaseType }}
+
+    runs-on: ubuntu-latest    # Specifies the runner OS
+    
+    steps:
+      # Step 1: Authenticate with Azure using OIDC
+      # This is more secure than using stored credentials
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}          # App registration ID
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}          # Azure AD tenant
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  # Azure subscription
+
+      # Step 2: Get the built application artifacts
+      # These were created by the build job and stored in GitHub
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dotnet-app    # Name of the artifact to download
+          path: ./publish     # Where to place the files locally
+
+      # Step 3: Deploy to Azure Web App
+      # Uses Azure's deployment action to push code to App Service
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}  # Name of your Azure Web App
+          package: ./publish                        # Path to deployment files
+```
+
+#### Endringer i Main.yml
+
+I main.yml fila må vi nå kalle **deploy-azure.yml** fila vår to ganger med de ulike miljøene vi ønsker å gjøre en deply til i Azure. Først for test og så for produksjon:
+
+```yaml
+# Main orchestrator workflow for our CI/CD pipeline
+# This workflow coordinates building, testing, and deploying our application
+name: CI/CD Pipeline
+
+# Define permissions needed for Azure OIDC authentication
+permissions:
+  id-token: write    # Required for Azure OIDC connection
+  contents: read     # Needed to read repository contents
+
+# Define when this workflow should run
+on:
+  push:
+    branches:
+      - main        # Runs on every push to main branch
+  pull_request:
+    branches:
+      - main        # Runs when PRs target main branch
+  workflow_dispatch: # Enables manual triggering from GitHub UI
+
+# Define the sequence of jobs in our pipeline
+jobs:
+  # Step 1: Build the application
+  # This job compiles our code and creates artifacts
+  build:
+    uses: ./.github/workflows/build.yml    # References our build workflow
+
+  # Step 2: Run automated tests
+  # This ensures our code changes haven't broken anything
+  test:
+    uses: ./.github/workflows/test.yml     # References our test workflow
+    needs: [build]                         # Won't run until build succeeds
+
+  # Step 3: Deploy to test environment
+  # This gives us a chance to verify changes in a safe environment
+  deploy-test:
+    uses: ./.github/workflows/deploy-azure.yml
+    with:
+      releaseType: 'TEST'                  # Specifies test environment
+    secrets: inherit                       # Passes through Github repository secrets
+    needs: [test]                         # Won't run until tests pass
+
+  # Step 4: Deploy to production
+  # Final step - only runs after successful test deployment
+  deploy-prod:
+    uses: ./.github/workflows/deploy-azure.yml
+    with:
+      releaseType: 'production'            # Specifies production environment
+    secrets: inherit                       # Passes through repository secrets
+    needs: [deploy-test]                   # Ensures test deployment succeeded
+
+# Main Points:
+# 1. Pipeline stages: Build → Test → Deploy Test → Deploy Production
+# 2. Each stage must succeed before the next can start
+# 3. Uses reusable workflows for maintainability
+# 4. Separates environments for safety
+# 5. Automated testing ensures code quality
+```
+
+### Godkjenning av deploy til produksjon
+
+Siden vi i produksjonsmiljøet til vår Github repo har satt et det miljøet krever en godkjenning før det blir aktivert, så vil deploy til produksjon vente til vi godkjenner det manuelt.
+
+I pipeline ser det slik ut når en godkjenning er påkrevd før prosessen fortsetter.
+
+<img src="review.png" width="750" height="500" />
+
+>Hvis du får feil i når du kjører pipeline. Sjekk om du har lagt rettigheter til både test og prod i Github repo, Azure Entra ID og til slutt Azure portalen.
