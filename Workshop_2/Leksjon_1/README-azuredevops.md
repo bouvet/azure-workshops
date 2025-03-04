@@ -9,9 +9,9 @@ Denne leksjonen tar for seg Azure DevOps. Azure DevOps er en platform som inneho
 - Test rammeverk
 - Innebygget nuget feeds
 
->Det er lett å forvirre Azure og Azure DevOps. **Merk** at dette er to separate tjenester. Azure tar for seg infrastruktur som hoster software, mens Azure DevOps støtter opp under selve utviklingsprosessen av softwaren. 
+>Det er lett å forvirre Azure og Azure DevOps. **Merk** at dette er to separate tjenester. Azure tar for seg infrastruktur som hoster software, mens Azure DevOps støtter opp under selve utviklingsprosessen av softwaren.
 
-I denne leksjonen skal vi lage bygg og release pipeline for løsningen som ble laget i workshop 1. I grove trekk skal vi gjøre følgende:
+I denne leksjonen skal vi lage bygg og release pipeline for løsningen som ble laget i workshop 1. (Løsningen finner du i azure-workshops\Workshop_2\Start\AzureWorkshop folderen.) I grove trekk skal vi gjøre følgende:
 
 1. Lage et nytt prosjekt i [Azure DevOps](https://dev.azure.com)
 2. Lage App Services i [Azure](https://portal.azure.com)
@@ -22,9 +22,11 @@ I denne leksjonen skal vi lage bygg og release pipeline for løsningen som ble l
 
 ## 1: Lag et nytt prosjekt i Azure DevOps
 
+> Merk: Denne øvelsen krever at du enten har en MSDN lisens eller en demo konto for **både** Azure DevOps og Azure. Hvis du har en MSDN lisens men ikke tilgang til Azure Devops kan det hende at du må aktivere tjenesten på din subscription. Det kan du gjøre her: [Visual Studio Subscriptions](https://my.visualstudio.com/).
+
 Gå til [Azure DevOps](https://dev.azure.com) og logg inn.
 
->Om du ikke har registrert deg på Azure DevOps kan du gjøre det via samme linken. **Det anbefales at du benytter samme MS-konto på Azure DevOps som du gjør i Azure**. Dette er for å slippe autoriseringskonfigurasjon for de forskjellige brukerene dine på tvers av Azure DevOps og Azure.
+Om du ikke har registrert deg på Azure DevOps kan du gjøre det via samme linken. **Det anbefales at du benytter samme MS-konto på Azure DevOps som du gjør i Azure**. Dette er for å slippe autoriseringskonfigurasjon for de forskjellige brukerene dine på tvers av Azure DevOps og Azure.
 
 Lag en ny organisasjon om du ikke har en allerede.
 
@@ -39,13 +41,36 @@ Lag et nytt privat prosjekt med Git som version controll og Agile som work item 
 >- **Repos:** Det er her versjonskontroll repoene dine befinner seg. Herfra kan du få en oversikt over slike ting som filer, brancher og pull requests.
 >- **Pipelines:** Herfra kan du se, og konfigurere build og release pipelinene dine. Du kan lett få en oversikt over hvilke pipelines som gikk bra, hvilke som ikke gikk bra og hvorfor.
 >- **Test Plans:** Herfra kan prosjektet ditt koordinere og planlegge testing av applikasjonen din. Om build pipelinen din har et test steg kan det konfigureres til å rapportere testens resultat hit.
->- **Artifacts:** Om flere av prosjektene dine har avhengigheter til sentrale komponenter som du ikke vil dele med hele verden kan de publiseres til artifacts. Her er det støtte for både nuget og npm pakker som resten av prosjektene ditt kan ha avhengigheter til. 
+>- **Artifacts:** Om flere av prosjektene dine har avhengigheter til sentrale komponenter som du ikke vil dele med hele verden kan de publiseres til artifacts. Her er det støtte for både nuget og npm pakker som resten av prosjektene ditt kan ha avhengigheter til.
 
-Gå til Repos og initialisere med VisualStudio gitignore. Clone repoet ned til din egen maskin. For autentisering mot Azure DevOps kan du enten sette opp et access token eller en alternativ innlogging. Gå til [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops) og hent filene. Dette kan du enten gjøre ved å clone det ned til egen maskin via git, eller laste ned som zip. Gå til `Workshop_2/Start` og kopier innholdet til ditt lokale Azure DevOps repo. Commit det og push det opp til Azure DevOps. 
+### Fork repo
 
-## 2: Lag App Services i [Azure](https://portal.azure.com
+For at du skal kunne jobbe på din egen versjon av Bouvet sitt oppgaverepo uten innblanding fra andre deltakere, gjør en fork at det over til din eget GitHub konto. (Gjør din fork **public** så blir det litt mindre autentisering å holde styr på underveis. Hvis du gjør ditt repo privat må du også generere en Personal Access Token (PAT) for bruk i Azure Devops.)
 
-For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, og en for prod i [Azure](https://portal.azure.com). Husk å bruke samme brukeren i Azure som i Azure DevOps. 
+#### I portalen
+
+- Gå til Bouvet sitt repo i GitHub: [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops). Klikk på **Fork** knapen og kopier repo over til din egen GitHub.
+
+#### Github CLI (gh)
+
+```bash
+gh repo fork https://github.com/bouvet/azure-workshops
+```
+
+### Importer egen kopi av repo
+
+Nå som du har laget en egen kopi av Azure-workshops, kan vi nå importere det inn til vår Auzure DevOps prosjekt som vi opprettet. I din Devops:
+
+- Klikk på **Repos**. Du skal nå få beskjed **&lt;ditt-repo&gt; is empty. Add some code!**
+- Klikk **Import** knappen under **Import a repository**.
+- Velg **GIt**
+- I **Clone URL** legg inn url til din fork av azure-workshop
+
+Sjekk at du har en følgende folder under **Files**. Workshop_2/Start/AzureWorkshop. Det er denne applikasjonen vi skal lage en build og publish pipeline for.
+
+## 2: Lag App Services i Azure
+
+For å kunne deploye må vi ha noe å deploye til. Lag en web App Service for test, og en for prod i [Azure](https://portal.azure.com). Husk å bruke samme brukeren i Azure som i Azure DevOps.
 
 Det er som oftest lurt å lage separate ressursgrupper for forskjellige miljøer. Når det gjelder app service plan trenger vi ikke noen kraftige greier. Det holder med en F1 pricing tier. Anbefaler at dere gir ressursgruppene, app service planene, og app servicene et navn som gjør det lett å få oversikt over hvilke Azure ressurser som hører til hvilket miljø. Dette gjør det lettere å identifisere miljøene når vi skal sette opp build pipelinen. Eksempelvis for app servicene:
 
@@ -55,19 +80,20 @@ Det er som oftest lurt å lage separate ressursgrupper for forskjellige miljøer
 Fremgangsmåte:
 
 1. Gå til [Azure](https://portal.azure.com)
-2. Lag en resource group for hvert av miljøene, Valgfritt (anbefalt: west europe, north europe eller norway east/west)
-3. Lag en app service for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
+2. Lag en resource group for hvert av miljøene, Valgfritt (anbefalt: norway east eller west europe)
+3. Lag en web app for hvert av miljøene. Når du oppretter en web app så vil Azure automatisk opprette en app service plan for hver web app du oppretter. (Merk at hvis du ønsker at fler web apps skal dele en app service plan så må du eksplisitt velge dette.)
 
     - **Name:** Dette navnet må være unikt i hele Azure, da den vil kunne nås fra &lt;appservicenavn&gt;.azurewebsites.net.
     - **Publish:** Code
-    - **Runtime Stack:** .NET 6 (LTS)
-    - **OS:** Windows
-    - **Region:** Benytt samme region som ressursgruppen.
-    - **App service plan:** Endre sku and size til Free F1 under dev/test.
+    - **Runtime Stack:** .NET 8 (LTS)
+    - **OS:** Linux
+    - **Region:** Benytt samme region som ressursgruppen. (Norway east)
+    - **Linux plan:** Her kan du velge en eksisterende plan eller opprette en ny. Du vil vanligvis ha en seperat plan for hvert miljø. Men du kan ha flere apper i samme miljø på samme plan.
+    - **Pricing plan** Sjekk at sku and size er Free F1.
 
 4. Klikk på review and create.
 
-## 3: Opprett storage accounts i [Azure](https://portal.azure.com)
+## 3: Opprett storage accounts i Azure
 
 For at web applikasjonen skal fungere i begge miljøer, behøver vi en storage account for test, og en for prod.
 Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
@@ -77,7 +103,7 @@ Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
    - **Storage account name** Navnet må være unikt i hele azure, lengde fra 3-24 tegn og kan kun innholde små bokstaver og tall. Postfix storage accounten med `test`/ `prod`. Eksempel `ws2knuteltest`
    - **Region** Velg samme region som ressursgruppen.
    - **Performance** Standard
-   - **Redundancy** LRS
+   - **Redundancy** LRS (Locally Redundant Storage, det vil si tre kopier i samme datasenter.)
 
 3. Klikk på Review og create.
 4. Gå til Opprettet storage account, og navigerer inn i Containers.
@@ -89,14 +115,13 @@ Vi trenger å sette opp en tilgang for DevOps til ditt subscription i Azure.
 Dette kan gjøres med en Service connection.
 
 1. I Azure devops, klikker du på Project settings (tannhjul nede til venstre)
-2. Under Pipelines, så klikker du på Service Connections.
-3. Klikk på new Service Connection. Det vil dukke opp ett panel, her velger du Azure Resource Manager. Klikk så Next.
-4. Velg Service Principal (Automatic), klikk next.
-   1. Scope Level: Subscription.
-   2. Subscription: Velg riktig subscription.
-   3. Resource Group : La stå blankt. 
-   4. Service connection name: Fyll dette ut, navnet må du huske til ett senere steg.
-   5. Huk av Grant access permission to all pipelines
+2. Under **Pipelines**, så klikker du på **Service Connections**.
+3. Klikk på **Create service connection**. Det vil dukke opp ett panel, her velger du **Azure Resource Manager**. Klikk så Next.
+4. Velg **App registration (Automatic)** under Identity type.
+   1. Credential: Velg **Workload identity federation**
+   2. Scope level: Klikk på **Subscription** og velg subscription du har ressursene dine i.
+   3. Gi **Service Connection Name** ett navn
+   4. Ignorer de resterende valgene.
 5. Klikk Save.
 
 Nå har vi opprettet en Service connection som vi skal bruke for å deployere ressurser i senere steg.
@@ -107,58 +132,76 @@ Nå som du har opprettet et prosjekt i Azure DevOps og importert et Git repo kan
 
 >- Via build pipeline designeren
 >- Via YAML script
->
+
 Microsoft anbefaler å sette opp et YAML script som definerer build pipelinen din. Fordelen med å definere build pipelinen din i et script er at man kan sjekke det inn i kildekoden. Azure DevOps vil lese YAML fila og sette opp pipelinen din som et steg før selve applikasjonen din kjøres gjennom den. På den måten kan man ikke bare endre selve applikasjonen ved en commit, men pipelinen også. Det blir i tillegg mulig å rulle tilbake selve pipelinen din om en feil skulle oppstå.
 
-Den andre måten å gjøre det på er gjennom designeren. Det negative med denne fremgangsmetoden er at definisjonen av pipelinen din ikke er lagret i kildekoden din, med alle implikasjoner det gir. Microsoft ønsker at man skal bruke YAML og har nå gjort det ca like lett å bruke yaml som designeren (med pek og klikk).
+Den andre måten å konfigurere en pipeline på er gjennom designeren, såkalt klassisk modus. Det negative med denne fremgangsmetoden er at definisjonen av pipelinen din ikke er lagret i kildekoden din, med alle implikasjoner det gir. Microsoft ønsker at man skal bruke YAML og har nå gjort det ca like lett å bruke yaml som designeren (med pek og klikk).
 
 >Azure DevOps gjør det forholdsvis enkelt å traversere mellom å bruke designeren og YAML filer om det skulle ønskes. Så man kan starte med designeren for så å konvertere pipelinen YAML om man skulle ønske det.
 
 I Azure DevOps, gå til "*Pipelines*" => "*Pipelines*" => "*Create pipeline*".
 
-- Velg deretter "Azure Repos Git (YAML)".
+- Velg deretter **Azure Repos Git (YAML)**.
 - Velg så det repoet vi importerte til Azure DevOps prosjektet vårt i steg 1 (det er det som er valgt for oss som default om vi kun har et repo i prosjektet vårt).
-- På neste steg kan vi velge å enten benytte en YAML fil som allerede finnes i repoet, starte med en minimalistisk YAML fil, eller -tarte fra en template.
-- Velg templaten "ASP.NET CORE". Denne templaten gir oss alt vi trenger for å komme i gang. Må muligens klikke på Show more for å få opp alle templates.
-- Trykk så på "Save and Run", DevOps vil så gi deg muligheten til å commite yaml filen til repoet. 
+- På neste steg kan vi velge å enten benytte en YAML fil som allerede finnes i repoet, starte med en blank YAML fil.
+- Vi starter fra en mal. For å se listen over tilgjengelige maler, klikk **Show more**. Velg malen **ASP.NET CORE**. Denne malen gir oss alt vi trenger for å komme i gang.
+- Trykk så på **Save and Run**, DevOps vil så gi deg muligheten til å commite yaml filen til repoet.
+- SKriv en commit melding og velg å lage en ny branch for denne commit. (God praksis å ikke gjøre commit direkte til main.)
+- Kryss av for **Sart a pull request**
 - Trykk "Save and Run".
 
-Nå har vi kommet til siden hvor vi kan se byggingen av koden. YAML-filen som devops gir når vi bygger .NET Core er ikke stor, den inneholder bare ett steg. Følg med på bygg jobben og se om noe går galt. 
+Nå har vi kommet til siden hvor vi kan se byggingen av koden. YAML-filen som devops gir når vi bygger .NET Core er ikke stor, den inneholder bare ett steg.
 
-Om du har gjort alt riktig så burde build steget feile og det er meningen. .NET Core YAML-filen har build steg uten at prosjekt er oppgitt, i filen oppgir vi ikke hvilket prosjekt vi skal bruke og vi har to mapper i repoet så den finner ingen csproj eller sln filer. Dette skal vi nå gjøre noe med.
+Dette bygget vil feile. .NET Core YAML-filen har build steg uten at prosjekt er oppgitt, i filen oppgir vi ikke hvilket prosjekt vi skal bruke og vi har to mapper i repoet så den finner ingen csproj eller sln filer. Dette skal vi nå gjøre noe med.
+
+>Merk: I en Yaml fil har space og innrykk en betydning. Hvis du får feil når du skriver yaml syntaks, sjekk innrykk i fila.
+
+### Rediger Yaml - Publisere
 
 - Gå til Pipelines
 - Velg Pipelinen du lagde
-- Trykk Edit
+- Trykk **Edit**
 - Slett alt under steps: (burde være to linjer, en med 'script:' og en med 'displayname:')
-- Legg til Npm Task
-- Velg `Install` som command. og Working Folder: `AzureWorkshop/AzureWorkshopApp`
-- Legg til .Net Core task
-- Velg publish under .Net Core tasken
-- Huk vekk Publish web projects
-- Under 'Path to project(s)' legger du inn 'AzureWorkshop/AzureWorkshop.sln'
-- Under Arguments skal det stå --configuration $(buildConfiguration)
-- Trykk Add
-- Trykk Save og Save (commit to pipeline)
-- Trykk Run
+- Legg til Npm Task. Du kan legge til en task fra høyre menyen **Tasks**
+- Alle tasks vil bli satt inn der markøren din står i skriptet. Pass på at markøren står under **steps:**
+- I taks panelet søk etter **npm** og vleg npm
+- Under **Command** velg `Install` som command. Sett **Working Folder** til: `Workshop_2/Start/AzureWorkshop`
+- Legg til ny oppgave: **.Net Core** task
+- Under **Azure Resource Manager connection** trenger du ikke å legge til noe ennå.
+- **Command** velg **publish**
+- Huk av **Publish web projects** (fjern)
+- Under **Path to project(s)** legger du inn 'Workshop_2/Start/AzureWorkshop/AzureWorkshop.sln' (Eller hva som er stien til din applikasjon du vil publisere.)
+- Under **Arguments** skal det stå --configuration $(buildConfiguration)
+- Trykk **Add**
+- Trykk **Validate and Save**, legg på commit message og trykk **Save**
+- Trykk **Run**. Sjekk at du er på riktig branch (ikke main) og trykk **Run** en gang til.
 
->Hvis du trykker på Job så kan du se på outputen til pipelinen din. Her burde alt gå grønt (eller ikke få farge) hvis alt går riktig, hvis noe går galt blir det rødt.
+>Hvis du trykker på Job så kan du se på status til pipelinen din. Hvis et skritt feiler kan du trykk på det skrittet og se feilmeldingen, som forhåpentlig kan hjelpe det med å rette feilen.
 
 Se gjennom loggene og gjør deg litt kjent. Vi skal nemlig utvide yaml filen med deploy og da kan det være at du støter borti problemer og loggene kan da brukes til å finne ut hva som gikk galt.
 
+#### Runde to - Distribuere
+
+Nå som vi ser at pipeline bygger, la oss publisere koden.
+
 Vi skal nå legge inn deploy av Web Appen til Azure i YAML-filen. Gå til edit av pipelinen og gjør følgende
 
-- Legg til tasken 'Azure App Service deploy'
-- Velg ConnectionType Azure resource manager og Azure Subscription velger du Service connection du opprett i steg 4.
-- Sett App Service type til Windows/Linux (dette må matche det man valgte når man opprettet Web Appen)
-- Velg applikasjonen du lagde
-- Legg til displayName med et fornuftig navn på steget (f.eks. Deploy Web App to Azure)
+- Gå til starten på linjen i slutten av yaml fila. (Gir det mindre yaml-trøbbel på grunn av mellomrom.)
+- Legg til tasken **Azure App Service deploy**
+- Velg **Connection Type** Azure resource manager og **Azure Subscription** velger du Service connection du opprett tidligere.
+- Sett **App Service type** til Linux (Eller Windows. Dette må matche det man valgte når man opprettet Web Appen)
+- **App Service name**, navnet på web applikasjonen du opprettet tidligere. (Ikke app service plan.)
+- La **Deploy to Slot or App Service Environment** være av. Vi skal ikke gjøre deploy til staging.
+- **Runtime Stack** set til :NET 8.0
+- La resten være som det er.
 - Trykk Add
 - Trykk Save og Save (commit to pipeline)
 - Trykk Run
 
 Nå kan du se på jobben og hvis alt ble grønt så kan du gå til Deploy Web App to Azure tasken og åpne linken til applikasjonen du lastet opp til azure. Alternativt så kan du finne urlen via portalen. Se at nettsiden nå funker.
 Hvis noe gikk galt i bygg eller deploy stegene så se gjennom loggene og prøv å fikse problemet før du ber om hjelp.
+
+>Jobber her
 
 Vi har nå laget en basic build og deploy pipeline, men for å få en fullstendig pipeline så pleier man ha en stødigere struktur enn det vi har laget til nå hvor alt er samme job og stage. Vi skal nå endre litt på strukturen og her må man være forsiktig med whitespace for man må fort endre på det manuelt.
 
@@ -197,7 +240,7 @@ stages:
       - task: DownloadBuildArtifacts@1
         inputs:
           ****
-      - task: AzureRmWebAppDeployment@4
+      - task: AzureRmWebAppDeployment@5
         inputs:
           ****
 ```
@@ -210,17 +253,21 @@ Vi har nå en pipeline som har flere stages og flere kan legges inn. Det kan f.e
 
 La oss lage vårt første Environment.
 
-- Gå til Environments under Pipelines
-- Trykk Create environment
+- Gå til **Environments** under Pipelines
+- Trykk **Create environment**
 - Skriv inn Test som Name (dette blir test miljøet vårt)
 - Legg til en beskrivelse som passer
 - La none stå som resources
-- Trykk Create
+- Trykk **Create**
 - Gå ut av Test environmentet
 - Trykk på New environment
 - Repeter stegene over for Produksjon
 
-Vi skal nå legge til brukergodkjenning for deploy til prod. Det gjør vi ved å gå inn i environmentet Prod/Produksjon. Oppe i høyre hjørnet er det en knapp med dre dots på, trykk her og så på "Approvals and checks". Velg så Approvals og legg til deg selv som Approver (dette kan gjøres gjennom + tegnet eller ved å trykke på Approvals under "Add your first check"). Etter å ha trykket på create så skal "Approvals and checks" siden nå inneholde en entry med "All approvers must approve". Nå må vi bare koble dette miljøet sammen med deployProd stagen i YAML-filen. Gå tilbake til edit av pipeline og gjør følgende:
+### Stages med brukergodkjenning
+
+>Merk: Denne funksjnaliteten er ikke tilgjengelig med free trial eller MSDN subsription. Krever minimum **Azure DevOps Services Basic Plan**.
+
+Vi skal nå legge til brukergodkjenning for deploy til prod. Det gjør vi ved å gå inn i environmentet Prod/Produksjon. Oppe i høyre hjørnet er det en knapp med tre dots på, trykk her og så på "Approvals and checks". Velg så Approvals og legg til deg selv som Approver (dette kan gjøres gjennom + tegnet eller ved å trykke på Approvals under "Add your first check"). Etter å ha trykket på create så skal "Approvals and checks" siden nå inneholde en entry med "All approvers must approve". Nå må vi bare koble dette miljøet sammen med deployProd stagen i YAML-filen. Gå tilbake til edit av pipeline og gjør følgende:
 
 - Finn deployProd Stagen (det er her vi skal gjøre endringer)
 - Under jobs: så skal vi endre fra "- job: deploy" til "- deployment: deploy"

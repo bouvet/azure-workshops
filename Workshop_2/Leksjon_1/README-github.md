@@ -83,7 +83,30 @@ Sjekk inn koden og lag en PR til deg selv. Se at pipeline kjører når du ber om
 
 ## Start prosjekt 2
 
-Gjør en fork av Leksjon 2 Start prosjektet her: xxxxxxxxx
+### Fork repo
+
+For at du skal kunne jobbe på din egen versjon av Bouvet sitt oppgaverepo uten innblanding fra andre deltakere, gjør en fork at det over til din eget GitHub konto. (Gjør din fork **public** så blir det litt mindre autentisering å holde styr på underveis. Hvis du gjør ditt repo privat må du også generere en Personal Access Token (PAT) for bruk i Azure Devops.)
+
+#### I portalen
+
+- Gå til Bouvet sitt repo i GitHub: [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops). Klikk på **Fork** knapen og kopier repo over til din egen GitHub.
+
+#### Github CLI (gh)
+
+```bash
+gh repo fork https://github.com/bouvet/azure-workshops
+```
+
+### Importer egen kopi av repo
+
+Nå som du har laget en egen kopi av Azure-workshops, kan vi nå importere det inn til vår Auzure DevOps prosjekt som vi opprettet. I din Devops:
+
+- Klikk på **Repos**. Du skal nå få beskjed **&lt;ditt-repo&gt; is empty. Add some code!**
+- Klikk **Import** knappen under **Import a repository**.
+- Velg **GIt**
+- I **Clone URL** legg inn url til din fork av azure-workshop
+
+Sjekk at du har en følgende folder under **Files**. Workshop_2/Start/AzureWorkshop. Det er denne applikasjonen vi skal lage en build og publish pipeline for.
 
 ### 5: Github Actions pipeline
 
