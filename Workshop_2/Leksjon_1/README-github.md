@@ -19,7 +19,7 @@ I denne leksjonen skal vi lage bygg og release pipeline for løsningen som ble l
 
 Gå til [GitHub](https://github.com/) og logg inn.
 
-Om du ikke har registrert deg på GitHub, opprett ny bruker lag en nytt repository. Du kan godt gjøre det offentlig siden det gir deg mer "kreditt" og repo er bare for å teste.
+Om du ikke har registrert deg på GitHub, opprett ny bruker lag en nytt repository.
 
 I tillegg til versjonskontroll med Git består GitHub av moduler for å drive utviklingsprosesser, som prosjekt, automatisering og overvåkning. Vi skal her konsentrere oss om å bruke automatisering til å sette opp en CI/CD pipeline. (I GitHub kan du automatisere mer enn bare bygging av pipeline.)
 
