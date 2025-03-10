@@ -66,9 +66,9 @@ Først la oss opprette en dafult action og se hvordan vi kan koble den til en ar
 1. Klon repoet ditt til ditt lokale miljø
 2. Åpne yaml fila i VS Code.
 
-### 2: Redigere Bicept
+### 2: Redigere yaml
 
-Åpne **ci.yml** fila du lagde ovenfor og endre på bicep koden. Du kan for eksempel liste ut dato og antall filer i repo:
+Åpne **ci.yml** fila du lagde ovenfor og endre på yaml koden. Du kan for eksempel liste ut dato og antall filer i repo:
 
 ```yaml
       - name: Run a simple script
@@ -112,7 +112,7 @@ Sjekk at du har en følgende folder under **Files**. Workshop_2/Start/AzureWorks
 
 Nå som du har opprettet et prosjekt i Github Actions og "forke" et Git repo kan vi sette opp en pipeline for å automatisere bygging og testing av applikasjonen.
 
-La oss først bygge prosjektet med Github Actions. Vi skal senere kombinere alle Bicep modulene vi oppretter til en sammenhengende bicept fil som bygger prosjektet, kjører tester, logger på Azure og publiserer koden til Azure.
+La oss først bygge prosjektet med Github Actions. Vi skal senere kombinere alle yaml modulene vi oppretter til en sammenhengende yaml fil som bygger prosjektet, kjører tester, logger på Azure og publiserer koden til Azure.
 
 #### Legg til test miljø
 
@@ -122,7 +122,7 @@ VI trenger å legge til et test miljø i vårt GitHub repo. I føreste omgang tr
 - I menye til venstre velg **Environments**
 - Klikk **New Environement** gi det navnet test. Hopp over resten. Vi kommer tilbake til denne senere.
 
-#### BICEP script
+#### Yaml script
 
 >Merk. Trigger av action **on: workflow_dispatch** er her satt opp med manuell trigger for at vi enklere skal kunne kjøre workflow for debugging.
 
@@ -285,7 +285,7 @@ Merk at du kan ikke se den hemmelighetene du har lagt inn i ettertid, men du kan
 
 ## 5 test forbindelsen
 
-For å teste forbindelsen vi nettopp har satt opp skal vi skrive en liten BICEP fil.
+For å teste forbindelsen vi nettopp har satt opp skal vi skrive en liten yaml fil.
 
 1. Opprett en nye yaml fil i **workflows** katalogen. Kall den noe slikt som azure-login.yaml.
 
@@ -357,7 +357,7 @@ Du kan finne flere forkortelser for Azure ressurser her:
 
 >Manuell opprettelse av Azure ressurser
 >
-> Merk at vi her oppretter Azure resurser dirkete i portalen. Dette er for å forenkle øvingsoppgaven. Det man heller vil ønske å gjøre i et utviklingsprojsket er å benytte Github actions automatisering til også å opprette ressursene i Azure ved hjelp av Bicep kode.
+> Merk at vi her oppretter Azure resurser dirkete i portalen. Dette er for å forenkle øvingsoppgaven. Det man heller vil ønske å gjøre i et utviklingsprojsket er å benytte Github actions automatisering til også å opprette ressursene i Azure ved hjelp av yaml kode.
 
 Fremgangsmåte:
 
@@ -420,7 +420,7 @@ For at Github Actions skal kunne publisere til vår web app i Azure må den serv
 
 Tilbake til GitHub actions. Nå som rettigheter er satt kan vi fullføre pipline til å inkludere deploy.
 >Merk. Når vi nå syr sammen alt må vi gjøre noen endringer i de filene vi allerede har skrevet.
-For å koble de ulike bicep modulene sammen må vi opprette en bicep fil som refererer til de ulike modulene. For at denne filen skal kunne trigge bicep scriptene i de andre modulene må disse bicep scriptene ha en trigger av type "workflow_call". Tidligere satte vi tillatelser til å skrive id-token og lese innholdt i vår **azure-login.yml** fil. Disse instillingtene må vi nå flytte til **Main.yml**. (Du kan fjern dem fra login fila, eller slette hele login fila siden vi ikke trenger den mer.)
+For å koble de ulike yaml modulene sammen må vi opprette en yaml fil som refererer til de ulike modulene. For at denne filen skal kunne trigge yaml scriptene i de andre modulene må disse yaml scriptene ha en trigger av type "workflow_call". Tidligere satte vi tillatelser til å skrive id-token og lese innholdt i vår **azure-login.yml** fil. Disse instillingtene må vi nå flytte til **Main.yml**. (Du kan fjern dem fra login fila, eller slette hele login fila siden vi ikke trenger den mer.)
 
 ```yaml
 # This is the main orchestrator workflow that coordinates the entire CI/CD pipeline
@@ -445,7 +445,7 @@ jobs:
   build:
     uses: ./.github/workflows/build.yml  # References our build workflow. It compiles the app and creates artifacts
 
-  # Third job: Deploy using Bicep
+  # Third job: Deploy using yaml
   deploy:
     uses: ./.github/workflows/deploy.yml  # References our deployment workflow
     secrets: inherit  # Inherits secrets for Azure deployment
@@ -454,7 +454,7 @@ jobs:
 
 ### deploy.yml
 
-Nå må generere deploy bicep skriptet. Siden credentials ikke består mellom moduler, må vi legge inn Azure pålogging i deploy skriptet. Vi vil ikke lengre bruke påloggingsskriptet fra tidligere. 
+Nå må generere deploy yaml skriptet. Siden credentials ikke består mellom moduler, må vi legge inn Azure pålogging i deploy skriptet. Vi vil ikke lengre bruke påloggingsskriptet fra tidligere. 
 
 ```yaml
 # This workflow handles the deployment of our application to Azure Web App Service
@@ -617,9 +617,9 @@ Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Action
 - **Repository**: Ditt repo
 - Velg **Environment** og skriv **production**. (Dette tilsvarer det miljøet du har satt opp i GitHub for ditt repo ovenfor.)
 
-### Bicep endringer
+### yaml endringer
 
-Nå som vi har satt opp nytt produksjonsmijø og lagt til ny federated identity i Azure Entra ID er det på tide å endre Bicep skriptene våre.
+Nå som vi har satt opp nytt produksjonsmijø og lagt til ny federated identity i Azure Entra ID er det på tide å endre yaml skriptene våre.
 
 Først endrer vi vårt deploy script slik at det virker med flere miljøer enn test. Hvilket miljø det skal gjøre en deploy til avgjør vi ved å sende inn miljøet som et prameter til deploy skriptet. For å få det til må vi legge til en beskrivelse av hva input parameteret fram **Main.yml** er. **workflow_call** lar denne modulen bli kalt fra en annen modul, som main.yml.
 

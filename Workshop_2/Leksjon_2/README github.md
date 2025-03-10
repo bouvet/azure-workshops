@@ -4,6 +4,12 @@
 ​Infrastruktur som kode (IaC) er en praksis som lar deg administrere og klargjøre skyressursene dine gjennom kode, noe som gjør infrastrukturen mer konsekvent, repeterbar og skalerbar. Ved å bruke IaC kan du versjonskontrollere infrastrukturen din, redusere manuelle feil og effektivisere distribusjonsprosessene dine, noe som til slutt fører til mer effektive og pålitelige skyoperasjoner. I denne veiledningen lærer du hvordan du automatiserer infrastrukturdistribusjonene dine ved hjelp av GitHub Actions, et kraftig CI/CD-verktøy integrert med GitHub.
 
 I tillegg skal vi utforske Bicep, et domenespesifikt språk (DSL) for deklarativ distribusjon av Azure-ressurser, noe som forenkler redigeringsopplevelsen og forbedrer lesbarheten til infrastrukturkoden din.
+
+## Ett repo, to workflows
+
+Vi har nå en pipeline for å bygge og distribuere applikasjonen og en for å opprette ressurser i Azure. Vi legger begge pipeline i samme repo, men det er også mulig å legge dem i forskjellige repo. Vi legger også samme trigger på begge workflows slik at både applikasjonskode og infrastruktur er synkronisert.
+
+Hvis vi ønsker å sette opp en inner/outer loop workflow så kan vi gjøre det med å bruke Github environments.
 ​
 >**Forutsetninger** for denne leksjonen er at du har både en egen github konto og en egen Azure subsription. Enten som en del av MSDN eller en demo Azure konto.
 
