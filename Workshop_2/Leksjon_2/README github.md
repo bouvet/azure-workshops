@@ -33,43 +33,166 @@ Se **leksjon 1** for hvordan du gjør dette. Hopp over skrittet med å lage en w
 ## Opprett workflow fil
 
 - Opprett **\\.github\workflows** folder i prosjektet ditt. **\Workshop_2\Start\AzureWorkshopInfrastruktur**
-- Legg til en ny yml fil. Kall den noe med **iac-** så du lettere kjenner den igjen.
+- Legg til en ny yaml fil for github action.
   
 ```yaml
-name: IaC deploy
+# This workflow validates Bicep Infrastructure as Code (IaC) files
 
+# Define the workflow name that appears in GitHub Actions
+name: IaC bicep validate
+
+# Set required permissions for the workflow
+# - id-token: write is needed for Azure OIDC authentication
+# - contents: read is needed to read the repository contents
 permissions:
   id-token: write
   contents: read
 
+# Define when this workflow should run
 on:
   push:
     branches:
-      - main
+      - main  # Run on every push to main branch
   pull_request:
     branches:
-      - main
-  workflow_dispatch:
+      - main  # Run on pull requests targeting main branch
+  workflow_dispatch:  # Allow manual trigger of the workflow
 
 jobs:
     deploy-infrastructure:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-latest  # Use Ubuntu as the runner operating system
+      env:
+        RESOURCE_GROUP: your-resource-group-name  # Define environment variable for Azure resource group
       steps:
+        # Step 1: Check out the repository code
         - name: Checkout
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
   
-        - name: Azure login
-          uses: azure/login@v1
+        # Step 2: Authenticate with Azure using OIDC
+        - name: Azure Login
+          uses: azure/login@v2
           with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}        # Azure App Registration client ID
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}        # Azure tenant ID
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  # Azure subscription ID
+
+        # Step 3: Validate Bicep syntax and build
+        - name: Bicep lint
+          uses: azure/cli@v1
+          with:
+            inlineScript: |
+              # Build checks if Bicep can compile to ARM
+              az bicep build --file bicep/main.bicep
+              # Lint checks for best practices and potential errors
+              az bicep lint --file bicep/main.bicep
+
+        # Step 4: Validate the deployment against Azure
+        - name: Bicep Validate
+          uses: Azure/cli@v1
+          with:
+            inlineScript: |
+              # Validates if the template is valid for deployment
+              az deployment group validate \
+                --name validate-${{ github.run_id }} \
+                --resource-group ${{ env.RESOURCE_GROUP_NAME }} \
+                --template-file ./bicep/main.bicep 
+```
+
+Lag en ny folder som du kaller for bicep. I den oppretter du en ny fil for bicept template.
+
+- Kall den **main.bicep**.
+
+```json
+// This is the main deployment file that orchestrates our Azure infrastructure
+
+// Parameters allow you to provide values at deployment time
+// The @description decorator provides documentation for the parameter
+@description('The environment name. "dev" and "prod" are valid values.')
+param environmentName string = 'dev'  // Default value if none is provided
+param location string = 'norwayeast'  // Location where resources will be deployed
+
+// Variables are used to store reusable values
+// Here we define tags that will be applied to all resources
+var tags = {
+  environment: environmentName 
+  project: 'Azure Workshop'
+}
+
+// targetScope defines at which level this template operates
+// Options are: 'resourceGroup', 'subscription', 'managementGroup', 'tenant'
+targetScope = 'resourceGroup'
+
+// Modules are used to break down complex templates into smaller, reusable parts
+// This module deploys a storage account using a separate template file
+module storageAccount 'modules/storageAccount.bicep' = {
+  name: 'st${environmentName}'  // Dynamic naming using string interpolation
+  params: {
+    location: location  // Passing parameters to the module
+    tags: tags         // Passing our tags to ensure consistent tagging
+  }
+}
+```
+
+I bicep folderen lager du en ny folder som du kaller for **modules**. Vi ønsker å dele bicep malene opp i moduler for lettere kunne organisere dem, samt gjenbruke moduler flere steder.
+
+- Opprett en fil i modul folderen som du kaller for **storageAccount.bicep**.
+
+```json
+// This module defines an Azure Storage Account resource
+
+// Input parameters that will be provided by the parent template
+param location string        // Azure region where the storage account will be created
+param tags object           // Resource tags for organization and billing
+
+// Variables help us define reusable values and improve readability
+var storageAccountName = 'st${uniqueString(resourceGroup().id)}'  // Generate a unique storage account name
+
+// Storage Account resource definition
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
+  // Name must be globally unique, lowercase, and 3-24 characters long
+  name: storageAccountName
+  location: location
+  tags: tags
   
-        - name: Deploy with Azure CLI
-          run: |
-            az group create --name ${{ env.RESOURCE_GROUP }} --location ${{ env.LOCATION }}
-            az deployment group create \
-              --resource-group ${{ env.RESOURCE_GROUP }} \
-              --template-file main.bicep \
-              --parameters main.parameters.json
+  // SKU defines the type and replication strategy
+  sku: {
+    name: 'Standard_LRS'    // Locally-redundant storage (cheapest option)
+  }
+  
+  // Kind specifies the type of storage account
+  kind: 'StorageV2'         // General-purpose v2 accounts support all storage services
+  
+  // Properties define the configuration of the storage account
+  properties: {
+    minimumTlsVersion: 'TLS1_2'                // Enforce minimum TLS version for security
+    supportsHttpsTrafficOnly: true             // Only allow secure connections
+    allowBlobPublicAccess: false               // Disable public access for security
+    accessTier: 'Hot'                          // Hot tier for frequently accessed data
+  }
+}
+
+// Outputs allow the parent template to access information about the deployed resource
+output storageAccountId string = storageAccount.id
+output storageAccountName string = storageAccount.name
+```
+
+### Legg til deploy
+
+Nå som vi har validert at vår bicep mal virker skal vi legge til et **deploy** skritt.
+
+```yaml
+        # Step 5: Perform the actual deployment
+        - name: Deploy Bicep
+          id: deploy
+          uses: Azure/arm-deploy@v1
+          with:
+            scope: resourcegroup     # Deploy at resource group scope
+            resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}
+            template: ./bicep/main.bicep
+            parameters:              # Pass parameters to the Bicep template
+              environmentName=${{ env.ENVIRONMENT_NAME }}
+              location=${{ env.AZURE_LOCATION }}
+            failOnStdErr: false     # Continue on non-critical errors
 ```
 
 > Jobber her
