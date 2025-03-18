@@ -96,6 +96,15 @@ jobs:
                 --name validate-${{ github.run_id }} \
                 --resource-group ${{ env.RESOURCE_GROUP_NAME }} \
                 --template-file ./bicep/main.bicep 
+
+        - name: What-If Deployment
+          uses: azure/arm-deploy@v1
+          with:
+            resourceGroupName: your-resource-group
+            template: ./path/to/template.json
+            parameters: ./path/to/parameters.json
+            deploymentMode: Validate
+            additionalArguments: --what-if
 ```
 
 Lag en ny folder som du kaller for bicep. I den oppretter du en ny fil for bicept template.
@@ -178,25 +187,219 @@ output storageAccountName string = storageAccount.name
 
 ### Legg til deploy
 
-Nå som vi har validert at vår bicep mal virker skal vi legge til et **deploy** skritt.
+Nå som vi har validert at vår bicep mal virker skal vi legge til et **deploy** skritt. Vi kan legge tl deploy som en ege jobb, men her legger vi det til som et eget step. Men først legger vi til en sjekk om de foregående skrittene genererte feil eller ikke. Først konfigurerer vi inline skript til å stoppe ved feil:
 
 ```yaml
-        # Step 5: Perform the actual deployment
+          with:
+            inlineScript: |
+              set -e  # Exit on any error
+              echo "Running Bicep build..."
+```
+
+```yaml
+        # Step 5: Deploy if all validation passes
         - name: Deploy Bicep
+          if: success()  # Only deploys if validation succeeds
           id: deploy
           uses: Azure/arm-deploy@v1
           with:
-            scope: resourcegroup     # Deploy at resource group scope
+            scope: resourcegroup     # Deploy to resource group scope
             resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}
             template: ./bicep/main.bicep
-            parameters:              # Pass parameters to the Bicep template
+            parameters:              # Parameters passed to Bicep template
               environmentName=${{ env.ENVIRONMENT_NAME }}
               location=${{ env.AZURE_LOCATION }}
             failOnStdErr: false     # Continue on non-critical errors
 ```
 
-> Jobber her
+# Del to. Organsiere Github pipeline i to flyter
 
+Så langt har vi skrevet all yaml og bicept mer eller mindre rett fram uten å tenke så mye på organisering og struktur. Det har vært bra for å få en følelse av hvordan skrive yamle og bicep maler. Nå skal vi strukturere IaC prosjektet vårt for å gjøre det mer oversiktelig, øke gjenbruk og sikkerhet ved å skille mellom applikasjonskode og infrastruktur.
+
+Vi skal nå opprette infrastructur for å kjøre web app vi publiserte i leksjon 1. I den leksjonen opprettet vi infrastrukturen manuelt i protalen. Nå skal vi gjøre det med bicept template og yaml skript i en Github Action pipeline.
+
+## Rydde opp i Azure
+
+- Gjenbruk ressursgruppe fra leksjon 1. (For å gjøre det litt enklere for oss selv i denne leksjonen oppretter vi ikke ressursgruppen med bicep.)
+- Slett web app og Appservice du opprettet i leksjon 1.
+
+## Omorganisere IaC prosjektet vårt
+
+Vi skal nå opprette to workflows, en for å bygge og distribuere applikasjonskode og en for å opprette infrastruktur i Azure. Ved å dele i to arbidsflyter kan vi både begrense hvor ofte infrastruktur malene blir publisert ved å legge på filter og konfigurere ulik sikkerhet for distribusjon av kode og opprettelse av infrastruktur.
+
+- Opprett to nye foldere hvor under **.github\worksflows**.
+- Lag en for infrastruktur yaml filer. Kall den for **infrastructure**.
+- Opprett en for applikasjons skript. Kall denne for **application**.
+- I applikasajonsfolderen skap en ny fil. Kall den for **application.yml**.
+- I infrastrukturfolderen opprett en ny fil og kall den for **infrastructur.yml**.
+- I applikasjonfila kopierer du inn all yaml vi tidligere har skrevet som omhandler pålogging i Azure, bygg, test og distribusjon av applikasjonkode.
+- Gjør tilsvarende for infrastuktur. I tellegg må vi opprette ny bicep maler for å kunne opprette infrastrastruktur for å kunne kjøre applikasjonen fra leksjon 1.
+ 
+> Jobber her
+>
+La oss starte med main.bicep fil. Denne fila er den overordnede bicep malen og kaller andre moduler med parametre for test og produksjon for å gjenbruke moduler. Den bruker **modules/webapp.bicep** og **modules/storage.bicep**
+
+```json
+// This is the main Bicep file that orchestrates the deployment of our Azure resources.
+// Bicep is a Domain Specific Language (DSL) that represents your Azure infrastructure as code.
+
+// Parameter declarations with decorators for validation
+// @allowed decorator restricts the possible values to a predefined set
+@allowed([
+  'test'
+  'prod'
+])
+param environment string
+
+// Parameters use decorators to enforce naming conventions and provide metadata
+// @minLength and @maxLength ensure the name meets Azure's requirements
+// @description provides documentation for the parameter
+@minLength(2)
+@maxLength(36)
+@description('The name of the web site.')
+param webSiteName string = 'app-${uniqueString(resourceGroup().id)}'
+
+@minLength(3)
+@maxLength(20)
+@description('The name of the Azure Storage account. May contain numbers and lowercase letters only!')
+param storageAccountName string = 'st-azskl-images'
+
+@description('The SKU of the App Service Plan')
+param appServiceSku string = 'F1'
+
+@description('The location in which the Azure Storage resources should be deployed.')
+param location string = resourceGroup().location
+
+// Variables are used to compute values that will be reused throughout the template
+// They help maintain consistency and reduce repetition
+var servicePlanName = 'asp-${webSiteName}'
+var blobContainerName = 'ci-image-${webSiteName}'
+var websiteNameWithEnvironment = '${webSiteName}-${environment}'
+var storageAccountNameWithEnvironment = '${storageAccountName}${environment}'
+
+// Tags are metadata attached to Azure resources
+// They are useful for organizing, managing, and tracking costs
+var tags = {
+  environment: environment
+  project: 'Azure Workshop'
+}
+
+// Conditional expression example: determines the tier based on the SKU
+var skuTier = appServiceSku == 'F1' ? 'Free' : 'Basic'
+
+// Modules are reusable components that help organize and maintain your infrastructure
+// They promote code reuse and separation of concerns
+module webApp 'modules/webapp.bicep' = {
+  name: 'webApp'  // This is the deployment name, not the resource name
+  params: {
+    // Pass parameters to the module for configuration
+    location: location
+    appServicePlanName: servicePlanName
+    webAppName: websiteNameWithEnvironment
+    skuName: appServiceSku
+    skuTier: skuTier
+    tags: tags
+  }
+}
+
+// Another module for storage resources
+module storage 'modules/storage.bicep' = {
+  name: 'storage'
+  params: {
+    location: location
+    storageAccountName: storageAccountNameWithEnvironment
+    containerName: blobContainerName
+    tags: tags
+  }
+}
+
+// Outputs make specific values available after deployment
+// They can be used by other templates or scripts
+output webAppName string = webApp.outputs.webAppName
+output webAppHostName string = webApp.outputs.webAppHostName
+output storageAccountName string = storage.outputs.storageAccountName
+output blobContainerName string = storage.outputs.blobContainerName
+```
+
+Bicep for web applikasjonen
+
+```json
+param location string
+param appServicePlanName string
+param webAppName string
+param skuName string
+param skuTier string
+param tags object = {}
+
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
+  name: appServicePlanName
+  location: location
+  tags: tags
+  kind: 'app'
+  sku: {
+    name: skuName
+    tier: skuTier
+  }
+}
+
+resource webApp 'Microsoft.Web/sites@2022-03-01' = {
+  name: webAppName
+  location: location
+  properties: {
+    serverFarmId: appServicePlan.id
+    httpsOnly: true
+  }
+}
+
+output webAppName string = webApp.name
+output webAppHostName string = webApp.properties.defaultHostName
+```
+
+Bicep for Azure blob container
+
+```json
+param location string
+param storageAccountName string
+param containerName string
+param tags object = {}
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  name: storageAccountName
+  location: location
+  tags: tags
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+  properties: {
+    minimumTlsVersion: 'TLS1_2'
+    allowBlobPublicAccess: false
+    supportsHttpsTrafficOnly: true
+    accessTier: 'Hot'
+  }
+}
+
+resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
+  parent: storageAccount
+  name: 'default'
+}
+
+resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
+  parent: blobServices
+  name: containerName
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
+output storageAccountName string = storageAccount.name
+output storageAccountKey string = storageAccount.listKeys().keys[0].value
+output blobContainerName string = containerName
+```
+
+
+
+> Jobber her
 ## Klargjør parameter-filer for test-miljøet og prod
 
 Parameter-filen i ARM-templates (kalt *azuredeploy.{environment}.parameters.json* i dette prosjektet), gjør det mulig å spinne opp et sett med Azure ressurser med ulik konfigurasjon til forskjellige miljøer. For hvert miljø kan du legge inn parameters, eksempel hvis du vil oppskalere produksjonsmiljøet i forhold til test. Det er også vanlig å definere navn på ressurser her.
