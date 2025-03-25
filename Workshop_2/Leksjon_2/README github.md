@@ -7,9 +7,7 @@ I tillegg skal vi utforske Bicep, et domenespesifikt språk (DSL) for deklarativ
 
 ## Ett repo, to workflows
 
-Vi har nå en pipeline for å bygge og distribuere applikasjonen og en for å opprette ressurser i Azure. Vi legger begge pipeline i samme repo, men det er også mulig å legge dem i forskjellige repo. Vi legger også samme trigger på begge workflows slik at både applikasjonskode og infrastruktur er synkronisert.
-
-Hvis vi ønsker å sette opp en inner/outer loop workflow så kan vi gjøre det med å bruke Github environments.
+Vi har nå en pipeline for å bygge og distribuere applikasjonen og en for å opprette ressurser i Azure. Vi legger begge pipeline i samme repo, men det er også mulig å legge dem i forskjellige repo. Vi legger også samme trigger på begge workflows slik at både applikasjonskode og infrastruktur er synkronisert. Men for å forhindre at vi deployer infrastructur hver gang vi gjør en merge på applikasjonskode, legger vi på et filter på hvilken folder som det er gjort endringer i. Det vil si at infrastruktur vil bare bli distribuert når det er gjort endringer i en fil under folderen **infrastruktur**.
 ​
 >**Forutsetninger** for denne leksjonen er at du har både en egen github konto og en egen Azure subsription. Enten som en del av MSDN eller en demo Azure konto.
 
@@ -17,9 +15,9 @@ Hvis vi ønsker å sette opp en inner/outer loop workflow så kan vi gjøre det 
 
 >Hopp over dette punktet hvis du allerede har en fork fra leksjon 1, samt konfigurert tilgang til Azure for Github actions.
 
-Se **leksjon 1** for hvordan du gjør dette. Hopp over skrittet med å lage en web applikasjon.
+Se **leksjon 1** for hvordan du gjør dette i mer detalj, men hopp over skrittet i leksjon 1 med å lage en web applikasjon.
 
-- Fork repo fra Bouvet sin github konto.
+- **Fork** repo fra Bouvet sin github konto og klon det ned på din egen pc. (Med fork lager du en egen kopi av repo i den Github konto og kan jobbe på den uten å bli forstyrret av andre deltakere.)
 - Opprett ressursgrupper i Azure.
 - Legg til test og produksjonsmiljø i ditt Github repo.
 - Konfigurer tilgang til Azure for Github actions. (Siden vi bruker samme miljø i begge leksjoner trenger du ikke å legge til nye tilganger hvis du har gjort det tidligere.)
@@ -28,12 +26,203 @@ Se **leksjon 1** for hvordan du gjør dette. Hopp over skrittet med å lage en w
   - Opprett federated credetials i Azure
   - Legg til hemmeligheter i Github secrets på repo nivå.
 
-> Slutt på hopp-over avsnitt.
+> Slutt på hopp-over avsnitt. Fortsett her hvis du har gjort det overstående i leksjon 1.
 
-## Opprett workflow fil
+### Infrastruktur bicep
+
+Vi starter med å lage en Bicep mal som vi skal bruke til å opprette infrastruktur i Azure.
+
+Lag en ny folder som du kaller for bicep. I den oppretter du en ny fil for bicept template. Denne malen vil vi bryte opp i flere deler for gjenbruk, men vi starter med **main.bicep**.
+
+- Opprett **bicep** folder i rot på prosjektet ditt. **\Workshop_2\Start\AzureWorkshopInfrastruktur**
+- Kall den **main.bicep**. Skriv inn følgende kode:
+
+```json
+// This is the main Bicep file that orchestrates the deployment of our Azure resources.
+// Bicep is a Domain Specific Language (DSL) that represents your Azure infrastructure as code.
+
+// Parameter declarations with decorators for validation
+// @allowed decorator restricts the possible values to a predefined set
+@allowed([
+  'test'
+  'production'
+])
+param environment string
+
+// Parameters use decorators to enforce naming conventions and provide metadata
+// @minLength and @maxLength ensure the name meets Azure's requirements
+// @description provides documentation for the parameter
+@minLength(2)
+@maxLength(36)
+@description('The name of the web site.')
+param webSiteName string = 'app-${uniqueString(resourceGroup().id)}'
+
+// Storage accounts have strict naming rules - only lowercase letters and numbers
+@minLength(3)
+@maxLength(20)
+@description('The name of the Azure Storage account. May contain numbers and lowercase letters only!')
+param storageAccountName string = 'stazsklimages'
+
+// The SKU of the App Service Plan
+@description('The SKU of the App Service Plan')
+param appServiceSku string = 'F1'
+
+// The location in which the Azure Storage resources should be deployed.
+@description('The location in which the Azure Storage resources should be deployed.')
+param location string = resourceGroup().location
+
+// Variables are used to compute values that will be reused throughout the template
+// They help maintain consistency and reduce repetition
+var servicePlanName = 'asp-${webSiteName}'
+var blobContainerName = 'ci-image-${webSiteName}'
+var websiteNameWithEnvironment = '${webSiteName}-${environment}'
+var storageAccountNameWithEnvironment = '${storageAccountName}${environment}'
+
+// Tags are metadata attached to Azure resources
+// They are useful for organizing, managing, and tracking costs
+var tags = {
+  environment: environment
+  project: 'Azure Workshop'
+}
+
+// Conditional expression example: determines the tier based on the SKU
+var skuTier = appServiceSku == 'F1' ? 'Free' : 'Basic'
+
+// Modules are reusable components that help organize and maintain your infrastructure
+// They promote code reuse and separation of concerns
+module webApp 'modules/webapp.bicep' = {
+  name: 'webApp'  // This is the deployment name, not the resource name
+  params: {
+    // Pass parameters to the module for configuration
+    location: location
+    appServicePlanName: servicePlanName
+    webAppName: websiteNameWithEnvironment
+    skuName: appServiceSku
+    skuTier: skuTier
+    tags: tags
+  }
+}
+
+// Another module for storage resources
+module storage 'modules/storage.bicep' = {
+  name: 'storage'
+  params: {
+    location: location
+    storageAccountName: storageAccountNameWithEnvironment
+    containerName: blobContainerName
+    tags: tags
+  }
+}
+
+// Outputs make specific values available after deployment
+// They can be used by other templates or scripts
+output webAppName string = webApp.outputs.webAppName
+output webAppHostName string = webApp.outputs.webAppHostName
+output storageAccountName string = storage.outputs.storageAccountName
+output blobContainerName string = storage.outputs.blobContainerName
+```
+
+### Infrastruktur moduler
+
+
+I main.bicep malen refererer vi til to moduler som vi ønsker å gjenbruke for test og produksjons miljøer. Vi starter med å opprette en ny folder under bicep folderen for å samle modulene der. (Vi har bare to, men det å bruke foldere blir fort nyttig i større prosjekt.)
+
+- I bicep folderen lager du en ny folder som du kaller for **modules**.
+- Opprett en fil i modul folderen som du kaller for **storage.bicep**.
+- Og en fil som du kaller for **webapp.bicep**.
+
+#### Storage
+
+Her er bicep koden for mal for å opprette en blob storage i Azure.
+
+```json
+// This module defines an Azure Storage Account resource
+
+// Input parameters that will be provided by the parent template
+param location string        // Azure region where the storage account will be created
+param tags object           // Resource tags for organization and billing
+
+// Variables help us define reusable values and improve readability
+var storageAccountName = 'st${uniqueString(resourceGroup().id)}'  // Generate a unique storage account name
+
+// Storage Account resource definition
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
+  // Name must be globally unique, lowercase, and 3-24 characters long
+  name: storageAccountName
+  location: location
+  tags: tags
+  
+  // SKU defines the type and replication strategy
+  sku: {
+    name: 'Standard_LRS'    // Locally-redundant storage (cheapest option)
+  }
+  
+  // Kind specifies the type of storage account
+  kind: 'StorageV2'         // General-purpose v2 accounts support all storage services
+  
+  // Properties define the configuration of the storage account
+  properties: {
+    minimumTlsVersion: 'TLS1_2'                // Enforce minimum TLS version for security
+    supportsHttpsTrafficOnly: true             // Only allow secure connections
+    allowBlobPublicAccess: false               // Disable public access for security
+    accessTier: 'Hot'                          // Hot tier for frequently accessed data
+  }
+}
+
+// Outputs allow the parent template to access information about the deployed resource
+output storageAccountId string = storageAccount.id
+output storageAccountName string = storageAccount.name
+```
+
+#### Web app
+
+Her er bicep koden for mal for å opprette en web app i Azure.
+
+```json
+// This is a Bicep module that deploys an Azure Web App along with its required App Service Plan
+// Parameters allow us to make our template reusable across different environments
+param location string // The Azure region where resources will be deployed
+param appServicePlanName string // Name for the App Service Plan (the hosting plan)
+param webAppName string // Name for the Web App that will be created
+param skuName string // The SKU name defines the pricing tier size (e.g., F1, B1, S1)
+param skuTier string // The tier type (e.g., Free, Basic, Standard)
+param tags object = {} // Optional resource tags with a default empty object
+
+// App Service Plan resource - this is the hosting infrastructure for your web app
+// Think of it as the virtual machine or container that will run your application
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
+  name: appServicePlanName
+  location: location
+  tags: tags
+  kind: 'app' // Specifies this is for a regular web app (not a function app or container)
+  sku: {
+    name: skuName // Defines the compute resources available
+    tier: skuTier // Defines the feature set available
+  }
+}
+
+// Web App resource - this is your actual web application
+// It runs on the App Service Plan defined above
+resource webApp 'Microsoft.Web/sites@2022-03-01' = {
+  name: webAppName
+  location: location
+  properties: {
+    serverFarmId: appServicePlan.id // Links the web app to the App Service Plan
+    httpsOnly: true // Security best practice: forces HTTPS for all traffic
+  }
+}
+
+// Outputs allow other templates to reference properties of the deployed resources
+output webAppName string = webApp.name // The name of the created web app
+output webAppHostName string = webApp.properties.defaultHostName // The default URL where the web app will be available
+```
+
+### Github actions - yaml
+
+For å deploye bicep malen vi nettop har skrevet trenger vi en Github action. Vi starter med å skrive yaml kode for å validere bicep malen vi nettopp har skrevet for å validere at den er korrekt. La oss opprette yaml filer for validering.
 
 - Opprett **\\.github\workflows** folder i prosjektet ditt. **\Workshop_2\Start\AzureWorkshopInfrastruktur**
-- Legg til en ny yaml fil for github action.
+- Legg til en ny yaml fil for github action. Kall den **infrastructure.yaml**
   
 ```yaml
 # This workflow validates Bicep Infrastructure as Code (IaC) files
@@ -107,110 +296,208 @@ jobs:
             additionalArguments: --what-if
 ```
 
-Lag en ny folder som du kaller for bicep. I den oppretter du en ny fil for bicept template.
+### Deployment
 
-- Kall den **main.bicep**.
+Vi ønsker å gjenbruke så mye av yaml skriptet som vi kan så vi oppretter en en yaml fil som bare kaller en modul med parameter for test og produksjon.
 
-```json
-// This is the main deployment file that orchestrates our Azure infrastructure
+- Slett innholdet i **infrastructure.yml** og erstatt det med koden under:
+  
+```yaml
+# This workflow handles the deployment of Azure infrastructure using Bicep templates
 
-// Parameters allow you to provide values at deployment time
-// The @description decorator provides documentation for the parameter
-@description('The environment name. "dev" and "prod" are valid values.')
-param environmentName string = 'dev'  // Default value if none is provided
-param location string = 'norwayeast'  // Location where resources will be deployed
+# Workflow name - appears in GitHub Actions UI
+name: Infrastructure Deployment
 
-// Variables are used to store reusable values
-// Here we define tags that will be applied to all resources
-var tags = {
-  environment: environmentName 
-  project: 'Azure Workshop'
-}
+# Trigger conditions for the workflow
+on:
+  push:
+    # Only run on main branch updates
+    branches: [ main ]
+    # Only trigger when these paths are modified
+    paths:
+      - 'bicep/**'        # Any changes to Bicep files
+      - '.github/workflows/infrastructure.yml'  # Changes to this workflow
+  # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
 
-// targetScope defines at which level this template operates
-// Options are: 'resourceGroup', 'subscription', 'managementGroup', 'tenant'
-targetScope = 'resourceGroup'
+# Required permissions for the workflow
+permissions:
+  # Read access to repo contents
+  contents: read
+  # Write access to OpenID Connect token for Azure authentication
+  id-token: write
+  # Read access to GitHub Actions
+  actions: read
 
-// Modules are used to break down complex templates into smaller, reusable parts
-// This module deploys a storage account using a separate template file
-module storageAccount 'modules/storageAccount.bicep' = {
-  name: 'st${environmentName}'  // Dynamic naming using string interpolation
-  params: {
-    location: location  // Passing parameters to the module
-    tags: tags         // Passing our tags to ensure consistent tagging
-  }
-}
+# Jobs to be executed
+jobs:
+  # First job: Deploy to test environment
+  deploy-test-infra:
+    name: Deploy Test Infrastructure
+    # Reuses another workflow file for actual deployment
+    uses: ./.github/workflows/deploy-azure.yml
+    with:
+      # Passes 'test' as environment type
+      releaseType: 'test'
+    # Inherits secrets from the calling workflow
+    secrets: inherit
+
+  # Second job: Deploy to production environment
+  deploy-prod-infra:
+    name: Deploy Production Infrastructure
+    # Ensures test deployment succeeds before running prod
+    needs: deploy-test-infra
+    # Reuses same deployment workflow as test
+    uses: ./.github/workflows/deploy-azure.yml
+    with:
+      # Passes 'production' as environment type
+      releaseType: 'production'
+    # Inherits secrets from the calling workflow
+    secrets: inherit
 ```
 
-I bicep folderen lager du en ny folder som du kaller for **modules**. Vi ønsker å dele bicep malene opp i moduler for lettere kunne organisere dem, samt gjenbruke moduler flere steder.
+#### Depløoy modul
 
-- Opprett en fil i modul folderen som du kaller for **storageAccount.bicep**.
+Opprett en ny yaml fil på samme nivå som **infrastructure.yml**. (For å forenkle debugging legger vi på triggere på denne yaml fila. Hvis du har triggere i en yaml fil må denne ligge på rot-nivå for at Github actions skal 'se' den.)
 
-```json
-// This module defines an Azure Storage Account resource
-
-// Input parameters that will be provided by the parent template
-param location string        // Azure region where the storage account will be created
-param tags object           // Resource tags for organization and billing
-
-// Variables help us define reusable values and improve readability
-var storageAccountName = 'st${uniqueString(resourceGroup().id)}'  // Generate a unique storage account name
-
-// Storage Account resource definition
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
-  // Name must be globally unique, lowercase, and 3-24 characters long
-  name: storageAccountName
-  location: location
-  tags: tags
-  
-  // SKU defines the type and replication strategy
-  sku: {
-    name: 'Standard_LRS'    // Locally-redundant storage (cheapest option)
-  }
-  
-  // Kind specifies the type of storage account
-  kind: 'StorageV2'         // General-purpose v2 accounts support all storage services
-  
-  // Properties define the configuration of the storage account
-  properties: {
-    minimumTlsVersion: 'TLS1_2'                // Enforce minimum TLS version for security
-    supportsHttpsTrafficOnly: true             // Only allow secure connections
-    allowBlobPublicAccess: false               // Disable public access for security
-    accessTier: 'Hot'                          // Hot tier for frequently accessed data
-  }
-}
-
-// Outputs allow the parent template to access information about the deployed resource
-output storageAccountId string = storageAccount.id
-output storageAccountName string = storageAccount.name
-```
-
-### Legg til deploy
-
-Nå som vi har validert at vår bicep mal virker skal vi legge til et **deploy** skritt. Vi kan legge tl deploy som en ege jobb, men her legger vi det til som et eget step. Men først legger vi til en sjekk om de foregående skrittene genererte feil eller ikke. Først konfigurerer vi inline skript til å stoppe ved feil:
+- Opprett filen **deploy-azure.yml**
+- Denne fila innholder mya av det vi tidligere skrev for å validere bicep malen vi skrev, nå gjør vi validering i begge miljøer.
 
 ```yaml
+# This workflow handles the deployment of infrastructure to Azure using Bicep
+
+# Workflow name that appears in GitHub Actions UI
+name: Deploy to Azure
+
+# Environment variables available to all jobs and steps
+env:
+  # Dynamic environment name based on input parameter
+  ENVIRONMENT_NAME: ${{inputs.releaseType}}
+  # Azure region where resources will be deployed
+  AZURE_LOCATION: 'norwayeast'
+  # Resource group name with dynamic suffix based on release type
+  RESOURCE_GROUP: 'rg-azskolen-${{inputs.releaseType}}'
+
+# Defines when the workflow will run
+on:
+  # Manual trigger from GitHub Actions UI
+  workflow_dispatch: 
+  # Allows this workflow to be called by other workflows
+  workflow_call:
+    inputs:
+      releaseType:
+        description: 'Where to release (test or prod)?'
+        type: string
+        required: true
+        default: 'test'
+
+# Required permissions for the workflow
+permissions:
+  contents: read      # Permission to read repository contents
+  id-token: write    # Permission to request OIDC tokens
+  actions: read      # Permission to read Actions data
+
+# Jobs to be executed
+jobs:
+    validate-bicep:
+      name: Validate Bicep
+      # Specifies the runner environment
+      runs-on: ubuntu-latest
+      steps:
+        # Checks out repository code to the runner
+        - name: Checkout
+          uses: actions/checkout@v4
+  
+        # Authenticates with Azure using OIDC
+        - name: Azure Login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+        # Validates Bicep syntax and builds ARM template
+        - name: Bicep lint
+          uses: azure/cli@v1
           with:
             inlineScript: |
               set -e  # Exit on any error
-              echo "Running Bicep build..."
-```
+              # Compiles Bicep to ARM template
+              echo "Running Bicep build ..."
+              az bicep build --file bicep/main.bicep
+              # Checks Bicep code for style and syntax issues
+              echo "Running Bicep lint..."
+              az bicep lint --file bicep/main.bicep
 
-```yaml
-        # Step 5: Deploy if all validation passes
+        # Validates the Bicep template against the resource group
+        - name: Bicep Validate
+          if: success()
+          uses: Azure/cli@v1
+          with:
+            inlineScript: |
+              set -e
+              echo "Validating Bicep template: rs-grp ${{env.RESOURCE_GROUP}}"
+              az deployment group validate \
+                --resource-group ${{ env.RESOURCE_GROUP }} \
+                --template-file ./bicep/main.bicep \
+                --parameters environment=${{ env.ENVIRONMENT_NAME }} location=${{ env.AZURE_LOCATION }}
+        
+        # Performs a What-If deployment to preview changes
+        - name: What-If Deployment
+          uses: azure/arm-deploy@v1
+          with:
+            scope: resourcegroup
+            resourceGroupName: ${{ env.RESOURCE_GROUP }}
+            template: ./bicep/main.bicep
+            parameters: environment=${{ env.ENVIRONMENT_NAME }} location=${{ env.AZURE_LOCATION }}
+            deploymentMode: Validate
+            additionalArguments: --what-if
+                
+        # Deploys the Bicep template to Azure
         - name: Deploy Bicep
-          if: success()  # Only deploys if validation succeeds
+          if: github.event_name == 'push' && github.ref == 'refs/heads/main'
           id: deploy
           uses: Azure/arm-deploy@v1
           with:
-            scope: resourcegroup     # Deploy to resource group scope
-            resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}
+            scope: resourcegroup
+            resourceGroupName: ${{ env.RESOURCE_GROUP }}
             template: ./bicep/main.bicep
-            parameters:              # Parameters passed to Bicep template
-              environmentName=${{ env.ENVIRONMENT_NAME }}
+            parameters: 
+              environment=${{ env.ENVIRONMENT_NAME }}
               location=${{ env.AZURE_LOCATION }}
-            failOnStdErr: false     # Continue on non-critical errors
+            failOnStdErr: false
 ```
+
+## Managed identity
+
+Det er flere måter å autoriser tilgang fra en web app. Det er mulig å gi web applikasjonen nøklene til storage account, noe som ikke er anbefalt da man ikke lengre har kontroll på hvem som har tilgang til storage. Man kan opprette et delt tilgangstoken (SAS) hvor man har større kontroll over hva det gis tilgang til og for hvor lenge. Ulempen med denne er at det er en manuell prosess som uløper og krever manuell inngripen for å fornye. Den anbefalte måten å gi tilgang er å bruke **managed identity**. Her gir Azure 'automatisk' tilgang når de tilgangene er satt i Entra Id. Du som utvikler trenger ikke å tenke på å forny token når alt er satt opp. La osss sette opp managed identity i Github actions.
+
+Først legger vi til at storage benytter managed identity:
+
+```json
+  kind: 'StorageV2'
+  identity: {
+    type: 'SystemAssigned'
+  }
+```
+
+Så må vi opprette en ny assignment modul i storage.bicep
+
+```json
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(storageAccount.id, 'Storage Blob Data Contributor')
+  scope: storageAccount
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
+    principalId: storageAccount.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+```
+
+> Jobber her
+>
 
 # Del to. Organsiere Github pipeline i to flyter
 
