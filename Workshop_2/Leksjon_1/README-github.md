@@ -178,13 +178,21 @@ jobs:
     - name: Publish
       run: dotnet publish ./AzureWorkshopApp/AzureWorkshopApp.csproj --configuration Release --output ./publish --no-build
 
-    # Upload the published app as an artifact
+    # Upload the published app as an artifact to Github
     - name: Upload artifact
       uses: actions/upload-artifact@v4  # v4 is the latest version as of 2024
       with:
         name: dotnet-app  # Name of the artifact in GitHub
         path: ./publish   # Directory containing files to upload
 ```
+
+>Siden vi har satt **workflow_dispatch** som en trigger på vår workflow kan du også trigge workflow fra command line på din lokale maskin. Åpne et terminalvidu i VS Code og skriv. (Krever at du har installert GitHub CLI på din maskin.)
+>
+>**gh workflow run application.yml**
+>
+>Hvis du vil se status på alle kjøringer for en yaml fil:
+>
+>**gh run list --workflow=application.yml**  
 
 ### Artifact
 
