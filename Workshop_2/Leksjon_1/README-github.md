@@ -460,6 +460,66 @@ jobs:
     secrets: inherit  # Inherits secrets for Azure deployment
 ```
 
+La oss opprette **build.yml** for å bygge applikasjonen
+
+```yaml
+# This workflow builds a .NET application and creates a deployable artifact
+name: Build .NET App
+
+# Defines when this workflow can be triggered
+# workflow_call allows this workflow to be called from other workflows
+on:
+  workflow_call:
+
+# Jobs are the main building blocks of a workflow
+jobs:
+  build:
+    # Specifies the type of runner to execute the job
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Checks out your repository code to the runner
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # Sets up the .NET SDK on the runner
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'  # Specifies the .NET version to use
+        
+    # Installs frontend dependencies using npm
+    - name: Install npm packages
+      working-directory: ./AzureWorkshopApp  # Changes to the app directory
+      run: npm install
+        
+    # Restores .NET project dependencies
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ./AzureWorkshopApp
+        
+    # Debug step to show progress
+    - name: Echo build step
+      run: echo "Now building the application..."
+
+    # Builds the application in Release configuration
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+      working-directory: ./AzureWorkshopApp
+        
+    # Creates a publishable version of the application
+    - name: Publish
+      run: dotnet publish --no-build --configuration Release --output ./publish
+      working-directory: ./AzureWorkshopApp
+        
+    # Saves the build output as an artifact for use in other workflows
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-app  # Name of the artifact
+        path: ./AzureWorkshopApp/publish  # Path to the files to upload
+```
+
 ### deploy.yml
 
 Nå oppretter vi deploy yaml skriptet i workflows folderen. Siden credentials ikke består mellom moduler, må vi legge inn Azure pålogging i deploy skriptet. Vi vil ikke lengre bruke påloggingsskriptet fra tidligere.
