@@ -449,25 +449,25 @@ on:
 
 # Jobs run in parallel by default unless 'needs' is specified
 jobs:
-  # First job: Build the .NET application
+  # Build the .NET application
   build:
     uses: ./.github/workflows/build.yml  # References our build workflow. It compiles the app and creates artifacts
 
-  # Third job: Deploy using yaml
+  # Second job: Deploy using yaml
   deploy:
-    uses: ./.github/workflows/deploy.yml  # References our deployment workflow
+    needs: build  # Waits for the build job to complete
+    uses: ./.github/workflows/deploy1.yml  # References our deployment workflow
     secrets: inherit  # Inherits secrets for Azure deployment
-    needs: [build]  # This job won't start until both 'build' and 'login' complete. It ensures we have built artifacts and Azure authentication before deployment
 ```
 
 ### deploy.yml
 
-Nå må generere deploy yaml skriptet. Siden credentials ikke består mellom moduler, må vi legge inn Azure pålogging i deploy skriptet. Vi vil ikke lengre bruke påloggingsskriptet fra tidligere. 
+Nå oppretter vi deploy yaml skriptet i workflows folderen. Siden credentials ikke består mellom moduler, må vi legge inn Azure pålogging i deploy skriptet. Vi vil ikke lengre bruke påloggingsskriptet fra tidligere.
 
 ```yaml
 # This workflow handles the deployment of our application to Azure Web App Service
 # It's called by the main.yml workflow after build and login steps complete
-name: Deploy to Azure
+name: Build and deploy to Github
 
 # Indicates this workflow can be called by other workflows
 # This enables modular workflow design and reusability
