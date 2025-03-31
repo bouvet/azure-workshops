@@ -85,32 +85,23 @@ Sjekk inn koden og lag en PR til deg selv. Se at pipeline kjører når du ber om
 
 ### Fork repo
 
-For at du skal kunne jobbe på din egen versjon av Bouvet sitt oppgaverepo uten innblanding fra andre deltakere, gjør en fork at det over til din eget GitHub konto. (Gjør din fork **public** så blir det litt mindre autentisering å holde styr på underveis. Hvis du gjør ditt repo privat må du også generere en Personal Access Token (PAT) for bruk i Azure Devops.)
+For at du skal kunne jobbe på din egen versjon av Bouvet sitt oppgaverepo uten innblanding fra andre deltakere, gjør en **fork** og kopier repo over til din eget GitHub konto. (Gjør din fork **public** så blir det litt mindre autentisering å holde styr på underveis. Hvis du gjør ditt repo privat må du også generere en Personal Access Token (PAT) for bruk i Azure Devops.)
 
-#### I portalen
+#### I portalen (valgfritt)
 
 - Gå til Bouvet sitt repo i GitHub: [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops). Klikk på **Fork** knapen og kopier repo over til din egen GitHub.
 
-#### Github CLI (gh)
+#### Med Github CLI (valgfritt)
+
+Last ned her hvis du ikke allerede har det. [GH](https://cli.github.com/)
 
 ```bash
 gh repo fork https://github.com/bouvet/azure-workshops
 ```
 
-### Importer egen kopi av repo
-
-Nå som du har laget en egen kopi av Azure-workshops, kan vi nå importere det inn til vår Auzure DevOps prosjekt som vi opprettet. I din Devops:
-
-- Klikk på **Repos**. Du skal nå få beskjed **&lt;ditt-repo&gt; is empty. Add some code!**
-- Klikk **Import** knappen under **Import a repository**.
-- Velg **GIt**
-- I **Clone URL** legg inn url til din fork av azure-workshop
-
-Sjekk at du har en følgende folder under **Files**. Workshop_2/Start/AzureWorkshop. Det er denne applikasjonen vi skal lage en build og publish pipeline for.
-
 ### 5: Github Actions pipeline
 
-Nå som du har opprettet et prosjekt i Github Actions og "forke" et Git repo kan vi sette opp en pipeline for å automatisere bygging og testing av applikasjonen.
+Nå som du har testet github actions litt og "forket" Bouvet sitt git repo kan vi sette opp en pipeline for å automatisere bygging og testing av applikasjonen.
 
 La oss først bygge prosjektet med Github Actions. Vi skal senere kombinere alle yaml modulene vi oppretter til en sammenhengende yaml fil som bygger prosjektet, kjører tester, logger på Azure og publiserer koden til Azure.
 
@@ -120,7 +111,7 @@ VI trenger å legge til et test miljø i vårt GitHub repo. I føreste omgang tr
 
 - Velg **Settings** fanen på forsiden av ditt GitHUb repo
 - I menye til venstre velg **Environments**
-- Klikk **New Environement** gi det navnet test. Hopp over resten. Vi kommer tilbake til denne senere.
+- Klikk **New Environement** gi det navnet **test**. Hopp over resten. Vi kommer tilbake til denne senere.
 
 #### Yaml script
 
@@ -186,13 +177,16 @@ jobs:
         path: ./publish   # Directory containing files to upload
 ```
 
->Siden vi har satt **workflow_dispatch** som en trigger på vår workflow kan du også trigge workflow fra command line på din lokale maskin. Åpne et terminalvidu i VS Code og skriv. (Krever at du har installert GitHub CLI på din maskin.)
+>Siden vi har satt **workflow_dispatch** som en trigger på vår workflow kan du også trigge workflow fra command line på din lokale maskin. Åpne et terminalvidu i VS Code og skriv. (Krever at du har installert GitHub CLI (gh) på din maskin.)
 >
 >**gh workflow run application.yml**
 >
->Hvis du vil se status på alle kjøringer for en yaml fil:
+>Dette vil kjør github action på din default branch (main). Hvis du vil trigge en action på en annen branch som du har dyttet til Github kan du legge på parameteret
+**--ref [branch name]**
 >
->**gh run list --workflow=application.yml**  
+>Merk at action du ønsker å kjøre på **[branch name]** må også yaml fila eksistere på  default branch før Github plukker opp at du vil trigge den action på [branch name].
+>
+>Hvis du vil se status på alle kjøringer for en yaml fil: **gh run list --workflow=application.yml**  
 
 ### Artifact
 
@@ -262,11 +256,13 @@ På **Add a credential** siden
 - **Organization**: Din GitHub organisasjon
 - **Repository**: Ditt repo
 - **Entity type**: Her velger du hvilken entitet som skal være en del av hemmeligheten som styrer tilgang i Azure. For GitHub kan du velge: Environment, Branch, Pull request eller Tag.
-- Velg **Environment** og skriv **test**.
+- Velg **Branch** og skriv **branch-name**.
 
 >Innholdet i feltet Subject identifier er det vi skal generere i vår bicrpt skript og sende til Azure Entra. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions. Hvis det ikke stemmer vil du få en feilmelding.
 
 - Klikk **Create**
+  
+> Du kan legge til flere hemmligheter for ulike miljøer, hver branch du vil publisere fra osv.
   
 ### Legg til hemmeligheter til Github repo
 
@@ -291,7 +287,7 @@ Klikk **Add Secret** etter hver gang.
 
 Merk at du kan ikke se den hemmelighetene du har lagt inn i ettertid, men du kan slette den og legge til en ny.
 
-## 5 test forbindelsen
+## 5: Test forbindelsen
 
 For å teste forbindelsen vi nettopp har satt opp skal vi skrive en liten yaml fil.
 
@@ -314,7 +310,7 @@ permissions:
 jobs:
   login:
     runs-on: ubuntu-latest     # Specifies the type of virtual machine to run on
-    environment: test          # Links to GitHub Environment named 'test' with its secrets
+    environment: test          # Links to GitHub Environment named 'test' with its secrets, also used to generate the subject header for Entra federation. Remove this if you want to use other "selections" like branch
 
     steps:
     # Clear any existing Azure credentials to ensure clean authentication
@@ -445,6 +441,8 @@ on:
   push:
     branches:
       - '**'  # Runs on any branch push - useful during development
+  pull_request:
+    branches: [ "main" ] # Runs on PR to main branch
   workflow_dispatch:  # Allows manual triggers from GitHub UI
 
 # Jobs run in parallel by default unless 'needs' is specified
@@ -542,7 +540,7 @@ jobs:
     steps:
     # Move Azure login step
     - name: Azure Login
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -565,7 +563,7 @@ jobs:
         package: ./publish                       # Path to deployment package
 ```
 
-## tester
+## Tester
 
 Siste steget vi skal gjøre er å få lagt til en task for å kjøre gjennom tester. testen som finnes i prosjektet skal feile og du kan rette på koden etter at pipelinen stopper opp på grunn av testen. Start med å opprette en ny fil
 
@@ -644,10 +642,10 @@ Vi må sikre oss at testene kjører før vi prøver å publisere løsningen. Leg
   deploy:
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
-    needs: [build, test]
+    needs: [test]
 ```
 
-Gjør en commit og PR og se at pipeline stopper før deploy.
+Gjør en commit og PR og se at pipeline stopper før deploy. (Det er feil i testen.)
 
 #### test = true
 
@@ -659,7 +657,7 @@ Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Action
 
 ### GIthub repo
 
-Åpne ditt (forked) repo:
+Åpne ditt (forke'd) repo:
 
 - Velg **Settings** fanen på toppen.
 - Klikk på **Environments** i venstre menyen.
@@ -683,13 +681,120 @@ Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Action
 - Fra scenario velg som tidligere: **GitHub Actions deploying Azure resources**.
 - **Organization**: Din GitHub organisasjon
 - **Repository**: Ditt repo
-- Velg **Environment** og skriv **production**. (Dette tilsvarer det miljøet du har satt opp i GitHub for ditt repo ovenfor.)
+- Velg **Branch** og skriv **branch-name**. (Her kunne du også ha vlagt environment og 'produksjon' som tilsvarer det miljøet du har satt opp i GitHub for ditt repo.)
 
 ### yaml endringer
 
-Nå som vi har satt opp nytt produksjonsmijø og lagt til ny federated identity i Azure Entra ID er det på tide å endre yaml skriptene våre.
+Nå som vi har satt opp nytt produksjonsmijø og lagt til ny federated identity i Entra ID er det på tide å endre yaml skriptene våre.
 
-Først endrer vi vårt deploy script slik at det virker med flere miljøer enn test. Hvilket miljø det skal gjøre en deploy til avgjør vi ved å sende inn miljøet som et prameter til deploy skriptet. For å få det til må vi legge til en beskrivelse av hva input parameteret fram **Main.yml** er. **workflow_call** lar denne modulen bli kalt fra en annen modul, som main.yml.
+Først skal vi endre vårt deploy script slik at det virker med flere miljøer enn test. Hvilket miljø skriptet skal gjøre en deploy til avgjør vi ved å sende inn 'miljøet' som et prameter til deploy skriptet. For å få til å kalle et yaml skript fra et annet skript, må vi legge til en beskrivelse av hva input parameteret fram **Main.yml** er. Og legge til en ny trigger **workflow_call**. Denne gjør modulen i stand til å bli kalt fra en annen modul. Det skal vi gjøre fra main.yml.
+
+#### Endringer i Main.yml
+
+I **main.yml** fila må vi nå kalle build og deploy modulene våre to ganger med de ulike miljøene vi ønsker å gjøre en deply til i Azure. Først for test og så for produksjon:
+
+```yaml
+# Main orchestrator workflow for our CI/CD pipeline
+# This workflow coordinates building, testing, and deploying our application
+name: CI/CD Pipeline
+
+# Define permissions needed for Azure OIDC authentication
+permissions:
+  id-token: write    # Required for Azure OIDC connection
+  contents: read     # Needed to read repository contents
+
+# Define when this workflow should run
+on:
+  push:
+    branches:
+      - main        # Runs on every push to main branch
+  pull_request:
+    branches:
+      - main        # Runs when PRs target main branch
+  workflow_dispatch: # Enables manual triggering from GitHub UI
+
+# Define the sequence of jobs in our pipeline
+jobs:
+  # Step 1: Build the application
+  # This job compiles our code and creates artifacts
+  build:
+    uses: ./.github/workflows/build.yml  # References our build workflow
+    with:                                # Parameters to pass to the module
+      releasetype: 'test'                # Environment to build for
+
+  # Step 2: Run automated tests
+  # This ensures our code changes haven't broken anything
+  test:
+    uses: ./.github/workflows/test.yml     # References our test workflow
+    needs: [build]                         # Won't run until build succeeds
+
+  # Step 3: Deploy to test environment
+  # This gives us a chance to verify changes in a safe environment
+  deploy-test:
+    uses: ./.github/workflows/deploy-azure.yml
+    with:
+      releaseType: 'test'                 # Specifies production environment
+    secrets: inherit                      # Passes through Github repository secrets
+    needs: [test]                         # Won't run until tests pass
+
+  # Step 4: Deploy to production
+  # Final step - only runs after successful test deployment
+  deploy-prod:
+    uses: ./.github/workflows/deploy-azure.yml
+    with:
+      releaseType: 'production'            # Specifies production environment
+    secrets: inherit                       # Passes through repository secrets
+    needs: [deploy-test]                   # Ensures test deployment succeeded
+
+# Main Points:
+# 1. Pipeline stages: Build → Test → Deploy Test → Deploy Production
+# 2. Each stage must succeed before the next can start
+# 3. Uses reusable workflows for maintainability
+# 4. Separates environments for safety
+# 5. Automated testing ensures code quality
+```
+
+#### Publish
+
+Dette skrittet er ofte en valgfrtt del. Vi kan gjøre en deploy til Azure rett fra bygg skrittet, men for helhetens del legger vil til et publiseringsskritt her.
+
+```yaml
+name: Publish
+
+on:
+  workflow_call:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Publish
+      working-directory: ./AzureWorkshopApp
+      run: dotnet publish --configuration Release --output ./publish
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-app-${{ github.sha }}
+        path: ./AzureWorkshopApp/publish
+        compression-level: 9
+        retention-days: 5
+```
+
+Artifakten som opprettes kan du se i portalen ved å gå inn på **action** som har bygget den, så vises den nederst på siden.
+
+<img src="artifact-github.png" width="800" height="300" />
+
+
+
+
 
 ```yaml
 # This workflow handles deployment of our application to Azure Web App Service
@@ -743,68 +848,7 @@ jobs:
           package: ./publish                        # Path to deployment files
 ```
 
-#### Endringer i Main.yml
 
-I main.yml fila må vi nå kalle **deploy-azure.yml** fila vår to ganger med de ulike miljøene vi ønsker å gjøre en deply til i Azure. Først for test og så for produksjon:
-
-```yaml
-# Main orchestrator workflow for our CI/CD pipeline
-# This workflow coordinates building, testing, and deploying our application
-name: CI/CD Pipeline
-
-# Define permissions needed for Azure OIDC authentication
-permissions:
-  id-token: write    # Required for Azure OIDC connection
-  contents: read     # Needed to read repository contents
-
-# Define when this workflow should run
-on:
-  push:
-    branches:
-      - main        # Runs on every push to main branch
-  pull_request:
-    branches:
-      - main        # Runs when PRs target main branch
-  workflow_dispatch: # Enables manual triggering from GitHub UI
-
-# Define the sequence of jobs in our pipeline
-jobs:
-  # Step 1: Build the application
-  # This job compiles our code and creates artifacts
-  build:
-    uses: ./.github/workflows/build.yml    # References our build workflow
-
-  # Step 2: Run automated tests
-  # This ensures our code changes haven't broken anything
-  test:
-    uses: ./.github/workflows/test.yml     # References our test workflow
-    needs: [build]                         # Won't run until build succeeds
-
-  # Step 3: Deploy to test environment
-  # This gives us a chance to verify changes in a safe environment
-  deploy-test:
-    uses: ./.github/workflows/deploy-azure.yml
-    with:
-      releaseType: 'TEST'                  # Specifies test environment
-    secrets: inherit                       # Passes through Github repository secrets
-    needs: [test]                         # Won't run until tests pass
-
-  # Step 4: Deploy to production
-  # Final step - only runs after successful test deployment
-  deploy-prod:
-    uses: ./.github/workflows/deploy-azure.yml
-    with:
-      releaseType: 'production'            # Specifies production environment
-    secrets: inherit                       # Passes through repository secrets
-    needs: [deploy-test]                   # Ensures test deployment succeeded
-
-# Main Points:
-# 1. Pipeline stages: Build → Test → Deploy Test → Deploy Production
-# 2. Each stage must succeed before the next can start
-# 3. Uses reusable workflows for maintainability
-# 4. Separates environments for safety
-# 5. Automated testing ensures code quality
-```
 
 ### Godkjenning av deploy til produksjon
 
