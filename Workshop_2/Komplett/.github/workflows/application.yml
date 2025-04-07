@@ -22,7 +22,7 @@ jobs:
   # Step 1: Build the application
   # This job compiles our code and creates artifacts
   build:
-    uses: ./.github/workflows/build1.yml  # References our build workflow
+    uses: ./.github/workflows/build.yml  # References our build workflow
 
 
   # Step 2: Run automated tests
