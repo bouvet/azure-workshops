@@ -1,53 +1,39 @@
-# This workflow handles deployment of our application to Azure Web App Service
-name: Publish to Github
+name: Publish
 
-# Define when this workflow can be triggered:
 on:
-  workflow_dispatch:      # Enables manual trigger from GitHub UI
-  workflow_call:         # Allows this workflow to be called by the main workflows
-    inputs:
-      releaseType:       # Input parameter to specify deployment environment
-        description: 'Where to release (test or prod)?'
-        type: string
-        required: true
-        default: 'test'  # Default to test environment for safety
+  workflow_call:
 
 jobs:
-  # Main deployment job
-  deploy:
-    # Dynamic naming based on deployment target
-    name: Deploy to ${{ inputs.releaseType }}
-    # Uses GitHub environments for managing deployment configurations
-    environment: ${{ inputs.releaseType }}
-
-    runs-on: ubuntu-latest    # Specifies the runner OS
-    
-    # Add variables section for environment-specific values
-    env:
-      APP_NAME: app-azskolen-${{ inputs.releaseType }}    # Dynamic app name based on environment
-    
+  publish:
+    runs-on: ubuntu-latest
     steps:
-      # Step 1: Authenticate with Azure using OIDC
-      # This is more secure than using stored credentials
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}          # App registration ID
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}          # Azure AD tenant
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  # Azure subscription
-
-      # Step 2: Get the built application artifacts
-      # These were created by the build job and stored in GitHub
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dotnet-app    # Name of the artifact to download
-          path: ./publish     # Where to place the files locally
-
-      # Step 3: Deploy to Azure Web App
-      # Uses Azure's deployment action to push code to App Service
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.APP_NAME }}  # Use the environment variable
-          package: ./publish
+    - uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install npm dependencies
+      run: npm install dropzone @types/dropzone
+        
+    - name: Restore dependencies
+      working-directory: ./AzureWorkshopApp
+      run: dotnet restore
+        
+    - name: Publish
+      working-directory: ./AzureWorkshopApp
+      run: dotnet publish --configuration Release --output ./publish
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-app-${{ github.sha }}
+        path: ./AzureWorkshopApp/publish
+        compression-level: 9
+        retention-days: 5

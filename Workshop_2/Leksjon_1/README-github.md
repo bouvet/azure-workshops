@@ -689,6 +689,10 @@ Nå som vi har satt opp nytt produksjonsmijø og lagt til ny federated identity 
 
 Først skal vi endre vårt deploy script slik at det virker med flere miljøer enn test. Hvilket miljø skriptet skal gjøre en deploy til avgjør vi ved å sende inn 'miljøet' som et prameter til deploy skriptet. For å få til å kalle et yaml skript fra et annet skript, må vi legge til en beskrivelse av hva input parameteret fram **Main.yml** er. Og legge til en ny trigger **workflow_call**. Denne gjør modulen i stand til å bli kalt fra en annen modul. Det skal vi gjøre fra main.yml.
 
+Vi skal ende opp med en pipeline som dette:
+
+<img src="pipeline.png" width="1000" height="200" />
+
 #### Endringer i Main.yml
 
 I **main.yml** fila må vi nå kalle build og deploy modulene våre to ganger med de ulike miljøene vi ønsker å gjøre en deply til i Azure. Først for test og så for produksjon:
@@ -718,9 +722,8 @@ jobs:
   # Step 1: Build the application
   # This job compiles our code and creates artifacts
   build:
-    uses: ./.github/workflows/build.yml  # References our build workflow
-    with:                                # Parameters to pass to the module
-      releasetype: 'test'                # Environment to build for
+    uses: ./.github/workflows/build1.yml  # References our build workflow
+
 
   # Step 2: Run automated tests
   # This ensures our code changes haven't broken anything
@@ -728,19 +731,25 @@ jobs:
     uses: ./.github/workflows/test.yml     # References our test workflow
     needs: [build]                         # Won't run until build succeeds
 
-  # Step 3: Deploy to test environment
+  # Step 3: Publish to Github 
+  # This will publish the built app as an artifact in Github
+  publish:
+    uses: ./.github/workflows/publish.yml     # References our publish workflow
+    needs: [test]                             # Won't run until test succeeds
+
+  # Step 4: Deploy to test environment
   # This gives us a chance to verify changes in a safe environment
   deploy-test:
-    uses: ./.github/workflows/deploy-azure.yml
+    uses: ./.github/workflows/deploy1.yml
     with:
       releaseType: 'test'                 # Specifies production environment
     secrets: inherit                      # Passes through Github repository secrets
-    needs: [test]                         # Won't run until tests pass
+    needs: [publish]                         # Won't run until tests pass
 
-  # Step 4: Deploy to production
+  # Step 5: Deploy to production
   # Final step - only runs after successful test deployment
   deploy-prod:
-    uses: ./.github/workflows/deploy-azure.yml
+    uses: ./.github/workflows/deploy1.yml
     with:
       releaseType: 'production'            # Specifies production environment
     secrets: inherit                       # Passes through repository secrets
@@ -754,37 +763,161 @@ jobs:
 # 5. Automated testing ensures code quality
 ```
 
-#### Publish
+#### Build skritt
+
+```yaml
+# This defines the name of the workflow that will appear in the GitHub Actions UI
+name: Build .NET App
+
+# The 'on' section defines when this workflow will be triggered
+on:
+  # workflow_call: allows this workflow to be called from another workflow
+  workflow_call:
+  # workflow_dispatch: enables manual triggering of this workflow from the GitHub UI
+  workflow_dispatch:
+
+# Concurrency settings prevent multiple instances of the same workflow from running simultaneously
+concurrency:
+  # The group defines which workflows should be considered as the same for concurrency purposes
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # When true, cancels any running workflow in the same group when a new one is triggered
+  cancel-in-progress: true
+
+# Jobs section defines the actual work that will be performed by this workflow
+jobs:
+  # 'build' is the name of this job
+  build:
+    # Specifies the type of runner to use - in this case a Linux-based virtual machine
+    runs-on: ubuntu-latest
+    
+    # Steps are individual tasks that will execute sequentially
+    steps:
+    # This step clones your repository code to the runner
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # Sets up the .NET SDK on the runner
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        # Specifies which version of .NET to install
+        dotnet-version: '8.0.x'
+        
+    # Caches NuGet packages to speed up future workflow runs
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        # Path to store the cached files
+        path: ~/.nuget/packages
+        # Cache key to identify this specific cache
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        # Fallback keys to use if the exact key doesn't exist
+        restore-keys: ${{ runner.os }}-nuget-
+        
+    # Caches npm packages to speed up future workflow runs
+    - name: Cache npm packages
+      uses: actions/cache@v3
+      with:
+        # Path to store the cached npm files
+        path: ~/.npm
+        # Cache key based on the package-lock.json hash
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        # Fallback keys to use if the exact key doesn't exist
+        restore-keys: ${{ runner.os }}-node-
+        
+    # Installs required npm packages for the frontend
+    - name: Install npm packages
+      # Sets the working directory for this step
+      working-directory: ./AzureWorkshopApp
+      # The pipe symbol | allows for multiple commands in a single step
+      run: |
+        npm ci  # Clean install - uses package-lock.json for deterministic builds
+        npm install --save-dev @types/dropzone  # Installs a specific dev dependency
+        
+    # Restores .NET dependencies based on the project files
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ./AzureWorkshopApp
+        
+    # Builds the .NET application
+    - name: Build
+      # --no-restore skips the restore step since we already did it
+      # --configuration Release builds in release mode (optimized, no debug symbols)
+      run: dotnet build --no-restore --configuration Release
+      working-directory: ./AzureWorkshopApp
+```
+
+#### Publish skritt
 
 Dette skrittet er ofte en valgfrtt del. Vi kan gjøre en deploy til Azure rett fra bygg skrittet, men for helhetens del legger vil til et publiseringsskritt her.
 
 ```yaml
+# This defines the name of the workflow that will appear in the GitHub Actions UI
 name: Publish
 
+# The 'on' section defines when this workflow will be triggered
 on:
+  # workflow_call: allows this workflow to be called from another workflow
+  # This means this workflow is designed to be reusable as a component in other workflows
   workflow_call:
 
+# Jobs section defines the actual work that will be performed by this workflow
 jobs:
+  # 'publish' is the name of this job
   publish:
+    # Specifies the type of runner to use - in this case a Linux-based virtual machine
     runs-on: ubuntu-latest
+    # Steps are individual tasks that will execute sequentially
     steps:
+    # Checks out the repository code to the runner
+    # The simplified syntax is used here (no name property)
     - uses: actions/checkout@v4
       
+    # Sets up the .NET SDK on the runner for building .NET applications
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
+        # Specifies which version of .NET to install
         dotnet-version: '8.0.x'
+    
+    # Sets up Node.js on the runner for frontend processing
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        # Specifies which version of Node.js to install
+        node-version: '18'
         
+    # Installs specific JavaScript dependencies needed for the application
+    - name: Install npm dependencies
+      # Direct npm command without working-directory implies it runs at repository root
+      run: npm install dropzone @types/dropzone
+        
+    # Restores the .NET dependencies based on project files
+    - name: Restore dependencies
+      # Sets the directory where the command will execute
+      working-directory: ./AzureWorkshopApp
+      # dotnet restore downloads all packages specified in project files
+      run: dotnet restore
+        
+    # Publishes the .NET application in a deployment-ready format
     - name: Publish
       working-directory: ./AzureWorkshopApp
+      # --configuration Release builds in release mode (optimized)
+      # --output ./publish specifies the output directory for published files
       run: dotnet publish --configuration Release --output ./publish
         
+    # Uploads the published application as a workflow artifact for later use
     - name: Upload artifact
+      # This action allows storing build outputs for use between jobs or workflows
       uses: actions/upload-artifact@v4
       with:
+        # Name of the artifact with commit SHA for unique identification
         name: dotnet-app-${{ github.sha }}
+        # Path to the files that should be uploaded
         path: ./AzureWorkshopApp/publish
+        # Compression level 9 is maximum compression to save storage space
         compression-level: 9
+        # Number of days to keep this artifact before automatic deletion
         retention-days: 5
 ```
 
@@ -792,9 +925,11 @@ Artifakten som opprettes kan du se i portalen ved å gå inn på **action** som 
 
 <img src="artifact-github.png" width="800" height="300" />
 
+#### Deploy til Azure
 
+Neste skritt er å distribuere artefakten vi har opprettet.
 
-
+> Merk. Det vil ofte ikke være nødvendig å ha to egne steg for publisering og distribusjon. Hvis vi ikke har behov for å ta vare på artefakten, slår vi ofte disse to sammen. Her gjør vi det for å demostrere hele prosessen.
 
 ```yaml
 # This workflow handles deployment of our application to Azure Web App Service
@@ -821,6 +956,10 @@ jobs:
 
     runs-on: ubuntu-latest    # Specifies the runner OS
     
+    # Add variables section for environment-specific values
+    env:
+      APP_NAME: app-azskolen-${{ inputs.releaseType }}    # Dynamic app name based on environment
+    
     steps:
       # Step 1: Authenticate with Azure using OIDC
       # This is more secure than using stored credentials
@@ -836,7 +975,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: dotnet-app    # Name of the artifact to download
+          name: dotnet-app-${{ github.sha }}    # Updated to match the artifact name format in publish.yml
           path: ./publish     # Where to place the files locally
 
       # Step 3: Deploy to Azure Web App
@@ -844,8 +983,8 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ vars.AZURE_WEBAPP_NAME }}  # Name of your Azure Web App
-          package: ./publish                        # Path to deployment files
+          app-name: ${{ env.APP_NAME }}  # Use the environment variable
+          package: ./publish                      # Path to deployment files
 ```
 
 

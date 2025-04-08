@@ -1,56 +1,40 @@
-# Main orchestrator workflow for our CI/CD pipeline
-# This workflow coordinates building, testing, and deploying our application
 name: CI/CD Pipeline
 
-# Define permissions needed for Azure OIDC authentication
 permissions:
-  id-token: write    # Required for Azure OIDC connection
-  contents: read     # Needed to read repository contents
+  id-token: write
+  contents: read
 
-# Define when this workflow should run
 on:
   push:
     branches:
-      - main        # Runs on every push to main branch
+      - main
   pull_request:
     branches:
-      - main        # Runs when PRs target main branch
-  workflow_dispatch: # Enables manual triggering from GitHub UI
+      - main
+  workflow_dispatch:
 
-# Define the sequence of jobs in our pipeline
 jobs:
-  # Step 1: Build the application
-  # This job compiles our code and creates artifacts
   build:
-    uses: ./.github/workflows/build.yml  # References our build workflow
+    uses: ./.github/workflows/build.yml
 
-
-  # Step 2: Run automated tests
-  # This ensures our code changes haven't broken anything
   test:
-    uses: ./.github/workflows/test.yml     # References our test workflow
-    needs: [build]                         # Won't run until build succeeds
+    uses: ./.github/workflows/test.yml
+    needs: [build]
 
-  # Step 3: Publish to Github 
-  # This will publish the built app as an artifact in Github
   publish:
-    uses: ./.github/workflows/publish.yml     # References our publish workflow
-    needs: [test]                             # Won't run until test succeeds
+    uses: ./.github/workflows/publish.yml
+    needs: [test]
 
-  # Step 4: Deploy to test environment
-  # This gives us a chance to verify changes in a safe environment
   deploy-test:
-    uses: ./.github/workflows/deploy1.yml
+    uses: ./.github/workflows/deploy.yml
     with:
-      releaseType: 'test'                 # Specifies production environment
-    secrets: inherit                      # Passes through Github repository secrets
-    needs: [publish]                         # Won't run until tests pass
+      releaseType: 'test'
+    secrets: inherit
+    needs: [publish]
 
-  # Step 5: Deploy to production
-  # Final step - only runs after successful test deployment
   deploy-prod:
-    uses: ./.github/workflows/deploy1.yml
+    uses: ./.github/workflows/deploy.yml
     with:
-      releaseType: 'production'            # Specifies production environment
-    secrets: inherit                       # Passes through repository secrets
-    needs: [deploy-test]                   # Ensures test deployment succeeded
+      releaseType: 'production'
+    secrets: inherit
+    needs: [deploy-test]

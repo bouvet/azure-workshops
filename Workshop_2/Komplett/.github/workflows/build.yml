@@ -1,73 +1,50 @@
-# Workflow name - This appears in the GitHub Actions UI
 name: Build .NET App
 
-# Trigger configuration - Defines when this workflow should run
 on:
-  workflow_call:   # Allows this workflow to be called by other workflows (reusability)
-  workflow_dispatch:  # Enables manual triggering from the GitHub UI
+  workflow_call:
+  workflow_dispatch:
 
-# Concurrency control - Prevents multiple workflow runs from conflicting
-# This is useful for deployment workflows to prevent race conditions
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}  # Creates a unique group identifier
-  cancel-in-progress: true  # Cancels any in-progress workflow runs in the same group
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
-# Jobs - The main building blocks of a workflow
-# Each job runs on a separate runner instance
 jobs:
   build:
-    # Runner specification - Defines the virtual environment for execution
-    # ubuntu-latest provides a Linux environment with common build tools
     runs-on: ubuntu-latest
     
-    # Steps - Sequential tasks to execute within this job
     steps:
-    # Checkout step - Fetches the repository code to the runner
-    # This is typically the first step in most workflows
     - name: Checkout code
-      uses: actions/checkout@v4  # Official GitHub action to clone the repository
+      uses: actions/checkout@v4
       
-    # Setup .NET - Installs the .NET SDK for building .NET applications
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3  # Official action to set up .NET environment
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'  # Specifies the .NET version to install (8.0.x = latest 8.0)
+        dotnet-version: '8.0.x'
         
-    # Caching - Speeds up workflows by reusing previously downloaded packages
-    # This cache stores NuGet packages between workflow runs
     - name: Cache NuGet packages
-      uses: actions/cache@v3  # GitHub's caching action
+      uses: actions/cache@v3
       with:
-        path: ~/.nuget/packages  # Path to the package cache location
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}  # Cache key based on OS and lock file
-        restore-keys: ${{ runner.os }}-nuget-  # Fallback key if exact match isn't found
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: ${{ runner.os }}-nuget-
         
-    # Another cache for npm packages - Front-end dependency caching
     - name: Cache npm packages
       uses: actions/cache@v3
       with:
-        path: ~/.npm  # Path where npm stores its cache
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}  # Hash of package lock file ensures cache invalidation when dependencies change
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: ${{ runner.os }}-node-
         
-    # Install npm packages - Sets up front-end dependencies for the application
     - name: Install npm packages
-      working-directory: ./AzureWorkshopApp  # Changes the working directory for this step only
-      run: |  # Multiline script using pipe character
-        npm ci  # Clean install - more reliable than npm install for CI environments
-        npm install --save-dev @types/dropzone  # Adds TypeScript type definitions for Dropzone
-        
-    # Build TypeScript - Compiles TypeScript code to JavaScript
-    - name: Build TypeScript
       working-directory: ./AzureWorkshopApp
-      run: npm run build  # Executes the build script defined in package.json
+      run: |
+        npm ci
+        npm install --save-dev @types/dropzone
         
-    # Restore .NET dependencies - Downloads and installs required NuGet packages
     - name: Restore dependencies
-      run: dotnet restore  # Uses the dotnet CLI to restore packages
+      run: dotnet restore
       working-directory: ./AzureWorkshopApp
         
-    # Build the .NET application - Compiles the application code
     - name: Build
-      run: dotnet build --no-restore --configuration Release  # Builds in Release mode without restoring again
+      run: dotnet build --no-restore --configuration Release
       working-directory: ./AzureWorkshopApp

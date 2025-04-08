@@ -1,53 +1,41 @@
-# This workflow handles deployment of our application to Azure Web App Service
 name: Deploy to Azure
 
-# Define when this workflow can be triggered:
 on:
-  workflow_dispatch:      # Enables manual trigger from GitHub UI
-  workflow_call:         # Allows this workflow to be called by the main workflows
+  workflow_dispatch:
+  workflow_call:
     inputs:
-      releaseType:       # Input parameter to specify deployment environment
+      releaseType:
         description: 'Where to release (test or prod)?'
         type: string
         required: true
-        default: 'test'  # Default to test environment for safety
+        default: 'test'
 
 jobs:
-  # Main deployment job
   deploy:
-    # Dynamic naming based on deployment target
     name: Deploy to ${{ inputs.releaseType }}
-    # Uses GitHub environments for managing deployment configurations
     environment: ${{ inputs.releaseType }}
 
-    runs-on: ubuntu-latest    # Specifies the runner OS
+    runs-on: ubuntu-latest
     
-    # Add variables section for environment-specific values
     env:
-      APP_NAME: app-azskolen-${{ inputs.releaseType }}    # Dynamic app name based on environment
+      APP_NAME: app-azskolen-${{ inputs.releaseType }}
     
     steps:
-      # Step 1: Authenticate with Azure using OIDC
-      # This is more secure than using stored credentials
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}          # App registration ID
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}          # Azure AD tenant
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  # Azure subscription
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # Step 2: Get the built application artifacts
-      # These were created by the build job and stored in GitHub
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: dotnet-app    # Name of the artifact to download
-          path: ./publish     # Where to place the files locally
+          name: dotnet-app-${{ github.sha }}
+          path: ./publish
 
-      # Step 3: Deploy to Azure Web App
-      # Uses Azure's deployment action to push code to App Service
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.APP_NAME }}  # Use the environment variable
+          app-name: ${{ env.APP_NAME }}
           package: ./publish

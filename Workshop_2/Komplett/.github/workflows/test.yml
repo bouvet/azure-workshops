@@ -1,80 +1,19 @@
-# Workflow name - Identifies this workflow in the GitHub Actions UI
-name: Test .NET App
+name: Test
 
-# Trigger configuration - Defines the events that will cause this workflow to run
 on:
-  workflow_call:    # Allows this workflow to be called by other workflows (reusable workflow pattern)
-  workflow_dispatch: # Enables manual triggering from the GitHub UI with custom parameters
+  workflow_call:
 
-# Concurrency control - Manages how parallel instances of the workflow are handled
-# Prevents resource conflicts when multiple instances run simultaneously
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}  # Unique identifier for the concurrency group
-  cancel-in-progress: true  # If a new workflow run is triggered, cancel any in-progress run in the same group
-
-# Jobs - The primary containers for workflow execution steps
-# Each job runs on a separate runner (virtual machine)
 jobs:
-  build:
-    # Runner specification - Determines the execution environment
-    # ubuntu-latest provides a Linux-based environment with common development tools
+  test:
     runs-on: ubuntu-latest
-    
-    # Steps - Sequential tasks that make up the job
-    # Each step is either a shell command or a reusable action
     steps:
-    # Checkout step - Clones the repository code to the runner
-    # Essential first step for accessing your project files
-    - name: Checkout code
-      uses: actions/checkout@v4  # Official GitHub action for code checkout
+    - uses: actions/checkout@v4
       
-    # Setup .NET - Installs the specified .NET SDK version
-    # Required for building and testing .NET applications
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3  # Official action for .NET setup
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'  # Uses latest patch version of .NET 8.0
-        
-    # Caching step for NuGet - Improves build speed by reusing packages
-    # Reduces network usage and build time in subsequent runs
-    - name: Cache NuGet packages
-      uses: actions/cache@v3  # GitHub's general-purpose caching action
-      with:
-        path: ~/.nuget/packages  # Directory where NuGet stores downloaded packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}  # Unique cache key based on OS and dependencies
-        restore-keys: ${{ runner.os }}-nuget-  # Fallback key for partial cache hits
-        
-    # Caching step for npm - Similar to NuGet cache, but for JavaScript dependencies
-    # Significantly speeds up front-end builds
-    - name: Cache npm packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.npm  # Directory where npm stores its cache
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}  # Hash based on package lock
-        restore-keys: ${{ runner.os }}-node-  # Fallback pattern
-        
-    # Installing npm dependencies - Prepares the JavaScript/TypeScript environment
-    # Similar to NuGet restore but for front-end code
-    - name: Install npm packages
-      working-directory: ./AzureWorkshopApp  # Changes directory context for this step
-      run: |  # Multi-line script using pipe symbol
-        npm ci  # Clean install - strict, reproducible builds (preferred for CI)
-        npm install --save-dev @types/dropzone  # Adds TypeScript type definitions
-        
-    # Building TypeScript - Transpiles TS to JS, checks types
-    # Critical step for TypeScript-based front-end code
-    - name: Build TypeScript
+        dotnet-version: '8.0.x'
+
+    - name: Test
       working-directory: ./AzureWorkshopApp
-      run: npm run build  # Executes the build script defined in package.json
-        
-    # Restoring .NET dependencies - Downloads required packages defined in .csproj
-    # Similar to npm ci but for .NET projects
-    - name: Restore dependencies
-      run: dotnet restore  # Uses the dotnet CLI to restore packages
-      working-directory: ./AzureWorkshopApp
-        
-    # Building the .NET application - Compiles source code into assemblies
-    # Creates artifacts that can be tested or deployed
-    - name: Build
-      run: dotnet build --no-restore --configuration Release  # Build in Release mode (optimized)
-      working-directory: ./AzureWorkshopApp  # Specifies where to find the .NET solution/project
+      run: dotnet test --configuration Release --verbosity normal
