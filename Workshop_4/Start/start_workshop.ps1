@@ -66,7 +66,7 @@ function Run_AzureInfra
     $azuredeploy = $basePath + "azuredeploy.json"
     $parameters = $basePath + "azuredeploy.parameters.dev.json"
 
-    az account set --subscription "Azureskolen"
+    az account set --subscription "Visual Studio Professional-abonnement"
     
     $output = az group create --location westeurope --name $rg
     if(!$output){
