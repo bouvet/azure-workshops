@@ -16,7 +16,7 @@ namespace AzureWorkshopFunctionApp.Functions
         }
 
         [FunctionName("TemplateQueueTrigger")]
-        public void Run([QueueTrigger(Constants.ImageQueue)]string myQueueItem, ILogger log)
+        public void Run([QueueTrigger(Constants.GreyImageQueue)]string myQueueItem, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
         }

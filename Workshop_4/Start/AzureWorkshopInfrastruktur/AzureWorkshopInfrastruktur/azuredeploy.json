@@ -22,7 +22,7 @@
     },
     "appServiceSku": {
       "type": "string",
-      "defaultValue": "F1",
+      "defaultValue": "B1",
       "metadata": {
         "description": "The SKU of the App Service Plan"
       }
@@ -178,7 +178,7 @@
     {
       "name": "[parameters('storageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2019-06-01",
       "location": "[parameters('location')]",
       "kind": "StorageV2",
       "sku": {
@@ -186,13 +186,14 @@
         "tier": "Standard"
       },
       "properties": {
-        "accessTier": "Hot"
+        "accessTier": "Hot",
+        "allowBlobPublicAccess": true
       },
       "resources": [
         {
           "name": "[concat('default/', parameters('blobContainerName'))]",
           "type": "blobServices/containers",
-          "apiVersion": "2018-03-01-preview",
+          "apiVersion": "2019-06-01",
           "properties": {
             "publicAccess": "Container"
           },
