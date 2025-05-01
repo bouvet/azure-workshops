@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
     <UserSecretsId>2fef4fba-23cd-4409-b17d-6739ed185749</UserSecretsId>
   </PropertyGroup>
@@ -28,5 +28,9 @@
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Properties\ServiceDependencies\" />
   </ItemGroup>
-  <ProjectExtensions><VisualStudio><UserProperties local_1settings_1json__JsonSchema="https://json.schemastore.org/lsdlschema.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties local_1settings_1json__JsonSchema="https://json.schemastore.org/lsdlschema.json" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

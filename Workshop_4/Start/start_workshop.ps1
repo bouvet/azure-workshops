@@ -66,7 +66,7 @@ function Run_AzureInfra
     $azuredeploy = $basePath + "azuredeploy.json"
     $parameters = $basePath + "azuredeploy.parameters.dev.json"
 
-    az account set --subscription "Visual Studio Professional-abonnement"
+    az account set --subscription "Visual Studio Professional Subscription"
     
     $output = az group create --location westeurope --name $rg
     if(!$output){
@@ -99,7 +99,7 @@ function Deploy_WebApp{
 
     cd ./AzureWorkshop/AzureWorkshopApp
     dotnet publish -c Release 
-    Compress-Archive -Path ./bin/Release/netcoreapp3.1/publish/* -DestinationPath ./code.zip -Force
+    Compress-Archive -Path ./bin/Release/net8.0/publish/* -DestinationPath ./code.zip -Force
 
     az functionapp deployment source config-zip -g $rg -n $wa --src code.zip
 
