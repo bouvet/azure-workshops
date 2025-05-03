@@ -1,5 +1,5 @@
-$Env:Rg = "richardaurzmqedsxlwp-rg"
-$Env:Fa = "richardfwhxuqnpkcboa-fa"
+$Env:Rg = "" # Resource Group
+$Env:Fa = "" # Function App
 
 function Deploy_WebApp{
 
