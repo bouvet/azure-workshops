@@ -8,17 +8,19 @@ namespace AzureWorkshopFunctionApp.Functions
     {
         private IBlobStorageService _blobStorageService { get; set; }
         private IImageService _imageService { get; set; }
+        private ILogger _logger { get; set; }
 
-        public TemplateQueueTrigger(IBlobStorageService blobStorageService, IImageService imageService)
+        public TemplateQueueTrigger(IBlobStorageService blobStorageService, IImageService imageService, ILogger<TemplateQueueTrigger> logger)
         {
             _blobStorageService = blobStorageService;
             _imageService = imageService;
+            _logger = logger;
         }
 
         [Function("TemplateQueueTrigger")]
-        public void Run([QueueTrigger(Constants.GreyImageQueue)]string myQueueItem, ILogger log)
+        public void Run([QueueTrigger(Constants.GreyImageQueue)]string myQueueItem)
         {
-            log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
+            _logger.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
         }
     }
 }
