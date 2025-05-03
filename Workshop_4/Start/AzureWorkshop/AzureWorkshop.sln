@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureWorkshopApp", "AzureWo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureWorkshopAppTests", "AzureWorkshopAppTests\AzureWorkshopAppTests.csproj", "{F33830EE-0BF3-4554-A452-CC4CB6496A0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureWorkshopFunctionApp", "FunctionApp\AzureWorkshopFunctionApp.csproj", "{BD46F226-E35E-4CD6-81E4-AF5B01C336B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureWorkshopFunctionApp", "AzureWorkshopFunctionApp\AzureWorkshopFunctionApp.csproj", "{BD46F226-E35E-4CD6-81E4-AF5B01C336B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
