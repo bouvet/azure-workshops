@@ -1,9 +1,6 @@
-using AzureWorkshopFunctionApp.Interfaces;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using System.Net;
-using System.Threading.Tasks;
+using AzureWorkshopFunctionApp.Interfaces;
 
 namespace AzureWorkshopFunctionApp.Functions
 {
