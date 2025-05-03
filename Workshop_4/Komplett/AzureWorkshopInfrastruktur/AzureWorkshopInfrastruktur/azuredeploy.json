@@ -22,7 +22,7 @@
     },
     "appServiceSku": {
       "type": "string",
-      "defaultValue": "F1",
+      "defaultValue": "B1",
       "metadata": {
         "description": "The SKU of the App Service Plan"
       }
@@ -30,22 +30,22 @@
     "appInsightsName": {
       "type": "string",
       "metadata": {
-        "description": "The name of the Application Insights instance" 
-      } 
-    }, 
-    "functionAppName":{
+        "description": "The name of the Application Insights instance"
+      }
+    },
+    "functionAppName": {
       "type": "string",
-      "metadata":{
+      "metadata": {
         "description": "The name of the Function App instance"
       }
     },
-    "serviceBusName":{
+    "serviceBusName": {
       "type": "string",
       "metadata": {
         "description": "The name of the service Bus instance"
       }
     },
-    "serviceBusQueueName":{
+    "serviceBusQueueName": {
       "type": "string",
       "metadata": {
         "description": "The name of the service Bus instance"
@@ -60,7 +60,7 @@
     }
   },
   "variables": {
-    "servicePlanName": "AppServicePlan" 
+    "servicePlanName": "AppServicePlan"
   },
   "resources": [
     {
@@ -100,10 +100,10 @@
               "name": "AzureWebJobsStorage",
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), 
               ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]"
-              
+
             },
             {
-              "name":"AzureWebJobsServiceBus",
+              "name": "AzureWebJobsServiceBus",
               "value": "[listKeys(resourceId(concat('Microsoft.ServiceBus/namespaces/AuthorizationRules'),parameters('serviceBusName'),'RootManageSharedAccessKey'),'2015-08-01').primaryConnectionString]"
             },
             {
@@ -117,7 +117,7 @@
             },
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "~3"
+              "value": "~4"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -125,7 +125,7 @@
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
-              "value": "dotnet"
+              "value": "dotnet-isolated"
             }
           ]
         }
@@ -178,7 +178,7 @@
     {
       "name": "[parameters('storageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2019-06-01",
       "location": "[parameters('location')]",
       "kind": "StorageV2",
       "sku": {
@@ -186,13 +186,14 @@
         "tier": "Standard"
       },
       "properties": {
-        "accessTier": "Hot"
+        "accessTier": "Hot",
+        "allowBlobPublicAccess": true
       },
       "resources": [
         {
           "name": "[concat('default/', parameters('blobContainerName'))]",
           "type": "blobServices/containers",
-          "apiVersion": "2018-03-01-preview",
+          "apiVersion": "2019-06-01",
           "properties": {
             "publicAccess": "Container"
           },
@@ -243,8 +244,8 @@
             "enablePartitioning": false,
             "enableExpress": false
           },
-            "resources":[
-        {
+          "resources": [
+            {
               "apiVersion": "2017-04-01",
               "name": "[concat(parameters('serviceBusQueueName'),'.listen')]",
               "type": "AuthorizationRules",
@@ -259,7 +260,7 @@
                 "revision": -1
               }
             }
-      ]
+          ]
         }
       ]
     }

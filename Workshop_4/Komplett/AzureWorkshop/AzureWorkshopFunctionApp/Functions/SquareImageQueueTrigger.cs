@@ -1,5 +1,5 @@
 using AzureWorkshopFunctionApp.Interfaces;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
@@ -7,27 +7,29 @@ namespace AzureWorkshopFunctionApp.Functions
 {
     public class SquareImageQueueTrigger
     {
-        private IBlobStorageService BlobStorageService { get; }
-        private IImageService ImageService { get; }
+        private readonly IBlobStorageService _blobStorageService;
+        private readonly IImageService _imageService;
+        private readonly ILogger<SquareImageQueueTrigger> _logger;
 
-        public SquareImageQueueTrigger(IImageService imageService, IBlobStorageService blobStorageService)
+        public SquareImageQueueTrigger(IImageService imageService, IBlobStorageService blobStorageService , ILogger<SquareImageQueueTrigger> logger)
         {
-            BlobStorageService = blobStorageService;
-            ImageService = imageService;
+            _blobStorageService = blobStorageService;
+            _imageService = imageService;
+            _logger = logger;
         }
 
-        [FunctionName("SquareImageQueueTrigger")]
-        public async Task Run([QueueTrigger(Constants.SquareImageQueue)] string imageName, ILogger log)
+        [Function("SquareImageQueueTrigger")]
+        public async Task Run([QueueTrigger(Constants.SquareImageQueue)] string imageName)
         {
-            log.LogInformation($"C# Queue trigger function processed: {imageName}");
+            _logger.LogInformation($"C# Queue trigger function processed: {imageName}");
 
-            var blobStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, imageName);
+            var blobStream = await _blobStorageService.GetBlobAsStream(Constants.ImageContainer, imageName);
 
-            log.LogInformation($"BlobService has connectionString");
-            var squareImageStream = ImageService.Square(blobStream);
+            _logger.LogInformation($"BlobService has connectionString");
+            var squareImageStream = _imageService.Square(blobStream);
 
-            await BlobStorageService.UploadStreamToBlob(Constants.SquareImageContainer, imageName, squareImageStream);
-            log.LogInformation($"Finished processing");
+            await _blobStorageService.UploadStreamToBlob(Constants.SquareImageContainer, imageName, squareImageStream);
+            _logger.LogInformation($"Finished processing");
         }
     }
 }

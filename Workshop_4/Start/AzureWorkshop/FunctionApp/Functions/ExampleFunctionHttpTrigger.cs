@@ -28,13 +28,6 @@ namespace AzureWorkshopFunctionApp
 
                 var blobName = req.Query["blobName"];
 
-                if (string.IsNullOrEmpty(blobName))
-                {
-                    var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-                    await badResponse.WriteStringAsync("blobName parameter is required");
-                    return badResponse;
-                }
-
                 var stream = await _blobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
                 if (stream == null)
                 {
@@ -43,11 +36,9 @@ namespace AzureWorkshopFunctionApp
                     return notFoundResponse;
                 }
 
-                var mirror = _imageService.FlipHorizontal(stream);
-
-                await _blobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, mirror);
-
-                return req.CreateResponse(HttpStatusCode.OK);
+                // 1. Perform image operation on stream (use imageService)
+                // 2. Upload the processed image to blob storage (use blobStorageService)
+                // 3. Return HttpResponse OK
             }
             catch (Exception ex)
             {
