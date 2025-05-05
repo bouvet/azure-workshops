@@ -5,11 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults()  // Required for Azure Functions
-    .ConfigureServices(services =>
-    {
-        // Register services (same as before, but adapted for isolated process)
+    .ConfigureFunctionsWebApplication()
+    .ConfigureServices(services => {
+        services.AddApplicationInsightsTelemetryWorkerService();
+        services.ConfigureFunctionsApplicationInsights();
+                // Register services (same as before, but adapted for isolated process)
         services.AddScoped<IBlobStorageService, BlobStorageService>(_ =>
             new BlobStorageService(Environment.GetEnvironmentVariable("AzureWebJobsStorage")));
 
@@ -17,4 +22,4 @@ var host = new HostBuilder()
     })
     .Build();
 
-await host.RunAsync();  // Run the host
+host.Run();
