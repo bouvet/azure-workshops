@@ -10,7 +10,7 @@ function Deploy_FunctionApp{
 
     cd ./AzureWorkshop/AzureWorkshopFunctionApp
     dotnet publish -c Release 
-    Compress-Archive -Path ./bin/Release/netcoreapp3.1/publish/* -DestinationPath ./code.zip -Force
+    Compress-Archive -Path ./bin/Release/net8.0/publish/* -DestinationPath ./code.zip -Force
 
     az functionapp deployment source config-zip -g $rg -n $fa --src code.zip
     

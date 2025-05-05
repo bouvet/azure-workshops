@@ -1,6 +1,6 @@
 using AzureWorkshopFunctionApp.Interfaces;
-using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Microsoft.Azure.Functions.Worker;
 using System.Threading.Tasks;
 
 namespace AzureWorkshopFunctionApp.Functions
@@ -8,31 +8,32 @@ namespace AzureWorkshopFunctionApp.Functions
     public class GrayScaleQueueTrigger
     {
 
-        private IBlobStorageService BlobStorageService { get; }
-        private IImageService ImageService { get; }
+        private readonly IBlobStorageService _blobStorageService;
+        private readonly IImageService _imageService;
+        private readonly ILogger<GrayScaleQueueTrigger> _logger;
 
-        public GrayScaleQueueTrigger(IImageService imageService, IBlobStorageService blobStorageService)
+        public GrayScaleQueueTrigger(IImageService imageService, IBlobStorageService blobStorageService, ILogger<GrayScaleQueueTrigger> logger)
         {
-            BlobStorageService = blobStorageService;
-            ImageService = imageService;
+            _imageService = imageService;
+            _blobStorageService = blobStorageService;
+            _logger = logger;
         }
 
-        [FunctionName("GrayScaleQueueTrigger")]
-        [return: Queue(Constants.SquareImageQueue)]
-        public async Task<string> Run([QueueTrigger(Constants.GreyImageQueue)] string imageName,
-            ILogger log)
+        [Function("GrayScaleQueueTrigger")]
+        [QueueOutput(Constants.SquareImageQueue)]
+        public async Task<string> Run([QueueTrigger(Constants.GreyImageQueue)] string imageName)
         {
-            log.LogInformation($"C# Queue trigger function processed: {imageName}");
+            _logger.LogInformation($"C# Queue trigger function processed: {imageName}");
 
-            var blobStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, imageName);
+            var blobStream = await _blobStorageService.GetBlobAsStream(Constants.ImageContainer, imageName);
 
-            log.LogInformation($"BlobService has connectionString");
-            var greyStream = ImageService.GreyScale(blobStream);
+            _logger.LogInformation($"BlobService has connectionString");
+            var greyStream = _imageService.GreyScale(blobStream);
             greyStream.Position = 0;
 
-            await BlobStorageService.UploadStreamToBlob(Constants.GreyImageContainer, imageName, greyStream);
+            await _blobStorageService.UploadStreamToBlob(Constants.GreyImageContainer, imageName, greyStream);
 
-            log.LogInformation($"Finished processing");
+            _logger.LogInformation($"Finished processing");
             return imageName;
         }
     }

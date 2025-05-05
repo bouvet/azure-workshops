@@ -1,21 +1,24 @@
 using AzureWorkshopFunctionApp.Interfaces;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace AzureWorkshopFunctionApp.Functions
 {
     public class TemplateQueueTrigger
     {
-        private IBlobStorageService BlobStorageService { get; set; }
-        private IImageService ImageService { get; set; }
+        private IBlobStorageService _blobStorageService { get; set; }
+        private IImageService _imageService { get; set; }
 
         public TemplateQueueTrigger(IBlobStorageService blobStorageService, IImageService imageService)
         {
-            BlobStorageService = blobStorageService;
-            ImageService = imageService;
+            _blobStorageService = blobStorageService;
+            _imageService = imageService;
         }
 
-        [FunctionName("TemplateQueueTrigger")]
+        [Function("TemplateQueueTrigger")]
         public void Run([QueueTrigger(Constants.GreyImageQueue)]string myQueueItem, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");

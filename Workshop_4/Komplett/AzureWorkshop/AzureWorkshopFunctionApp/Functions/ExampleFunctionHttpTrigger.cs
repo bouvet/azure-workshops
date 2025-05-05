@@ -1,74 +1,72 @@
 using AzureWorkshopFunctionApp.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using System.IO;
-using System.Threading.Tasks;
+using System.Net;
 
 namespace AzureWorkshopFunctionApp.Functions
 {
     public class ExampleFunctionHttpTrigger
     {
-        private IBlobStorageService BlobStorageService { get; }
-        private IImageService ImageService { get; }
+        private readonly IBlobStorageService _blobStorageService;
+        private readonly IImageService _imageService;
+        private readonly ILogger<ExampleFunctionHttpTrigger> _logger;
 
-        public ExampleFunctionHttpTrigger(IImageService imageService, IBlobStorageService blobStorageService)
+        public ExampleFunctionHttpTrigger(IImageService imageService, IBlobStorageService blobStorageService, ILogger<ExampleFunctionHttpTrigger> logger)
         {
-            BlobStorageService = blobStorageService;
-            ImageService = imageService;
+            _blobStorageService = blobStorageService;
+            _imageService = imageService;
+            _logger = logger;
         }
 
-        [FunctionName("ExampleFunctionHttpTrigger")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+        [Function("ExampleFunctionHttpTrigger")]
+        public async Task<HttpResponseData> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestData req)
         {
             var blobName = req.Query["blobName"];
             var func = req.Query["func"];
             Stream imageStream;
             Stream changedImageStream;
 
-            if (func.Count != 0)
+            if (func != null)
             {
-                switch (func[0])
+                switch (func)
                 {
                     case "mirror":
-                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.FlipHorizontal(imageStream);
-                        await BlobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, changedImageStream);
+                        imageStream = await _blobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = _imageService.FlipHorizontal(imageStream);
+                        await _blobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, changedImageStream);
                         break;
                     case "flip":
-                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.FlipVertical(imageStream);
-                        await BlobStorageService.UploadStreamToBlob(Constants.FlippedImageContainer, blobName, changedImageStream);
+                        imageStream = await _blobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = _imageService.FlipVertical(imageStream);
+                        await _blobStorageService.UploadStreamToBlob(Constants.FlippedImageContainer, blobName, changedImageStream);
                         break;
                     case "rotate":
-                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.RotateClockwise(imageStream);
-                        await BlobStorageService.UploadStreamToBlob(Constants.ClockwiseImageContainer, blobName, changedImageStream);
+                        imageStream = await _blobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = _imageService.RotateClockwise(imageStream);
+                        await _blobStorageService.UploadStreamToBlob(Constants.ClockwiseImageContainer, blobName, changedImageStream);
                         break;
                     case "antirotate":
-                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.RotateClockwise(imageStream);
-                        await BlobStorageService.UploadStreamToBlob(Constants.AntiClockwiseImageContainer, blobName, changedImageStream);
+                        imageStream = await _blobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = _imageService.RotateClockwise(imageStream);
+                        await _blobStorageService.UploadStreamToBlob(Constants.AntiClockwiseImageContainer, blobName, changedImageStream);
                         break;
                     case "greyscale":
-                        imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                        changedImageStream = ImageService.GreyScale(imageStream);
-                        await BlobStorageService.UploadStreamToBlob(Constants.GreyImageContainer, blobName, changedImageStream);
+                        imageStream = await _blobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                        changedImageStream = _imageService.GreyScale(imageStream);
+                        await _blobStorageService.UploadStreamToBlob(Constants.GreyImageContainer, blobName, changedImageStream);
                         break;
                 }
             }
             else
             {
-                imageStream = await BlobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
-                changedImageStream = ImageService.FlipHorizontal(imageStream);
+                imageStream = await _blobStorageService.GetBlobAsStream(Constants.ImageContainer, blobName);
+                changedImageStream = _imageService.FlipHorizontal(imageStream);
 
-                await BlobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, changedImageStream);
+                await _blobStorageService.UploadStreamToBlob(Constants.MirrorImageContainer, blobName, changedImageStream);
             }
-            return new OkResult();
+            return req.CreateResponse(HttpStatusCode.OK);
         }
 
     }

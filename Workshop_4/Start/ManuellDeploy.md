@@ -23,9 +23,9 @@
 1. Naviger til `Start/AzureWorkshop/AzureWorkshopApp` mappen
 1. Kjør kommandoen `dotnet publish -c Release`
    - Dette lager en release av koden
-1. Zip filene i mappen `./bin/Release/netcoreapp3.1/publish/` 
-   - Powershell `Compress-Archive -Path ./bin/Release/netcoreapp3.1/publish/* -DestinationPath ./code.zip` (legg til -Force for å overskrive)
-   - Terminal (Linux/Mac) `zip -r code.zip ./bin/Release/netcoreapp3.1/publish/*`
+1. Zip filene i mappen `./bin/Release/net8.0/publish/` 
+   - Powershell `Compress-Archive -Path ./bin/Release/net8.0/publish/* -DestinationPath ./code.zip` (legg til -Force for å overskrive)
+   - Terminal (Linux/Mac) `zip -r code.zip ./bin/Release/net8.0/publish/*`
 1. Deploy ved å kjøre `az functionapp deployment source config-zip -g {YourResourceGroup} -n {YourAppServiceName} --src code.zip` 
 1. Hvis du får tilbake `Deployment endpoint responded with status code 202` så er applikasjonen lastet opp og klar til å testes
 
@@ -35,8 +35,8 @@
 1. Naviger til `Start/AzureWorkshop/AzureWorkshopFunctionApp` mappen
 1. Kjør kommandoen `dotnet publish -c Release`
    - Dette lager en release av koden
-1. Zip filene i mappen `./bin/Release/netcoreapp3.1/publish/` 
-   - Powershell `Compress-Archive -Path ./bin/Release/netcoreapp3.1/publish/* -DestinationPath ./code.zip` (legg til -Force for å overskrive)
-   - Terminal (Linux/Mac) `zip -r code.zip ./bin/Release/netcoreapp3.1/publish/*`
+1. Zip filene i mappen `./bin/Release/net8.0/publish/` 
+   - Powershell `Compress-Archive -Path ./bin/Release/net8.0/publish/* -DestinationPath ./code.zip` (legg til -Force for å overskrive)
+   - Terminal (Linux/Mac) `zip -r code.zip ./bin/Release/net8.0/publish/*`
 1. Deploy ved å kjøre `az functionapp deployment source config-zip -g {YourResourceGroup} -n {YourAppServiceName} --src code.zip` 
 1. Hvis du får tilbake `Deployment endpoint responded with status code 202` så er applikasjonen lastet opp og klar til å testes
