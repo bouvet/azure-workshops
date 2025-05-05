@@ -1,20 +1,21 @@
 ﻿using AzureWorkshopFunctionApp.Interfaces;
 using AzureWorkshopFunctionApp.Services;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-var builder = FunctionsApplication.CreateBuilder(args);
+var host = new HostBuilder()
+    .ConfigureFunctionsWebApplication()
+    .ConfigureServices(services => {
+        services.AddApplicationInsightsTelemetryWorkerService();
+        services.ConfigureFunctionsApplicationInsights();
+        // Register services (same as before, but adapted for isolated process)
+        services.AddScoped<IBlobStorageService, BlobStorageService>(_ =>
+            new BlobStorageService(Environment.GetEnvironmentVariable("AzureWebJobsStorage")));
 
-builder.ConfigureFunctionsWebApplication();
-
-
-builder.Services.
-    AddScoped<IBlobStorageService, BlobStorageService>(_ =>
-                new BlobStorageService(Environment.GetEnvironmentVariable("AzureWebJobsStorage"))).
-    AddScoped<IImageService, ImageService>();
-
-
-var host = builder.Build();
+        services.AddScoped<IImageService, ImageService>();
+    })
+    .Build();
 
 host.Run();

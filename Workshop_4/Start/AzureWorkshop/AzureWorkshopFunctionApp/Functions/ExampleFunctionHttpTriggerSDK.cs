@@ -8,21 +8,23 @@ using System.Threading.Tasks;
 
 namespace AzureWorkshopFunctionApp.Functions
 {
-    public class ExampleFunctionHttpTrigger
+    public class ExampleFunctionHttpTriggerSDK
     {
         private IBlobStorageService _blobStorageService { get; set; }
         private IImageService _imageService { get; set; }
+        private readonly ILogger<ExampleFunctionHttpTriggerSDK> _logger;
 
-        public ExampleFunctionHttpTrigger(IImageService imageService, IBlobStorageService blobStorageService)
+
+        public ExampleFunctionHttpTriggerSDK(IImageService imageService, IBlobStorageService blobStorageService, ILogger<ExampleFunctionHttpTriggerSDK> logger)
         {
             _blobStorageService = blobStorageService;
             _imageService = imageService;
+            _logger = logger;
         }
 
-        [Function("ExampleFunctionHttpTrigger")]
+        [Function("ExampleFunctionHttpTriggerSDK")]
         public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req)
         {
             try
             {
@@ -31,7 +33,6 @@ namespace AzureWorkshopFunctionApp.Functions
                 if (string.IsNullOrEmpty(blobName))
                 {
                     var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-                    await badResponse.WriteStringAsync("blobName parameter is required");
                     return badResponse;
                 }
 
@@ -39,7 +40,6 @@ namespace AzureWorkshopFunctionApp.Functions
                 if (stream == null)
                 {
                     var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound);
-                    await notFoundResponse.WriteStringAsync($"Blob {blobName} not found");
                     return notFoundResponse;
                 }
 
@@ -51,9 +51,8 @@ namespace AzureWorkshopFunctionApp.Functions
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Error processing request");
+                _logger.LogError(ex, "Error processing request");
                 var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                await errorResponse.WriteStringAsync("An error occurred processing your request");
                 return errorResponse;
             }
         }
