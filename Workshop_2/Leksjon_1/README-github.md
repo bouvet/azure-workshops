@@ -19,7 +19,7 @@ I denne leksjonen skal vi lage bygg og release pipeline for løsningen som ble l
 
 Gå til [GitHub](https://github.com/) og logg inn.
 
-Om du ikke har registrert deg på GitHub, opprett ny bruker lag en nytt repository.
+Om du ikke har registrert deg på GitHub, opprett ny bruker og lag en nytt repository.
 
 I tillegg til versjonskontroll med Git består GitHub av moduler for å drive utviklingsprosesser, som prosjekt, automatisering og overvåkning. Vi skal her konsentrere oss om å bruke automatisering til å sette opp en CI/CD pipeline. (I GitHub kan du automatisere mer enn bare bygging av pipeline.)
 
@@ -41,7 +41,7 @@ I tillegg til versjonskontroll med Git består GitHub av moduler for å drive ut
 
 ## Opprett nytt repo
 
-Først la oss opprette en dafult action og se hvordan vi kan koble den til en arbeidsflyt
+Først la oss opprette en default action og se hvordan vi kan koble den til en arbeidsflyt
 
 ### Aktivitet: Opprett standard arbeidsflyt
 
@@ -63,7 +63,7 @@ Først la oss opprette en dafult action og se hvordan vi kan koble den til en ar
 
 ### Lokalt miljø
 
-1. Klon repoet ditt til ditt lokale miljø
+1. Klon repoet ditt til ditt lokale miljø.
 2. Åpne yaml fila i VS Code.
 
 ### 2: Redigere yaml
@@ -85,11 +85,11 @@ Sjekk inn koden og lag en PR til deg selv. Se at pipeline kjører når du ber om
 
 ### Fork repo
 
-For at du skal kunne jobbe på din egen versjon av Bouvet sitt oppgaverepo uten innblanding fra andre deltakere, gjør en **fork** og kopier repo over til din eget GitHub konto. (Gjør din fork **public** så blir det litt mindre autentisering å holde styr på underveis. Hvis du gjør ditt repo privat må du også generere en Personal Access Token (PAT) for bruk i Azure Devops.)
+For at du skal kunne jobbe på din egen versjon av Bouvet sitt oppgaverepo uten innblanding fra andre deltakere, gjør en **fork** og kopier repo over til din egen GitHub konto. (Gjør din fork **public** så blir det litt mindre autentisering å holde styr på underveis. Hvis du gjør ditt repo privat må du også generere en Personal Access Token (PAT) for bruk i Azure Devops.)
 
 #### I portalen (valgfritt)
 
-- Gå til Bouvet sitt repo i GitHub: [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops). Klikk på **Fork** knapen og kopier repo over til din egen GitHub.
+- Gå til Bouvet sitt repo i GitHub: [AzureWorkshop repoet](https://github.com/bouvet/azure-workshops). Klikk på **Fork** knappen og kopier repo over til din egen GitHub.
 
 #### Med Github CLI (valgfritt)
 
@@ -107,10 +107,10 @@ La oss først bygge prosjektet med Github Actions. Vi skal senere kombinere alle
 
 #### Legg til test miljø
 
-VI trenger å legge til et test miljø i vårt GitHub repo. I føreste omgang trenger vi bare selve miljøet, senere skal vi legge til verdier som vi skal bruke i workflow.
+Vi trenger å legge til et test miljø i vårt GitHub repo. I første omgang trenger vi bare selve miljøet, senere skal vi legge til verdier som vi skal bruke i workflow.
 
-- Velg **Settings** fanen på forsiden av ditt GitHUb repo
-- I menye til venstre velg **Environments**
+- Velg **Settings** fanen på forsiden av ditt GitHub repo.
+- I menyen til venstre velg **Environments**.
 - Klikk **New Environement** gi det navnet **test**. Hopp over resten. Vi kommer tilbake til denne senere.
 
 #### Yaml script
@@ -184,7 +184,7 @@ jobs:
 >Dette vil kjør github action på din default branch (main). Hvis du vil trigge en action på en annen branch som du har dyttet til Github kan du legge på parameteret
 **--ref [branch name]**
 >
->Merk at action du ønsker å kjøre på **[branch name]** må også yaml fila eksistere på  default branch før Github plukker opp at du vil trigge den action på [branch name].
+>Merk at action du ønsker å kjøre på **[branch name]** må også yaml fila eksistere på default branch før Github plukker opp at du vil trigge den action på [branch name].
 >
 >Hvis du vil se status på alle kjøringer for en yaml fil: **gh run list --workflow=application.yml**  
 
@@ -192,9 +192,9 @@ jobs:
 
 Du kan se hva du nettopp har bygget ved å:
 
-- Gå inn på **Actions**
-- Klikk på det bygget du vil se på
-- Nederst på siden ser du resultatet av ditt bygg som en zip fil: **dotnet-app**
+- Gå inn på **Actions**.
+- Klikk på det bygget du vil se på.
+- Nederst på siden ser du resultatet av ditt bygg som en zip fil: **dotnet-app**.
 
 ## Konfigurere GitHub actions tilgang til Azure
 
@@ -218,36 +218,36 @@ Vi skal bruke Azure Login-action med Open ID Connect (OIDC). Først må vi konfi
 
 Logg inn i Microsoft Entra Admin Center med din MSDN eller Azure Demo konto, ikke Bouvet.
 
-1. Gå til [Entra ID admin](https://entra.microsoft.com/)
+1. Gå til [Entra ID admin](https://entra.microsoft.com/).
 
 #### App registration
 
-- I Microsoft Entra admin center velg **App registration** under **Applications**
+- I Microsoft Entra admin center velg **App registration** under **Applications**.
 - Velg **New registration**.
 - Gi applikasjonen et brukervennlig navn som: GitHub-devops.
 - Velg single tenant API aksess.
 - Hopp over de valgfrie alternativene.
 - Klikk **registrer**.
 
-I tillegg må du gi din app registration reader tilgang til din subscription for å kunne logge på Azure fra GIthub Actions.
+I tillegg må du gi din app registration reader tilgang til din subscription for å kunne logge på Azure fra Github Actions.
 
-- Åpne din subscription i Azure portalen
+- Åpne din subscription i Azure portalen.
 - Velg **Access control (IAM)** og legg til ny rolle.
 - Velg **Role assignments** under add fanen. **Role** fanen er valgt som standard.
 - Velg **Job function roles** og søk etter **Reader** rollen. Velg denne.
-- Bytt til **Memeber** fanen
-- Under **Assign access to** velg **User, group, or service principal**
+- Bytt til **Members** fanen.
+- Under **Assign access to** velg **User, group, or service principal**.
 - Klikk **+ Select members** og søk etter din app registration "GitHub-devops".
 - Klikk **Select** for å legge denne til.
-- Til slutt klikk **Review and assign** en gang for å sjekke potensielle endringer og klikk en gang til for å iverksette ednringer.
+- Til slutt klikk **Review and assign** en gang for å sjekke potensielle endringer og klikk en gang til for å iverksette endringer.
 
 #### Federated credetials
 
 Gå inn på applikasjonen du nettopp registrerte: (GitHub-devops)
 
-- Velg «Certificates and secrets».
-- Klikk på «Federated Credentials» fanen
-- Klikk på «Add credentials»
+- Velg «Certificates and secrets», som finnes under «Manage».
+- Klikk på «Federated Credentials» fanen.
+- Klikk på «Add credentials».
 
 På **Add a credential** siden
 
@@ -258,11 +258,11 @@ På **Add a credential** siden
 - **Entity type**: Her velger du hvilken entitet som skal være en del av hemmeligheten som styrer tilgang i Azure. For GitHub kan du velge: Environment, Branch, Pull request eller Tag.
 - Velg **Branch** og skriv **branch-name**.
 
->Innholdet i feltet Subject identifier er det vi skal generere i vår bicrpt skript og sende til Azure Entra. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions. Hvis det ikke stemmer vil du få en feilmelding.
+>Innholdet i feltet Subject identifier er det vi skal generere i vår bicept skript og sende til Azure Entra. Dette blir subject claim i JWT, det som står her må stemme 100 % med det du skriver i GitHub actions. Hvis det ikke stemmer vil du få en feilmelding.
 
 - Klikk **Create**
   
-> Du kan legge til flere hemmligheter for ulike miljøer, hver branch du vil publisere fra osv.
+> Du kan legge til flere hemmeligheter for ulike miljøer, hver branch du vil publisere fra osv.
   
 ### Legg til hemmeligheter til Github repo
 
@@ -274,7 +274,7 @@ Vi trenger:
 - Tenant ID finner du på samme app reg side.
 - Subscription ID finner du ved å gå inn i Azure portalen.
 
-Vi skal legge til sikkrhet på repo nivå: Gå til:
+Vi skal legge til sikkerhet på repo nivå: Gå til:
 **Settings > Secrets and variables > Actions > New repository secret**.
 
 Leg til disse tre hemmelighetene, en om gangen:
@@ -340,8 +340,8 @@ jobs:
         az account show
 ```
 
->Her styrer vi tilgangen til Azure ved å sette miljøet til test som er det samme som vi satte opp når vi opprette aaplikasjonen i Azure Entra Id.
->Hadde vi benyttet branch som subjekt i Entra måtte vi nå ha sjekket inn på samme barnch som vi hadde satt i app registreringen.
+>Her styrer vi tilgangen til Azure ved å sette miljøet til test som er det samme som vi satte opp når vi opprette applikasjonen i Azure Entra ID.
+>Hadde vi benyttet branch som subjekt i Entra måtte vi nå ha sjekket inn på samme branch som vi hadde satt i app registreringen.
 
 ## Infrastruktur i Azure
 
@@ -361,23 +361,23 @@ Du kan finne flere forkortelser for Azure ressurser her:
 
 >Manuell opprettelse av Azure ressurser
 >
-> Merk at vi her oppretter Azure resurser dirkete i portalen. Dette er for å forenkle øvingsoppgaven. Det man heller vil ønske å gjøre i et utviklingsprojsket er å benytte Github actions automatisering til også å opprette ressursene i Azure ved hjelp av yaml kode.
+> Merk at vi her oppretter Azure ressurser direkte i portalen. Dette er for å forenkle øvingsoppgaven. Det man heller vil ønske å gjøre i et utviklingsprosjekt er å benytte Github actions automatisering til også å opprette ressursene i Azure ved hjelp av yaml kode.
 
 Fremgangsmåte:
 
-1. Gå til [Azure](https://portal.azure.com)
+1. Gå til [Azure](https://portal.azure.com).
 2. Lag en resource group for hvert av miljøene. Se navnestandard ovenfor.
-3. Lag en **Web App (app)** for hvert av miljøene, som du kopler opp mot hvert sin resource group og hver sin service plan.
+3. Lag en **Web App (app)** for hvert av miljøene, som du kobler opp mot hver sin resource group og hver sin service plan.
 
     - **Name:** Starter på app-. Dette navnet må være unikt i hele Azure, da den vil kunne nås fra &lt;appservicenavn&gt;.azurewebsites.net.
     - **Publish:** Code
     - **Runtime Stack:** .NET 8 (LTS)
     - **OS:** Linux eller Windows
-    - **Region:** Benytt samme region som ressursgruppen. (Det er alltid en god ide å benytte samme region som flesteparten av dine brkere er.)
+    - **Region:** Benytt samme region som ressursgruppen. (Det er alltid en god ide å benytte samme region som flesteparten av dine brukere er.)
     - **App service plan:** Azure vil opprette en app service plan for deg.
     - **Pricing plan:** Endre sku and size til Free F1 under dev/test.
 
-4. Klikk på review and create.
+4. Klikk på **Review + create**.
 
 ### 3: Opprett storage account i Azure
 
@@ -386,17 +386,17 @@ Storage accountene opprettes i samme ressursgruppe for web applikasjonen.
 
 >Fordelen med å ha alle ressurser i samme ressursgruppe er at det gjør det enklere å administrere ressursene som applikasjonen bruker. Man kan f.eks. slette alle ressurene som applikasjonen bruker samtidig ved å slette selve ressursgruppen.
 
-1. Gå til [Azure](https://portal.azure.com)
+1. Gå til [Azure](https://portal.azure.com).
 2. Lag en storage account for hvert miljø, velg samme ressursgrupper som web applikasjonen.
-   - **Storage account name (st)** Navnet må være unikt i hele azure, state med **st** og ha en lengde fra 3-24 tegn og kan kun innholde små bokstaver og tall. Merk, her er det ikke tillatt med bindestrek i navnet.
+   - **Storage account name (st)** Navnet må være unikt i hele azure, starte med **st** og ha en lengde fra 3-24 tegn og kan kun innholde små bokstaver og tall. Merk, her er det ikke tillatt med bindestrek i navnet.
    - **Region** Velg samme region som ressursgruppen.
    - **Primary service** Velg **Azure Blob Storage or Azure Data Lake Storage Gen 2**
    - **Performance** Standard
    - **Redundancy** LRS (3 kopier eksisterer kun i samme datasenter.)
 
-3. Klikk på Review og create.
+3. Klikk på **Review + create**.
 4. Gå til Opprettet storage account, og navigerer inn i **Blob Containers**.
-5. Opprett en ny Container som du kaller for: **imagecontainer**. Contaneren vil ha private access level siden vi satte det på selve Storage kontoen.
+5. Opprett en ny Container som du kaller for: **imagecontainer**. Containeren vil ha private access level siden vi satte det på selve Storage kontoen.
 
 ## Github actions pipeline
 
@@ -408,11 +408,11 @@ For at Github Actions skal kunne publisere til vår web app i Azure må den serv
 
 - Ressursgruppen du opprettet i Azure tidligere. (rg-azskolen-test)
 - Velg **Access control (IAM)** fra menyen til venstre.
-- Klikk på **+ Add** og velg **Add role assignment**
+- Klikk på **+ Add** og velg **Add role assignment**.
 - Velg fanen **Privileged administrative role**.
 - Velg **Contributor** fra listen. (Som sagt, vær forsiktig med denne.)
 - Klikk **Next**. Det vil åpne **Members** fanen.
-- Sjekk at valgt rolle er Contributor.
+- Sjekk at valgt rolle er **Contributor**.
 - Under **Assign access to** velg **User, group or service principal**.
 - Klikk på lenken **+  Select members** og søk etter github app registration du laget tidligere.
 - Trykk på **Select** knappen og velg **Review + assign** knappen. Vi trenger ikke konfigurere mer.
@@ -422,9 +422,9 @@ For at Github Actions skal kunne publisere til vår web app i Azure må den serv
 
 ### Main.yml
 
-Tilbake til GitHub actions. Nå som rettigheter er satt kan vi fullføre pipline til å inkludere deploy.
+Tilbake til GitHub actions. Nå som rettigheter er satt kan vi fullføre pipeline til å inkludere deploy.
 >Merk. Når vi nå syr sammen alt må vi gjøre noen endringer i de filene vi allerede har skrevet.
-For å koble de ulike yaml modulene sammen må vi opprette en yaml fil som refererer til de ulike modulene. For at denne filen skal kunne trigge yaml scriptene i de andre modulene må disse yaml scriptene ha en trigger av type "workflow_call". Tidligere satte vi tillatelser til å skrive id-token og lese innholdt i vår **azure-login.yml** fil. Disse instillingtene må vi nå flytte til **Main.yml**. (Du kan fjern dem fra login fila, eller slette hele login fila siden vi ikke trenger den mer.)
+For å koble de ulike yaml modulene sammen må vi opprette en yaml fil som refererer til de ulike modulene. For at denne filen skal kunne trigge yaml scriptene i de andre modulene må disse yaml scriptene ha en trigger av type "workflow_call". Tidligere satte vi tillatelser til å skrive id-token og lese innholdt i vår **azure-login.yml** fil. Disse instillingene må vi nå flytte til **Main.yml**. (Du kan fjern dem fra login fila, eller slette hele login fila siden vi ikke trenger den mer.)
 
 ```yaml
 # This is the main orchestrator workflow that coordinates the entire CI/CD pipeline
@@ -565,11 +565,11 @@ jobs:
 
 ## Tester
 
-Siste steget vi skal gjøre er å få lagt til en task for å kjøre gjennom tester. testen som finnes i prosjektet skal feile og du kan rette på koden etter at pipelinen stopper opp på grunn av testen. Start med å opprette en ny fil
+Siste steget vi skal gjøre er å få lagt til en task for å kjøre gjennom tester. Testen som finnes i prosjektet skal feile og du kan rette på koden etter at pipelinen stopper opp på grunn av testen. Start med å opprette en ny fil.
 
-- under **.github/workflows** opprett en ny fil, kall den test.yml.
-- Åpne fila i din editor og legg til skript for kjøre tester.
-- Modifisert **Main.yml** fila som orkestrerer hele workflow'en til å ta høyde for den nye test modulen.
+- Under **.github/workflows** opprett en ny fil, kall den test.yml.
+- Åpne fila i din editor og legg til skript for å kjøre tester.
+- Modifiser **Main.yml** fila som orkestrerer hele workflow'en til å ta høyde for den nye test modulen.
 
 ### test.yml
 
@@ -628,7 +628,7 @@ Under jobs, legg til:
     needs: [build]
 ```
 
-For å redusere bygging i GitHub, fjern også trigger for alle brancher i **build.yml**. Bhold de andre triggere.
+For å redusere bygging i GitHub, fjern også trigger for alle brancher i **build.yml**. Behold de andre triggere.
 
 ```yaml
   push:
@@ -653,20 +653,20 @@ Endre testen til true, gjør en commit og PR og se at pipeline går gjennom igje
 
 ## Stages - Environments
 
-Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Actions sikrer kvalitetssikring, kontrollert distribusjon ved å bruke miljøspesifikke konfigurasjoner. Det hjelper til med kontroll med flyt av koden fra fase til fase når man ikke ønsker en kontinuerlig prodsetting. Vi skal her sette opp en arbeidsflyt med to miljøer, test og produksjon. Vi vi legge til en manuell avsjekk for å kunne publisere kode fra test til prod miljø.
+Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Actions sikrer kvalitetssikring, kontrollert distribusjon ved å bruke miljøspesifikke konfigurasjoner. Det hjelper til med kontroll med flyt av koden fra fase til fase når man ikke ønsker en kontinuerlig prodsetting. Vi skal her sette opp en arbeidsflyt med to miljøer, test og produksjon. Vi vil legge til en manuell avsjekk for å kunne publisere kode fra test til prod miljø.
 
-### GIthub repo
+### Github repo
 
 Åpne ditt (forke'd) repo:
 
 - Velg **Settings** fanen på toppen.
 - Klikk på **Environments** i venstre menyen.
 - Klikk på **New environment**.
-- Gi mljøet et navn som produksjon.
+- Gi miljøet et navn som produksjon.
 - Hak av for **Required reviewers**. Legg til deg selv. (Dette sikrer at deployment ikke blir gjennomført før det er godkjent. Vi har ikke lagt til dette på test miljøet siden vi vil at det skal publiseres til test i Azure uten godkjenning.)
 - Klikk **Save protection rules**.
 - Legg til en ny variabel. **Add environment variable**
-- SKriv inn navn: **AZURE_WEBAPP_NAME**
+- Skriv inn navn: **AZURE_WEBAPP_NAME**
 - Legg inn verdi: **app-azskolen-prod**. (Eller hva du har kalt din web app i prod.)
 
 <img src="review-config.png" width="800" height="300" />
@@ -676,8 +676,9 @@ Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Action
 - Åpne Azure Entra portalen.
 - Klikk på **Applications** i venstre meny.
 - Klikk på **App registrations**.
-- Åpne Github registration du la til. (**Github-Devop**)
-- Certificates & Secrets og velg **+ Add credential**.
+- Åpne Github registration du la til. (**Github-Devops**)
+- Klikk på **Manage > Certificates & secrets**.
+- Klikk på fane **Federated credentials** og velg **+ Add credential**.
 - Fra scenario velg som tidligere: **GitHub Actions deploying Azure resources**.
 - **Organization**: Din GitHub organisasjon
 - **Repository**: Ditt repo
@@ -687,11 +688,11 @@ Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Action
 
 Nå som vi har satt opp nytt produksjonsmijø og lagt til ny federated identity i Entra ID er det på tide å endre yaml skriptene våre.
 
-Først skal vi endre vårt deploy script slik at det virker med flere miljøer enn test. Hvilket miljø skriptet skal gjøre en deploy til avgjør vi ved å sende inn 'miljøet' som et prameter til deploy skriptet. For å få til å kalle et yaml skript fra et annet skript, må vi legge til en beskrivelse av hva input parameteret fram **Main.yml** er. Og legge til en ny trigger **workflow_call**. Denne gjør modulen i stand til å bli kalt fra en annen modul. Det skal vi gjøre fra main.yml.
+Først skal vi endre vårt deploy script slik at det virker med flere miljøer enn test. Hvilket miljø skriptet skal gjøre en deploy til avgjør vi ved å sende inn 'miljøet' som et parameter til deploy skriptet. For å få til å kalle et yaml skript fra et annet skript, må vi legge til en beskrivelse av hva input parameteret fram **Main.yml** er. Og legge til en ny trigger **workflow_call**. Denne gjør modulen i stand til å bli kalt fra en annen modul. Det skal vi gjøre fra main.yml.
 
 #### Endringer i Main.yml
 
-I **main.yml** fila må vi nå kalle build og deploy modulene våre to ganger med de ulike miljøene vi ønsker å gjøre en deply til i Azure. Først for test og så for produksjon:
+I **main.yml** fila må vi nå kalle build og deploy modulene våre to ganger med de ulike miljøene vi ønsker å gjøre en depoly til i Azure. Først for test og så for produksjon:
 
 ```yaml
 # Main orchestrator workflow for our CI/CD pipeline
@@ -756,7 +757,7 @@ jobs:
 
 #### Publish
 
-Dette skrittet er ofte en valgfrtt del. Vi kan gjøre en deploy til Azure rett fra bygg skrittet, men for helhetens del legger vil til et publiseringsskritt her.
+Dette skrittet er ofte en valgfritt del. Vi kan gjøre en deploy til Azure rett fra bygg skrittet, men for helhetens del legger vi til et publiseringsskritt her.
 
 ```yaml
 name: Publish
@@ -852,7 +853,7 @@ jobs:
 
 ### Godkjenning av deploy til produksjon
 
-Siden vi i produksjonsmiljøet til vår Github repo har satt et det miljøet krever en godkjenning før det blir aktivert, så vil deploy til produksjon vente til vi godkjenner det manuelt.
+Siden vi i produksjonsmiljøet til vår Github repo har satt at det miljøet krever en godkjenning før det blir aktivert, så vil deploy til produksjon vente til vi godkjenner det manuelt.
 
 I pipeline ser det slik ut når en godkjenning er påkrevd før prosessen fortsetter.
 
