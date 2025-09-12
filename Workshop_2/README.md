@@ -4,7 +4,7 @@ Denne workshop gir en innføring DevOps-teknikker i skyplattformen GitHub. (Vedl
 
 Forutsetninger for å gjennomføre workshop: ved bruk av **GitHub actions**.
 * Et Github abonnement
-* IDE. Visual studio 2022 eller Visual Studio Codee.
+* IDE. Visual studio 2022 eller Visual Studio Code.
 
 Disse emnene vil bli gjennomgått i denne modulen:
 * Introduksjon til DevOps
