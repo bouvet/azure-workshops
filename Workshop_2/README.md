@@ -10,7 +10,6 @@ Disse emnene vil bli gjennomgått i denne modulen:
 * Introduksjon til DevOps
 * GitHub DevOps - GitHub actions
 * Infrastructure as Code - ARM-templates
-* Monitorering og telemetri: Application Insights
 
 Forutsetninger for å gjennomføre workshop: ved bruk av **Azure Devops**.
 * Et Azure-abonnement. Her har du flere muligheter:
