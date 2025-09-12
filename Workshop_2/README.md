@@ -1,8 +1,18 @@
 # Workshop #2
 
-Denne workshop gir en innføring DevOps-teknikker i skyplattformen Azure fra Microsoft.
+Denne workshop gir en innføring DevOps-teknikker i skyplattformen GitHub. (Vedlagt ligger også en innføring for DevOps med Azure Devops. Denne blir IKKE gjennomgått i denne workshop
 
-Forutsetninger for å gjennomføre workshop:
+Forutsetninger for å gjennomføre workshop: ved bruk av **GitHub actions**.
+* Et Github abonnement
+* IDE. Visual studio 2022 eller Visual Studio Codee.
+
+Disse emnene vil bli gjennomgått i denne modulen:
+* Introduksjon til DevOps
+* GitHub DevOps - GitHub actions
+* Infrastructure as Code - ARM-templates
+* Monitorering og telemetri: Application Insights
+
+Forutsetninger for å gjennomføre workshop: ved bruk av **Azure Devops**.
 * Et Azure-abonnement. Her har du flere muligheter:
   * Har du MSDN-abonnement så får man aktiver den i abonnementsportalen: http://my.visualstudio.com
   * Hvis du ikke har MSDN, så kan du opprette trial abonnement og få $200 gratis credits med Dev Essentials her: http://my.visualstudio.com  
@@ -16,10 +26,3 @@ Forutsetninger for å gjennomføre workshop:
 * En git-klient for å sjekke ut kode i github.
   * Windows: https://git-scm.com/download/win
   * Mac: https://git-scm.com/download/mac
-
-Disse emnene vil bli gjennomgått i denne modulen:
-* Introduksjon til DevOps
-* Azure DevOps - Delivery Pipeline ()
-* Infrastructure as Code - ARM-templates
-* Monitorering og telemetri: Application Insights
-
