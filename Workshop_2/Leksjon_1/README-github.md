@@ -651,7 +651,7 @@ Gjør en commit og PR og se at pipeline stopper før deploy. (Det er feil i test
 
 Endre testen til true, gjør en commit og PR og se at pipeline går gjennom igjen.
 
-## Stages - Environments
+****## Stages - Environments
 
 Bruk av en arbeidsflyt med faser som test, staging og produksjon i GitHub Actions sikrer kvalitetssikring, kontrollert distribusjon ved å bruke miljøspesifikke konfigurasjoner. Det hjelper til med kontroll med flyt av koden fra fase til fase når man ikke ønsker en kontinuerlig prodsetting. Vi skal her sette opp en arbeidsflyt med to miljøer, test og produksjon. Vi vi legge til en manuell avsjekk for å kunne publisere kode fra test til prod miljø.
 

@@ -124,7 +124,6 @@ output blobContainerName string = storage.outputs.blobContainerName
 
 ### Infrastruktur moduler
 
-
 I main.bicep malen refererer vi til to moduler som vi ønsker å gjenbruke for test og produksjons miljøer. Vi starter med å opprette en ny folder under bicep folderen for å samle modulene der. (Vi har bare to, men det å bruke foldere blir fort nyttig i større prosjekt.)
 
 - I bicep folderen lager du en ny folder som du kaller for **modules**.
@@ -496,21 +495,18 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 
 ```
 
-> Jobber her
->
-
-# Del to. Organsiere Github pipeline i to flyter
+## Del to. Organsiere Github pipeline i to flyter
 
 Så langt har vi skrevet all yaml og bicept mer eller mindre rett fram uten å tenke så mye på organisering og struktur. Det har vært bra for å få en følelse av hvordan skrive yamle og bicep maler. Nå skal vi strukturere IaC prosjektet vårt for å gjøre det mer oversiktelig, øke gjenbruk og sikkerhet ved å skille mellom applikasjonskode og infrastruktur.
 
-Vi skal nå opprette infrastructur for å kjøre web app vi publiserte i leksjon 1. I den leksjonen opprettet vi infrastrukturen manuelt i protalen. Nå skal vi gjøre det med bicept template og yaml skript i en Github Action pipeline.
+Vi skal nå opprette infrastructur for å kjøre web app vi publiserte i leksjon 1. I den leksjonen opprettet vi infrastrukturen manuelt i portalen. Nå skal vi gjøre det med bicept template og yaml skript i en Github Action pipeline.
 
-## Rydde opp i Azure
+### Rydde opp i Azure
 
 - Gjenbruk ressursgruppe fra leksjon 1. (For å gjøre det litt enklere for oss selv i denne leksjonen oppretter vi ikke ressursgruppen med bicep.)
 - Slett web app og Appservice du opprettet i leksjon 1.
 
-## Omorganisere IaC prosjektet vårt
+### Omorganisere IaC prosjektet vårt
 
 Vi skal nå opprette to workflows, en for å bygge og distribuere applikasjonskode og en for å opprette infrastruktur i Azure. Ved å dele i to arbidsflyter kan vi både begrense hvor ofte infrastruktur malene blir publisert ved å legge på filter og konfigurere ulik sikkerhet for distribusjon av kode og opprettelse av infrastruktur.
 
@@ -522,8 +518,6 @@ Vi skal nå opprette to workflows, en for å bygge og distribuere applikasjonsko
 - I applikasjonfila kopierer du inn all yaml vi tidligere har skrevet som omhandler pålogging i Azure, bygg, test og distribusjon av applikasjonkode.
 - Gjør tilsvarende for infrastuktur. I tellegg må vi opprette ny bicep maler for å kunne opprette infrastrastruktur for å kunne kjøre applikasjonen fra leksjon 1.
  
-> Jobber her
->
 La oss starte med main.bicep fil. Denne fila er den overordnede bicep malen og kaller andre moduler med parametre for test og produksjon for å gjenbruke moduler. Den bruker **modules/webapp.bicep** og **modules/storage.bicep**
 
 ```json
@@ -684,10 +678,9 @@ output storageAccountKey string = storageAccount.listKeys().keys[0].value
 output blobContainerName string = containerName
 ```
 
-
-
 > Jobber her
-## Klargjør parameter-filer for test-miljøet og prod
+
+### Klargjør parameter-filer for test-miljøet og prod
 
 Parameter-filen i ARM-templates (kalt *azuredeploy.{environment}.parameters.json* i dette prosjektet), gjør det mulig å spinne opp et sett med Azure ressurser med ulik konfigurasjon til forskjellige miljøer. For hvert miljø kan du legge inn parameters, eksempel hvis du vil oppskalere produksjonsmiljøet i forhold til test. Det er også vanlig å definere navn på ressurser her.
 ​
