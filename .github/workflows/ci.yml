@@ -1,10 +1,10 @@
-name: CI
+
+name: Build and Deploy .NET Web App
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches: 
-      - master
+  push:
+    branches:
+      - '**'
   workflow_dispatch:
 
 jobs:
@@ -12,20 +12,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run a simple script
-        run: |
-          echo "Running a simple script"
-          echo "Current date and time: $(date)"
-          echo "List of files in the repository:"
-          ls -la
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+      - name: Install npm packages
+        working-directory: ./AzureWorkshopApp
+        run: npm install
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ./AzureWorkshopApp/AzureWorkshopApp.csproj --configuration Release --output ./publish --no-build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-app
+          path: ./publish
