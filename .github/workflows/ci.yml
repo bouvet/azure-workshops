@@ -33,7 +33,7 @@ jobs:
         run: dotnet restore ./Workshop_2/Start/AzureWorkshop/AzureWorkshopApp/AzureWorkshopApp.csproj
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build ./Workshop_2/Start/AzureWorkshop/AzureWorkshopApp/AzureWorkshopApp.csproj --configuration Release --no-restore
 
       - name: Publish
         run: dotnet publish ./Workshop_2/Start/AzureWorkshop/AzureWorkshopApp/AzureWorkshopApp.csproj --configuration Release --output ./publish --no-build
