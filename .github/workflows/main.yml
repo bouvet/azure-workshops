@@ -1,5 +1,8 @@
 name: This is a script
 on:
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
     
 jobs:
