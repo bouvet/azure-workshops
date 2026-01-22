@@ -1,0 +1,14 @@
+name: This is a script
+on:
+  workflow_dispatch:
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Run something
+        run: | 
+          echo "Running a simple script"
+          echo "Current date and time: $(date)"
+          ls -la
