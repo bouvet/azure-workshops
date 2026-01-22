@@ -1,0 +1,45 @@
+
+name: Build and Deploy .NET Web App
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install npm packages
+        working-directory: ./Workshop_2/Start/AzureWorkshop
+        run: npm install
+
+      - name: Restore dependencies
+        run: dotnet restore ./Workshop_2/Start/AzureWorkshop/AzureWorkshopApp/AzureWorkshopApp.csproj
+
+      - name: Build
+        run: dotnet build ./Workshop_2/Start/AzureWorkshop/AzureWorkshopApp/AzureWorkshopApp.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ./Workshop_2/Start/AzureWorkshop/AzureWorkshopApp/AzureWorkshopApp.csproj --configuration Release --output ./publish --no-build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-app
+          path: ./publish
