@@ -26,17 +26,17 @@ jobs:
           node-version: '18'
 
       - name: Install npm packages
-        working-directory: ./AzureWorkshopApp
+        working-directory: ./Workshop_2/Start/AzureWorkshop
         run: npm install
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore ./Workshop_2/Start/AzureWorkshop/AzureWorkshopApp/AzureWorkshopApp.csproj
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish ./AzureWorkshopApp/AzureWorkshopApp.csproj --configuration Release --output ./publish --no-build
+        run: dotnet publish ./Workshop_2/Start/AzureWorkshop/AzureWorkshopApp/AzureWorkshopApp.csproj --configuration Release --output ./publish --no-build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
